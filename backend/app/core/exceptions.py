@@ -106,6 +106,34 @@ class ExternalOpenAILimitError(AppException):
         )
 
 
+# File Upload Errors
+class FileTooLargeError(AppException):
+    def __init__(self, max_size_mb: int = 50):
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            code="FILE_TOO_LARGE",
+            message=f"파일 크기는 {max_size_mb}MB 이하여야 합니다.",
+        )
+
+
+class InvalidFileTypeError(AppException):
+    def __init__(self, allowed_types: str = "PDF"):
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            code="VALIDATION_FORMAT",
+            message=f"{allowed_types} 파일만 업로드 가능합니다.",
+        )
+
+
+class RateLimitError(AppException):
+    def __init__(self, message: str = "요청 한도를 초과했습니다. 잠시 후 다시 시도해주세요."):
+        super().__init__(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            code="RATE_LIMIT_EXCEEDED",
+            message=message,
+        )
+
+
 # Server Errors
 class ServerInternalError(AppException):
     def __init__(self, message: str = "서버 내부 오류가 발생했습니다."):

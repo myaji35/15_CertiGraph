@@ -12,23 +12,26 @@ class Settings(BaseSettings):
     supabase_url: str
     supabase_service_key: str
 
-    # OpenAI
-    openai_api_key: str
+    # Anthropic Claude (optional for MVP)
+    anthropic_api_key: str = ""
 
-    # Upstage
-    upstage_api_key: str
+    # OpenAI (for embeddings, optional for MVP)
+    openai_api_key: str = ""
 
-    # Pinecone
-    pinecone_api_key: str
+    # Upstage (optional for MVP)
+    upstage_api_key: str = ""
+
+    # Pinecone (optional for MVP)
+    pinecone_api_key: str = ""
     pinecone_index_name: str = "certigraph-questions"
 
-    # Neo4j
-    neo4j_uri: str
+    # Neo4j (optional for MVP - not used)
+    neo4j_uri: str = ""
     neo4j_user: str = "neo4j"
-    neo4j_password: str
+    neo4j_password: str = ""
 
     # Server
-    cors_origins: str = "http://localhost:3000"
+    cors_origins: str = "http://localhost:3000,http://localhost:3015"
 
     @property
     def cors_origins_list(self) -> list[str]:
