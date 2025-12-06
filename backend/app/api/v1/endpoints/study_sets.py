@@ -13,6 +13,7 @@ from app.core.exceptions import (
 )
 from app.models.study_set import (
     StudySetStatus,
+    LearningStatus,
     StudySetResponse,
     StudySetStatusResponse,
     StudySetListResponse,
@@ -90,12 +91,21 @@ async def upload_study_set(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     name: str = Form(...),
+    exam_name: str = Form(None),
+    exam_year: int = Form(None),
+    exam_round: int = Form(None),
+    exam_session: int = Form(None),
+    exam_session_name: str = Form(None),
+    tags: str = Form(None),  # JSON array as string
 ) -> dict[str, Any]:
     """
     Upload a PDF file to create a new study set.
 
     If a duplicate PDF is detected (same hash), we reuse cached results
     while showing fake processing progress to the user.
+
+    Exam metadata (exam_name, exam_year, etc.) helps organize study sets
+    hierarchically by certification exam, year, round, and session.
     """
     # Validate file type
     if file.content_type not in ALLOWED_CONTENT_TYPES:
@@ -123,6 +133,15 @@ async def upload_study_set(
     file_obj = BytesIO(content)
     pdf_path = await storage.upload_pdf(file_obj, current_user.clerk_id)
 
+    # Parse tags if provided
+    import json
+    tags_list = None
+    if tags:
+        try:
+            tags_list = json.loads(tags)
+        except json.JSONDecodeError:
+            pass
+
     # Create study set record
     # TODO: Get internal user_id from users table using clerk_id
     # For now, using clerk_id directly
@@ -133,6 +152,12 @@ async def upload_study_set(
         pdf_hash=pdf_hash,
         status=StudySetStatus.UPLOADING,
         source_study_set_id=source_study_set_id,
+        exam_name=exam_name,
+        exam_year=exam_year,
+        exam_round=exam_round,
+        exam_session=exam_session,
+        exam_session_name=exam_session_name,
+        tags=tags_list,
     )
 
     # Queue background processing
@@ -225,6 +250,13 @@ async def list_study_sets(
     offset: int = 0,
 ) -> dict[str, Any]:
     """List all study sets for the current user."""
+    # TODO: Remove this temporary fix once Supabase is configured
+    # Return empty list if Supabase is not configured
+    from app.core import get_settings
+    settings = get_settings()
+    if settings.supabase_url.startswith("https://your-project"):
+        return {"data": [], "total": 0}
+
     repo = StudySetRepository()
     study_sets = await repo.get_by_user(
         current_user.clerk_id,
@@ -243,11 +275,55 @@ async def list_study_sets(
             "question_count": question_count,
             "created_at": ss["created_at"],
             "is_cached": ss.get("source_study_set_id") is not None,
+            "exam_name": ss.get("exam_name"),
+            "exam_year": ss.get("exam_year"),
+            "exam_round": ss.get("exam_round"),
+            "exam_session": ss.get("exam_session"),
+            "exam_session_name": ss.get("exam_session_name"),
+            "tags": ss.get("tags"),
+            "learning_status": ss.get("learning_status", "not_learned"),
+            "last_studied_at": ss.get("last_studied_at"),
         })
 
     return {
         "data": result,
         "total": len(result),
+    }
+
+
+@router.patch("/{study_set_id}/learning-status")
+async def update_learning_status(
+    study_set_id: str,
+    current_user: CurrentUser,
+    learning_status: LearningStatus,
+) -> dict[str, Any]:
+    """
+    Update the learning status of a study set.
+
+    Status options:
+    - not_learned: 미학습 (default)
+    - learned: 학습됨
+    - reset: 초기화
+    """
+    repo = StudySetRepository()
+    study_set = await repo.get_by_id(study_set_id)
+
+    if not study_set:
+        raise ResourceNotFoundError("학습 세트", study_set_id)
+
+    # Verify ownership
+    if study_set["user_id"] != current_user.clerk_id:
+        raise ResourceNotFoundError("학습 세트", study_set_id)
+
+    # Update learning status
+    updated = await repo.update_learning_status(study_set_id, learning_status.value)
+
+    return {
+        "data": {
+            "id": updated["id"],
+            "learning_status": updated["learning_status"],
+            "last_studied_at": updated.get("last_studied_at"),
+        }
     }
 
 

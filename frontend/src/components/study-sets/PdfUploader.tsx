@@ -3,8 +3,17 @@
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 
+interface ExamMetadata {
+  examName?: string;
+  examYear?: number;
+  examRound?: number;
+  examSession?: number;
+  examSessionName?: string;
+  tags?: string[];
+}
+
 interface PdfUploaderProps {
-  onUpload: (file: File, name: string) => Promise<void>;
+  onUpload: (file: File, name: string, metadata?: ExamMetadata) => Promise<void>;
   isUploading?: boolean;
   uploadProgress?: number;
 }
@@ -19,6 +28,14 @@ export default function PdfUploader({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [studySetName, setStudySetName] = useState("");
   const [error, setError] = useState<string | null>(null);
+
+  // Exam metadata fields
+  const [examName, setExamName] = useState("");
+  const [examYear, setExamYear] = useState<number | "">(new Date().getFullYear());
+  const [examRound, setExamRound] = useState<number | "">(1);
+  const [examSession, setExamSession] = useState<number | "">(1);
+  const [examSessionName, setExamSessionName] = useState("");
+  const [showMetadata, setShowMetadata] = useState(false);
 
   const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: any[]) => {
     setError(null);
@@ -58,7 +75,15 @@ export default function PdfUploader({
     if (!selectedFile || !studySetName.trim()) return;
 
     try {
-      await onUpload(selectedFile, studySetName.trim());
+      const metadata: ExamMetadata = {
+        examName: examName.trim() || undefined,
+        examYear: examYear || undefined,
+        examRound: examRound || undefined,
+        examSession: examSession || undefined,
+        examSessionName: examSessionName.trim() || undefined,
+      };
+
+      await onUpload(selectedFile, studySetName.trim(), metadata);
     } catch (err) {
       setError(err instanceof Error ? err.message : "업로드 중 오류가 발생했습니다");
     }
@@ -92,6 +117,119 @@ export default function PdfUploader({
           disabled={isUploading}
         />
       </div>
+
+      {/* Toggle for Exam Metadata */}
+      <div>
+        <button
+          type="button"
+          onClick={() => setShowMetadata(!showMetadata)}
+          className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+          disabled={isUploading}
+        >
+          <svg
+            className={`w-4 h-4 transition-transform ${showMetadata ? "rotate-90" : ""}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+          시험 정보 입력 (선택사항)
+        </button>
+      </div>
+
+      {/* Exam Metadata Fields */}
+      {showMetadata && (
+        <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <div className="grid grid-cols-2 gap-4">
+            {/* Exam Name */}
+            <div className="col-span-2">
+              <label htmlFor="examName" className="block text-sm font-medium text-gray-700 mb-1">
+                자격증 시험명
+              </label>
+              <input
+                type="text"
+                id="examName"
+                value={examName}
+                onChange={(e) => setExamName(e.target.value)}
+                placeholder="예: 사회복지사 1급"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
+                disabled={isUploading}
+              />
+            </div>
+
+            {/* Exam Year */}
+            <div>
+              <label htmlFor="examYear" className="block text-sm font-medium text-gray-700 mb-1">
+                시험 년도
+              </label>
+              <input
+                type="number"
+                id="examYear"
+                value={examYear}
+                onChange={(e) => setExamYear(e.target.value ? parseInt(e.target.value) : "")}
+                placeholder="2024"
+                min="2000"
+                max="2100"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
+                disabled={isUploading}
+              />
+            </div>
+
+            {/* Exam Round */}
+            <div>
+              <label htmlFor="examRound" className="block text-sm font-medium text-gray-700 mb-1">
+                n차 시험
+              </label>
+              <input
+                type="number"
+                id="examRound"
+                value={examRound}
+                onChange={(e) => setExamRound(e.target.value ? parseInt(e.target.value) : "")}
+                placeholder="1"
+                min="1"
+                max="10"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
+                disabled={isUploading}
+              />
+            </div>
+
+            {/* Exam Session */}
+            <div>
+              <label htmlFor="examSession" className="block text-sm font-medium text-gray-700 mb-1">
+                교시
+              </label>
+              <input
+                type="number"
+                id="examSession"
+                value={examSession}
+                onChange={(e) => setExamSession(e.target.value ? parseInt(e.target.value) : "")}
+                placeholder="1"
+                min="1"
+                max="10"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
+                disabled={isUploading}
+              />
+            </div>
+
+            {/* Exam Session Name */}
+            <div>
+              <label htmlFor="examSessionName" className="block text-sm font-medium text-gray-700 mb-1">
+                교시 명칭
+              </label>
+              <input
+                type="text"
+                id="examSessionName"
+                value={examSessionName}
+                onChange={(e) => setExamSessionName(e.target.value)}
+                placeholder="예: 1교시 - 사회복지기초"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
+                disabled={isUploading}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Dropzone */}
       <div

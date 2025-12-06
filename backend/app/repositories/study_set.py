@@ -30,6 +30,12 @@ class StudySetRepository:
         pdf_hash: str,
         status: StudySetStatus = StudySetStatus.UPLOADING,
         source_study_set_id: Optional[str] = None,
+        exam_name: Optional[str] = None,
+        exam_year: Optional[int] = None,
+        exam_round: Optional[int] = None,
+        exam_session: Optional[int] = None,
+        exam_session_name: Optional[str] = None,
+        tags: Optional[list[str]] = None,
     ) -> dict[str, Any]:
         """
         Create a new study set record.
@@ -41,6 +47,12 @@ class StudySetRepository:
             pdf_hash: SHA-256 hash of PDF content
             status: Initial processing status
             source_study_set_id: If cached, reference to the original study set
+            exam_name: Certification exam name
+            exam_year: Exam year
+            exam_round: Exam round (1st, 2nd, etc.)
+            exam_session: Exam session (1교시, 2교시, etc.)
+            exam_session_name: Session name description
+            tags: Tags for organization
 
         Returns:
             Created study set record
@@ -56,6 +68,12 @@ class StudySetRepository:
             "pdf_hash": pdf_hash,
             "status": status.value,
             "source_study_set_id": source_study_set_id,
+            "exam_name": exam_name,
+            "exam_year": exam_year,
+            "exam_round": exam_round,
+            "exam_session": exam_session,
+            "exam_session_name": exam_session_name,
+            "tags": tags,
             "created_at": now,
             "updated_at": now,
         }
@@ -254,3 +272,42 @@ class StudySetRepository:
             )
             response.raise_for_status()
             return True
+
+    async def update_learning_status(
+        self,
+        study_set_id: str,
+        learning_status: str,
+    ) -> dict[str, Any]:
+        """
+        Update the learning status of a study set.
+
+        Args:
+            study_set_id: ID of the study set
+            learning_status: New learning status (not_learned, learned, reset)
+
+        Returns:
+            Updated study set record
+        """
+        from datetime import datetime
+
+        data = {
+            "learning_status": learning_status,
+            "updated_at": datetime.utcnow().isoformat(),
+        }
+
+        # Update last_studied_at only when marking as learned
+        if learning_status == "learned":
+            data["last_studied_at"] = datetime.utcnow().isoformat()
+        # Clear last_studied_at when reset
+        elif learning_status == "reset":
+            data["last_studied_at"] = None
+
+        async with httpx.AsyncClient() as client:
+            response = await client.patch(
+                f"{self.base_url}/study_sets",
+                headers=self.headers,
+                params={"id": f"eq.{study_set_id}"},
+                json=data,
+            )
+            response.raise_for_status()
+            return response.json()[0]

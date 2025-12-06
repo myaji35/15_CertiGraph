@@ -11,7 +11,18 @@ export default function NewStudySetPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  const handleUpload = async (file: File, name: string) => {
+  const handleUpload = async (
+    file: File,
+    name: string,
+    metadata?: {
+      examName?: string;
+      examYear?: number;
+      examRound?: number;
+      examSession?: number;
+      examSessionName?: string;
+      tags?: string[];
+    }
+  ) => {
     setIsUploading(true);
     setUploadProgress(0);
 
@@ -24,6 +35,16 @@ export default function NewStudySetPage() {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("name", name);
+
+      // Add exam metadata if provided
+      if (metadata?.examName) formData.append("exam_name", metadata.examName);
+      if (metadata?.examYear) formData.append("exam_year", metadata.examYear.toString());
+      if (metadata?.examRound) formData.append("exam_round", metadata.examRound.toString());
+      if (metadata?.examSession) formData.append("exam_session", metadata.examSession.toString());
+      if (metadata?.examSessionName) formData.append("exam_session_name", metadata.examSessionName);
+      if (metadata?.tags && metadata.tags.length > 0) {
+        formData.append("tags", JSON.stringify(metadata.tags));
+      }
 
       // Create XMLHttpRequest for progress tracking
       const xhr = new XMLHttpRequest();
