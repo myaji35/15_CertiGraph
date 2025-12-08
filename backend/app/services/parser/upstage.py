@@ -108,12 +108,19 @@ class UpstageDocumentParser:
                     "document": (filename, file_content, "application/pdf"),
                 },
                 data={
-                    "ocr": "auto",  # Enable OCR for scanned documents
-                    "output_formats": "text",  # We mainly need text
+                    "ocr": "force",  # Force OCR for all pages (even text-based PDFs)
+                    "output_formats": "text,markdown",  # Get both text and markdown formats
                 },
             )
             response.raise_for_status()
-            return response.json()
+            result = response.json()
+
+            # Debug: Log the API response
+            import json
+            print(f"📥 Upstage API Response: {json.dumps(result, ensure_ascii=False)[:2000]}")
+            logger.info(f"📥 Upstage API Response: {json.dumps(result, ensure_ascii=False)[:1000]}")
+
+            return result
 
     def _process_response(self, response: dict[str, Any]) -> ParseResult:
         """Process Upstage API response into structured result."""
@@ -147,6 +154,15 @@ class UpstageDocumentParser:
         Returns:
             Full text with basic structure preserved
         """
+        # First, check if we have markdown or text content directly from API response
+        if result.raw_response and 'content' in result.raw_response:
+            content = result.raw_response['content']
+            if 'markdown' in content and content['markdown']:
+                return content['markdown']
+            elif 'text' in content and content['text']:
+                return content['text']
+
+        # Fallback to processing elements if no direct content
         text_parts = []
         current_page = 0
 

@@ -20,6 +20,7 @@ class TestSessionService:
         study_set_id: str,
         mode: TestMode,
         question_count: int | None = None,
+        shuffle_options: bool = False,
     ) -> dict[str, Any]:
         """
         Start a new test session.
@@ -65,16 +66,24 @@ class TestSessionService:
         )
 
         # Format questions for response
-        formatted_questions = [
-            QuestionForTest(
-                id=q["id"],
-                question_number=q["question_number"],
-                question_text=q["question_text"],
-                options=q["options"],
-                passage=q.get("passage"),
+        import random
+        formatted_questions = []
+        for q in questions:
+            options = q["options"]
+            # Shuffle options if requested
+            if shuffle_options and options:
+                options = list(options)  # Make a copy
+                random.shuffle(options)
+
+            formatted_questions.append(
+                QuestionForTest(
+                    id=q["id"],
+                    question_number=q["question_number"],
+                    question_text=q["question_text"],
+                    options=options,
+                    passage=q.get("passage"),
+                )
             )
-            for q in questions
-        ]
 
         return {
             "session_id": session["id"],
@@ -98,9 +107,10 @@ class TestSessionService:
             user_id, study_set_id, limit
         )
 
-        # Get study set names
-        from app.repositories.study_set import StudySetRepository
-        study_set_repo = StudySetRepository()
+        # Get study set names using factory pattern
+        from app.api.v1.deps import get_study_set_repository
+        from app.core import get_settings
+        study_set_repo = get_study_set_repository(get_settings())
 
         study_set_ids = list(set(s["study_set_id"] for s in sessions))
         study_sets = {}

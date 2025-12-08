@@ -62,21 +62,34 @@ export default function NewStudySetPage() {
             const response = JSON.parse(xhr.responseText);
             resolve(response.data);
           } else {
-            const error = JSON.parse(xhr.responseText);
-            reject(new Error(error.error?.message || "업로드 실패"));
+            try {
+              const error = JSON.parse(xhr.responseText);
+              // Backend sends: { detail: { error: { code, message, details } } }
+              const errorData = error.detail?.error || error.error || error;
+
+              // 중복 파일 에러 처리
+              if (xhr.status === 409 && errorData?.code === "DUPLICATE_FILE") {
+                const existingName = errorData?.details?.existing_study_set_name || "이전 학습 세트";
+                reject(new Error(`⚠️ 이미 업로드된 파일입니다!\n\n기존 학습 세트: "${existingName}"\n\n다른 파일을 선택해주세요.`));
+              } else {
+                reject(new Error(errorData?.message || "업로드 실패"));
+              }
+            } catch {
+              reject(new Error("업로드 실패"));
+            }
           }
         };
 
         xhr.onerror = () => reject(new Error("네트워크 오류"));
 
-        xhr.open("POST", `${process.env.NEXT_PUBLIC_API_URL}/api/v1/study-sets/upload`);
+        xhr.open("POST", `${process.env.NEXT_PUBLIC_API_URL}/study-sets/upload`);
         xhr.setRequestHeader("Authorization", `Bearer ${token}`);
         xhr.send(formData);
       });
 
       const result = await uploadPromise;
 
-      // Redirect to the study set detail page
+      // Redirect to the study set detail page to start test
       router.push(`/dashboard/study-sets/${result.id}`);
     } catch (error) {
       setIsUploading(false);

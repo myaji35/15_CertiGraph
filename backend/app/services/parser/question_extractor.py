@@ -1,4 +1,4 @@
-"""AI-powered question extraction using Claude.
+"""AI-powered question extraction using Google Gemini.
 
 Extracts structured questions from parsed PDF text,
 including question text, options, correct answers, and explanations.
@@ -6,17 +6,15 @@ including question text, options, correct answers, and explanations.
 
 import json
 import asyncio
-import httpx
 from typing import Any
 from dataclasses import dataclass, asdict
 import logging
+import google.generativeai as genai
 
 from app.core.config import get_settings
 from app.core.exceptions import ServerInternalError
 
 logger = logging.getLogger(__name__)
-
-ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages"
 
 
 @dataclass
@@ -40,9 +38,15 @@ class ExtractedQuestion:
 
 EXTRACTION_PROMPT = """당신은 사회복지사 1급 시험 기출문제 PDF에서 문제를 추출하는 전문가입니다.
 
+시험 문제의 특성:
+- 일부 문제는 **지문(passage)**이 먼저 제시되고, 그 지문에 대한 여러 문제가 이어집니다
+- 지문은 "다음 글을 읽고", "다음을 보고" 등으로 시작합니다
+- 지문 관련 문제의 question_text에는 **지문 내용을 포함하지 마세요**. 순수한 질문만 추출하세요
+- 독립 문제(지문 없이 바로 질문으로 시작)도 있습니다
+
 주어진 텍스트에서 다음 정보를 추출해주세요:
 1. 문제 번호
-2. 문제 내용 (질문)
+2. 문제 내용 (질문) - **지문 제외, 질문만**
 3. 보기 (1~5번)
 4. 정답 번호
 5. 해설 (있는 경우)
@@ -56,7 +60,7 @@ EXTRACTION_PROMPT = """당신은 사회복지사 1급 시험 기출문제 PDF에
   "questions": [
     {
       "question_number": 1,
-      "question_text": "문제 내용",
+      "question_text": "문제 내용 (순수한 질문만, 지문 제외)",
       "options": [
         {"number": 1, "text": "보기 1"},
         {"number": 2, "text": "보기 2"},
@@ -74,6 +78,7 @@ EXTRACTION_PROMPT = """당신은 사회복지사 1급 시험 기출문제 PDF에
 ```
 
 중요 지침:
+- **지문과 문제를 구분**하세요. 지문은 question_text에 포함하지 마세요
 - 문제와 보기를 정확히 구분하세요
 - 보기 번호(①②③④⑤ 또는 1.2.3.4.5)를 1~5 숫자로 변환하세요
 - 정답이 명시되어 있지 않으면 correct_answer를 0으로 설정하세요
@@ -85,14 +90,21 @@ EXTRACTION_PROMPT = """당신은 사회복지사 1급 시험 기출문제 PDF에
 
 
 class QuestionExtractor:
-    """Service for extracting questions from parsed document text using Claude."""
+    """Service for extracting questions from parsed document text using Google Gemini."""
 
     MAX_RETRIES = 3
-    CHUNK_SIZE = 15000  # Characters per chunk to stay within token limits
+    CHUNK_SIZE = 5000  # Reduced to avoid Gemini safety filter issues
 
     def __init__(self):
         self.settings = get_settings()
-        self.api_key = self.settings.anthropic_api_key
+        self.api_key = self.settings.google_api_key
+
+        # Configure Gemini API
+        genai.configure(api_key=self.api_key)
+
+        # Use Gemini 2.5 Flash for fast, cost-effective processing
+        # Supports up to 1M tokens, stable release
+        self.model = genai.GenerativeModel('gemini-2.5-flash')
 
     async def extract_questions(
         self,
@@ -109,17 +121,28 @@ class QuestionExtractor:
         Returns:
             List of extracted questions
         """
+        # Log the input text for debugging
+        logger.info(f"📄 Input text length: {len(text)} characters")
+        logger.info(f"📄 First 500 chars: {text[:500]}")
+        logger.info(f"📄 Last 500 chars: {text[-500:]}")
+
         # Split text into chunks if too long
         chunks = self._split_into_chunks(text)
+        logger.info(f"📦 Split into {len(chunks)} chunks")
+
         all_questions = []
 
         for i, chunk in enumerate(chunks):
+            logger.info(f"📦 Chunk {i+1}/{len(chunks)}: {len(chunk)} characters")
+            logger.info(f"📦 Chunk {i+1} preview (first 300 chars): {chunk[:300]}")
+
             if on_progress:
                 progress = int((i / len(chunks)) * 100)
                 await on_progress(progress, f"문제 추출 중... ({i+1}/{len(chunks)})")
 
             try:
                 questions = await self._extract_from_chunk(chunk)
+                logger.info(f"✅ Extracted {len(questions)} questions from chunk {i+1}")
                 all_questions.extend(questions)
             except Exception as e:
                 logger.error(f"Failed to extract from chunk {i}: {e}")
@@ -132,104 +155,151 @@ class QuestionExtractor:
         return unique_questions
 
     def _split_into_chunks(self, text: str) -> list[str]:
-        """Split text into processable chunks."""
+        """
+        Split text into processable chunks while preserving passage-question relationships.
+
+        Strategy:
+        1. Identify page boundaries (페이지 markers)
+        2. Keep passages and their questions together
+        3. Split at page boundaries when possible
+        """
         if len(text) <= self.CHUNK_SIZE:
             return [text]
 
         chunks = []
-        # Try to split at page boundaries or paragraph breaks
-        paragraphs = text.split("\n\n")
+        # Split by page markers first to maintain page structure
+        pages = text.split("--- 페이지")
+
         current_chunk = ""
 
-        for para in paragraphs:
-            if len(current_chunk) + len(para) > self.CHUNK_SIZE:
-                if current_chunk:
-                    chunks.append(current_chunk)
-                current_chunk = para
-            else:
-                current_chunk += "\n\n" + para if current_chunk else para
+        for page_text in pages:
+            page_text = page_text.strip()
+            if not page_text:
+                continue
 
+            # If adding this page would exceed chunk size
+            if current_chunk and len(current_chunk) + len(page_text) > self.CHUNK_SIZE:
+                # Save current chunk and start new one
+                chunks.append(current_chunk)
+                current_chunk = page_text
+            else:
+                # Add to current chunk
+                if current_chunk:
+                    current_chunk += "\n--- 페이지" + page_text
+                else:
+                    current_chunk = page_text
+
+        # Add remaining chunk
         if current_chunk:
             chunks.append(current_chunk)
 
-        return chunks
+        return chunks if chunks else [text]
 
     async def _extract_from_chunk(self, chunk: str) -> list[ExtractedQuestion]:
-        """Extract questions from a single text chunk using Claude."""
+        """Extract questions from a single text chunk using Google Gemini."""
         last_error = None
 
         for attempt in range(self.MAX_RETRIES):
             try:
-                response = await self._call_claude(chunk)
+                response = await self._call_gemini(chunk)
                 return self._parse_response(response)
-
-            except httpx.HTTPStatusError as e:
-                last_error = e
-                logger.warning(f"Claude API error (attempt {attempt + 1}): {e}")
-                if e.response.status_code == 429:
-                    await asyncio.sleep(5 * (attempt + 1))
-                elif e.response.status_code >= 500:
-                    await asyncio.sleep(2 * (attempt + 1))
-                else:
-                    raise
-
-            except json.JSONDecodeError as e:
-                last_error = e
-                logger.warning(f"JSON parse error (attempt {attempt + 1}): {e}")
-                await asyncio.sleep(1)
 
             except Exception as e:
                 last_error = e
-                logger.warning(f"Extraction error (attempt {attempt + 1}): {e}")
-                await asyncio.sleep(2)
+                logger.warning(f"Gemini API error (attempt {attempt + 1}): {e}")
+                await asyncio.sleep(2 * (attempt + 1))
 
         logger.error(f"Failed to extract questions after {self.MAX_RETRIES} attempts: {last_error}")
         return []
 
-    async def _call_claude(self, text: str) -> dict[str, Any]:
-        """Make API call to Claude."""
-        async with httpx.AsyncClient(timeout=120.0) as client:
-            response = await client.post(
-                ANTHROPIC_API_URL,
-                headers={
-                    "x-api-key": self.api_key,
-                    "anthropic-version": "2023-06-01",
-                    "content-type": "application/json",
-                },
-                json={
-                    "model": "claude-sonnet-4-20250514",
-                    "max_tokens": 4096,
-                    "messages": [
+    async def _call_gemini(self, text: str) -> str:
+        """Make API call to Google Gemini."""
+        prompt = EXTRACTION_PROMPT + text
+
+        logger.info(f"📤 Sending Gemini API request with model: {self.model._model_name}")
+        logger.debug(f"📤 Prompt length: {len(prompt)} characters")
+
+        try:
+            # Gemini SDK is synchronous, so we run it in a thread pool
+            loop = asyncio.get_event_loop()
+            response = await loop.run_in_executor(
+                None,
+                lambda: self.model.generate_content(
+                    prompt,
+                    generation_config=genai.types.GenerationConfig(
+                        temperature=0.1,
+                        max_output_tokens=4096,
+                    ),
+                    # Disable ALL safety filters for educational content
+                    safety_settings=[
                         {
-                            "role": "user",
-                            "content": EXTRACTION_PROMPT + text,
+                            "category": "HARM_CATEGORY_HARASSMENT",
+                            "threshold": "BLOCK_NONE"
+                        },
+                        {
+                            "category": "HARM_CATEGORY_HATE_SPEECH",
+                            "threshold": "BLOCK_NONE"
+                        },
+                        {
+                            "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                            "threshold": "BLOCK_NONE"
+                        },
+                        {
+                            "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                            "threshold": "BLOCK_NONE"
                         }
-                    ],
-                },
+                    ]
+                )
             )
-            response.raise_for_status()
-            return response.json()
 
-    def _parse_response(self, response: dict[str, Any]) -> list[ExtractedQuestion]:
-        """Parse Claude response into ExtractedQuestion objects."""
-        content = response.get("content", [])
-        if not content:
-            return []
+            # Check if response was blocked
+            if hasattr(response, 'candidates') and response.candidates:
+                candidate = response.candidates[0]
+                if hasattr(candidate, 'finish_reason'):
+                    if candidate.finish_reason == 2:  # SAFETY
+                        logger.warning("⚠️ Gemini response blocked by safety filter - using fallback")
+                        # Try to get partial content or use a simpler approach
+                        if hasattr(candidate, 'content') and candidate.content:
+                            return str(candidate.content)
 
-        text = content[0].get("text", "")
+            if not response.text:
+                raise ValueError("Empty response from Gemini API")
 
+            logger.info(f"✅ Gemini API response received: {len(response.text)} characters")
+            logger.debug(f"📥 Response preview: {response.text[:500]}")
+
+            return response.text
+
+        except Exception as e:
+            logger.error(f"❌ Gemini API error: {str(e)}")
+            logger.error(f"API key configured: {'Yes' if self.api_key else 'No'}")
+
+            # If blocked by safety, return empty list to avoid crash
+            if "finish_reason" in str(e) and "is 2" in str(e):
+                logger.warning("Content blocked by Gemini safety filter - returning empty result")
+                return "[]"  # Return empty JSON array
+            raise
+
+    def _parse_response(self, response_text: str) -> list[ExtractedQuestion]:
+        """Parse Gemini response into ExtractedQuestion objects."""
         # Extract JSON from response (handle markdown code blocks)
-        json_str = text
-        if "```json" in text:
-            start = text.find("```json") + 7
-            end = text.find("```", start)
-            json_str = text[start:end].strip()
-        elif "```" in text:
-            start = text.find("```") + 3
-            end = text.find("```", start)
-            json_str = text[start:end].strip()
+        json_str = response_text
+        if "```json" in response_text:
+            start = response_text.find("```json") + 7
+            end = response_text.find("```", start)
+            json_str = response_text[start:end].strip()
+        elif "```" in response_text:
+            start = response_text.find("```") + 3
+            end = response_text.find("```", start)
+            json_str = response_text[start:end].strip()
 
-        data = json.loads(json_str)
+        try:
+            data = json.loads(json_str)
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse JSON: {e}")
+            logger.error(f"JSON string: {json_str[:500]}")
+            raise
+
         questions = []
 
         for q in data.get("questions", []):

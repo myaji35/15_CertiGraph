@@ -30,7 +30,7 @@ export default function TestHistoryPage() {
         if (!token) return;
 
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/tests/history`,
+          `${process.env.NEXT_PUBLIC_API_URL}/tests/history`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

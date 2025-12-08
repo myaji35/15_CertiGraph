@@ -5,11 +5,12 @@ from io import BytesIO
 from fastapi import APIRouter, UploadFile, File, Form, BackgroundTasks
 from typing import Any
 
-from app.api.v1.deps import CurrentUser
+from app.api.v1.deps import CurrentUser, StudySetRepo, StorageServiceDep
 from app.core.exceptions import (
     InvalidFileTypeError,
     FileTooLargeError,
     ResourceNotFoundError,
+    DuplicateFileError,
 )
 from app.models.study_set import (
     StudySetStatus,
@@ -41,14 +42,17 @@ FAKE_PROCESSING_STEPS = [
 ]
 
 
-async def process_cached_study_set(study_set_id: str, source_study_set_id: str):
+async def process_cached_study_set(
+    study_set_id: str,
+    source_study_set_id: str,
+    repo
+):
     """
     Simulate processing for a cached study set.
 
     Shows fake progress to the user while copying questions from source.
     This saves processing time and API costs for duplicate PDFs.
     """
-    repo = StudySetRepository()
 
     # Simulate processing with fake progress
     for progress, step in FAKE_PROCESSING_STEPS:
@@ -73,21 +77,27 @@ async def process_cached_study_set(study_set_id: str, source_study_set_id: str):
     )
 
 
-async def process_study_set(study_set_id: str, pdf_path: str):
+async def process_study_set(study_set_id: str, pdf_path: str, repo, storage=None):
     """
     Process a new PDF for question extraction.
 
     Uses the full pipeline: Upstage Document Parse → Claude Question Extraction
     """
     from app.services.parser.pipeline import PdfProcessingPipeline
+    from app.core import get_settings
 
-    pipeline = PdfProcessingPipeline()
+    settings = get_settings()
+
+    # Use real pipeline for both dev and production
+    pipeline = PdfProcessingPipeline(repo, storage)
     await pipeline.process(study_set_id, pdf_path)
 
 
 @router.post("/upload")
 async def upload_study_set(
     current_user: CurrentUser,
+    repo: StudySetRepo,
+    storage: StorageServiceDep,
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     name: str = Form(...),
@@ -122,14 +132,18 @@ async def upload_study_set(
     pdf_hash = PdfHashService.compute_hash_from_bytes(content)
 
     # Check for duplicate
-    repo = StudySetRepository()
     existing = await repo.find_by_hash(pdf_hash)
+    if existing is not None:
+        # Duplicate file detected - raise error
+        raise DuplicateFileError(
+            existing_study_set_name=existing["name"],
+            existing_study_set_id=existing["id"]
+        )
 
-    is_cached = existing is not None
-    source_study_set_id = existing["id"] if existing else None
+    is_cached = False
+    source_study_set_id = None
 
     # Upload to storage
-    storage = StorageService()
     file_obj = BytesIO(content)
     pdf_path = await storage.upload_pdf(file_obj, current_user.clerk_id)
 
@@ -142,7 +156,7 @@ async def upload_study_set(
         except json.JSONDecodeError:
             pass
 
-    # Create study set record
+    # Create study set record (ready but not parsed yet)
     # TODO: Get internal user_id from users table using clerk_id
     # For now, using clerk_id directly
     study_set = await repo.create(
@@ -150,8 +164,8 @@ async def upload_study_set(
         name=name,
         pdf_path=pdf_path,
         pdf_hash=pdf_hash,
-        status=StudySetStatus.UPLOADING,
-        source_study_set_id=source_study_set_id,
+        status=StudySetStatus.READY,  # Ready for parsing when user starts learning
+        source_study_set_id=None,
         exam_name=exam_name,
         exam_year=exam_year,
         exam_round=exam_round,
@@ -160,29 +174,16 @@ async def upload_study_set(
         tags=tags_list,
     )
 
-    # Queue background processing
-    if is_cached:
-        # Use fake processing with cached results
-        background_tasks.add_task(
-            process_cached_study_set,
-            study_set["id"],
-            source_study_set_id,
-        )
-    else:
-        # Process new PDF
-        background_tasks.add_task(
-            process_study_set,
-            study_set["id"],
-            pdf_path,
-        )
+    # Don't process PDF on upload - wait for user to start learning
+    # Processing will happen when user clicks "학습 시작"
 
     return {
         "data": {
             "id": study_set["id"],
             "name": study_set["name"],
-            "status": StudySetStatus.PARSING.value,
+            "status": StudySetStatus.READY.value,
             "created_at": study_set["created_at"],
-            "is_cached": is_cached,
+            "is_cached": False,
         }
     }
 
@@ -191,9 +192,9 @@ async def upload_study_set(
 async def get_study_set_status(
     study_set_id: str,
     current_user: CurrentUser,
+    repo: StudySetRepo,
 ) -> dict[str, Any]:
     """Get the processing status of a study set."""
-    repo = StudySetRepository()
     study_set = await repo.get_by_id(study_set_id)
 
     if not study_set:
@@ -217,9 +218,9 @@ async def get_study_set_status(
 async def get_study_set(
     study_set_id: str,
     current_user: CurrentUser,
+    repo: StudySetRepo,
 ) -> dict[str, Any]:
     """Get a study set by ID."""
-    repo = StudySetRepository()
     study_set = await repo.get_by_id(study_set_id)
 
     if not study_set:
@@ -246,22 +247,15 @@ async def get_study_set(
 @router.get("")
 async def list_study_sets(
     current_user: CurrentUser,
+    repo: StudySetRepo,
     limit: int = 50,
     offset: int = 0,
 ) -> dict[str, Any]:
     """List all study sets for the current user."""
-    # TODO: Remove this temporary fix once Supabase is configured
-    # Return empty list if Supabase is not configured
-    from app.core import get_settings
-    settings = get_settings()
-    if settings.supabase_url.startswith("https://your-project"):
-        return {"data": [], "total": 0}
-
-    repo = StudySetRepository()
-    study_sets = await repo.get_by_user(
+    study_sets = await repo.find_all_by_user(
         current_user.clerk_id,
+        skip=offset,
         limit=limit,
-        offset=offset,
     )
 
     # Get question counts
@@ -295,6 +289,7 @@ async def list_study_sets(
 async def update_learning_status(
     study_set_id: str,
     current_user: CurrentUser,
+    repo: StudySetRepo,
     learning_status: LearningStatus,
 ) -> dict[str, Any]:
     """
@@ -305,7 +300,6 @@ async def update_learning_status(
     - learned: 학습됨
     - reset: 초기화
     """
-    repo = StudySetRepository()
     study_set = await repo.get_by_id(study_set_id)
 
     if not study_set:
@@ -327,13 +321,73 @@ async def update_learning_status(
     }
 
 
+@router.post("/{study_set_id}/parse")
+async def parse_study_set(
+    study_set_id: str,
+    current_user: CurrentUser,
+    repo: StudySetRepo,
+    storage: StorageServiceDep,
+    background_tasks: BackgroundTasks,
+) -> dict[str, Any]:
+    """
+    Parse the PDF file for a study set to extract questions.
+
+    This is called when the user clicks "학습 시작" (Start Learning).
+    The PDF is processed in the background using Upstage + Claude.
+    """
+    study_set = await repo.get_by_id(study_set_id)
+
+    if not study_set:
+        raise ResourceNotFoundError("학습 세트", study_set_id)
+
+    # Verify ownership
+    if study_set["user_id"] != current_user.clerk_id:
+        raise ResourceNotFoundError("학습 세트", study_set_id)
+
+    # Check if already processed
+    question_count = await repo.get_question_count(study_set_id)
+    if question_count > 0:
+        return {
+            "data": {
+                "status": study_set["status"],
+                "message": "이미 처리된 학습 세트입니다.",
+                "question_count": question_count,
+            }
+        }
+
+    # Start background processing
+    background_tasks.add_task(
+        process_study_set,
+        study_set_id,
+        study_set["pdf_path"],
+        repo,
+        storage,
+    )
+
+    # Update status to parsing
+    await repo.update_status(
+        study_set_id,
+        StudySetStatus.PARSING,
+        progress=0,
+        current_step="PDF 파싱 시작 중...",
+    )
+
+    return {
+        "data": {
+            "status": StudySetStatus.PARSING.value,
+            "message": "PDF 파싱이 시작되었습니다.",
+        }
+    }
+
+
 @router.delete("/{study_set_id}")
 async def delete_study_set(
     study_set_id: str,
     current_user: CurrentUser,
+    repo: StudySetRepo,
+    storage: StorageServiceDep,
 ) -> dict[str, Any]:
     """Delete a study set and its associated questions."""
-    repo = StudySetRepository()
     study_set = await repo.get_by_id(study_set_id)
 
     if not study_set:
@@ -345,10 +399,36 @@ async def delete_study_set(
 
     # Delete from storage if PDF exists
     if study_set.get("pdf_path"):
-        storage = StorageService()
         await storage.delete_file(study_set["pdf_path"])
 
     # Delete study set (questions cascade delete via FK)
     await repo.delete(study_set_id)
 
     return {"data": {"deleted": True}}
+
+
+@router.get("/{study_set_id}/questions")
+async def get_study_set_questions(
+    study_set_id: str,
+    current_user: CurrentUser,
+    repo: StudySetRepo,
+) -> dict[str, Any]:
+    """
+    Get all questions for a study set.
+
+    Returns:
+        List of questions with their options and metadata
+    """
+    # Get study set to verify ownership
+    study_set = await repo.get(study_set_id)
+    if not study_set:
+        raise ResourceNotFoundError("학습 세트", study_set_id)
+
+    # Verify ownership
+    if study_set["user_id"] != current_user.clerk_id:
+        raise ResourceNotFoundError("학습 세트", study_set_id)
+
+    # Get questions from Supabase
+    questions = await repo.get_questions(study_set_id)
+
+    return {"data": questions}

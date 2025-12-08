@@ -273,6 +273,29 @@ class StudySetRepository:
             response.raise_for_status()
             return True
 
+    async def get_questions(self, study_set_id: str) -> list[dict[str, Any]]:
+        """
+        Get all questions for a study set.
+
+        Args:
+            study_set_id: ID of the study set
+
+        Returns:
+            List of question dictionaries
+        """
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{self.base_url}/questions",
+                headers=self.headers,
+                params={
+                    "study_set_id": f"eq.{study_set_id}",
+                    "select": "*",
+                    "order": "question_number.asc",
+                },
+            )
+            response.raise_for_status()
+            return response.json()
+
     async def update_learning_status(
         self,
         study_set_id: str,

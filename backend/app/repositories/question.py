@@ -7,7 +7,16 @@ import random
 from app.core.config import get_settings
 
 
-class QuestionRepository:
+def QuestionRepository():
+    """Factory function to return appropriate repository based on mode."""
+    settings = get_settings()
+    if settings.dev_mode:
+        from app.repositories.mock_question import MockQuestionRepository
+        return MockQuestionRepository()
+    return _QuestionRepository()
+
+
+class _QuestionRepository:
     """Data access layer for questions."""
 
     def __init__(self):

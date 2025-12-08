@@ -5,6 +5,13 @@ from functools import lru_cache
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
+    # Development mode (bypasses auth)
+    dev_mode: bool = False
+
+    # PostgreSQL (for direct database access)
+    use_postgres: bool = False
+    database_url: str = ""
+
     # Clerk (for JWT verification)
     clerk_jwks_url: str
 
@@ -14,6 +21,9 @@ class Settings(BaseSettings):
 
     # Anthropic Claude (optional for MVP)
     anthropic_api_key: str = ""
+
+    # Google Gemini (for question extraction)
+    google_api_key: str = ""
 
     # OpenAI (for embeddings, optional for MVP)
     openai_api_key: str = ""

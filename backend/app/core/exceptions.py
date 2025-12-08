@@ -125,6 +125,19 @@ class InvalidFileTypeError(AppException):
         )
 
 
+class DuplicateFileError(AppException):
+    def __init__(self, existing_study_set_name: str, existing_study_set_id: str):
+        super().__init__(
+            status_code=status.HTTP_409_CONFLICT,
+            code="DUPLICATE_FILE",
+            message=f"이미 업로드된 파일입니다: '{existing_study_set_name}'",
+            details={
+                "existing_study_set_id": existing_study_set_id,
+                "existing_study_set_name": existing_study_set_name,
+            },
+        )
+
+
 class RateLimitError(AppException):
     def __init__(self, message: str = "요청 한도를 초과했습니다. 잠시 후 다시 시도해주세요."):
         super().__init__(

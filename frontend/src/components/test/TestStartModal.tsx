@@ -6,7 +6,7 @@ interface TestStartModalProps {
   studySetName: string;
   questionCount: number;
   hasWrongQuestions: boolean;
-  onStart: (mode: string, count?: number) => void;
+  onStart: (mode: string, count?: number, shuffleOptions?: boolean) => void;
   onClose: () => void;
 }
 
@@ -19,6 +19,7 @@ export default function TestStartModal({
 }: TestStartModalProps) {
   const [selectedMode, setSelectedMode] = useState<string>("all");
   const [customCount, setCustomCount] = useState<number>(20);
+  const [shuffleOptions, setShuffleOptions] = useState<boolean>(false);
 
   const modes = [
     {
@@ -53,13 +54,13 @@ export default function TestStartModal({
 
   const handleStart = () => {
     if (selectedMode === "all") {
-      onStart("all");
+      onStart("all", undefined, shuffleOptions);
     } else if (selectedMode === "random_20") {
-      onStart("random", 20);
+      onStart("random", 20, shuffleOptions);
     } else if (selectedMode === "random_50") {
-      onStart("random", 50);
+      onStart("random", 50, shuffleOptions);
     } else if (selectedMode === "wrong_only") {
-      onStart("wrong_only");
+      onStart("wrong_only", undefined, shuffleOptions);
     }
   };
 
@@ -104,6 +105,22 @@ export default function TestStartModal({
               )}
             </button>
           ))}
+
+          {/* Shuffle Options Checkbox */}
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={shuffleOptions}
+                onChange={(e) => setShuffleOptions(e.target.checked)}
+                className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+              />
+              <div>
+                <span className="font-medium text-gray-900">섞어풀기</span>
+                <p className="text-sm text-gray-500">문제 순서와 보기를 섞어서 출제</p>
+              </div>
+            </label>
+          </div>
         </div>
 
         {/* Actions */}

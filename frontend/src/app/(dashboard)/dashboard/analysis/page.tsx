@@ -102,10 +102,10 @@ export default function AnalysisPage() {
 
         // Fetch both analyses in parallel
         const [predictionRes, weaknessRes] = await Promise.all([
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/analysis/exam-prediction`, {
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/analysis/exam-prediction`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/analysis/weak-concepts`, {
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/analysis/weak-concepts`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);

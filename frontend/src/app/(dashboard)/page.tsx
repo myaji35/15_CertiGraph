@@ -49,10 +49,10 @@ export default function DashboardPage() {
         if (!token) return;
 
         const [statsRes, predictionRes] = await Promise.all([
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/analysis/dashboard`, {
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/analysis/dashboard`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/analysis/exam-prediction`, {
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/analysis/exam-prediction`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);

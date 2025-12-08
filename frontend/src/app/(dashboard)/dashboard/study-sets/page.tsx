@@ -21,24 +21,14 @@ interface StudySet {
   last_studied_at?: string;
 }
 
-interface GroupedStudySets {
-  examName: string;
-  years: {
-    year: number;
-    rounds: {
-      round: number;
-      studySets: StudySet[];
-    }[];
-  }[];
-}
-
 export default function StudySetsPage() {
   const { getToken } = useAuth();
   const [studySets, setStudySets] = useState<StudySet[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<"grid" | "grouped">("grouped");
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   const fetchStudySets = async () => {
     try {
@@ -46,7 +36,7 @@ export default function StudySetsPage() {
       if (!token) return;
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/study-sets`,
+        `${process.env.NEXT_PUBLIC_API_URL}/study-sets`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -76,7 +66,7 @@ export default function StudySetsPage() {
       if (!token) return;
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/study-sets/${studySetId}/learning-status?learning_status=${newStatus}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/study-sets/${studySetId}/learning-status?learning_status=${newStatus}`,
         {
           method: "PATCH",
           headers: {
@@ -95,6 +85,37 @@ export default function StudySetsPage() {
       console.error("Error updating learning status:", err);
     } finally {
       setOpenDropdown(null);
+    }
+  };
+
+  const deleteStudySet = async (studySetId: string) => {
+    try {
+      setDeleting(studySetId);
+      const token = await getToken();
+      if (!token) return;
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/study-sets/${studySetId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete study set");
+      }
+
+      // Refresh the list
+      await fetchStudySets();
+    } catch (err) {
+      console.error("Error deleting study set:", err);
+      alert("삭제 중 오류가 발생했습니다.");
+    } finally {
+      setDeleting(null);
+      setDeleteConfirm(null);
     }
   };
 
@@ -200,75 +221,6 @@ export default function StudySetsPage() {
     );
   };
 
-  // Group study sets by exam hierarchy
-  const groupedStudySets = (): GroupedStudySets[] => {
-    const groups: { [examName: string]: GroupedStudySets } = {};
-    const ungrouped: StudySet[] = [];
-
-    studySets.forEach((set) => {
-      if (!set.exam_name) {
-        ungrouped.push(set);
-        return;
-      }
-
-      if (!groups[set.exam_name]) {
-        groups[set.exam_name] = {
-          examName: set.exam_name,
-          years: [],
-        };
-      }
-
-      const group = groups[set.exam_name];
-      const year = set.exam_year || 0;
-      let yearGroup = group.years.find((y) => y.year === year);
-
-      if (!yearGroup) {
-        yearGroup = { year, rounds: [] };
-        group.years.push(yearGroup);
-      }
-
-      const round = set.exam_round || 0;
-      let roundGroup = yearGroup.rounds.find((r) => r.round === round);
-
-      if (!roundGroup) {
-        roundGroup = { round, studySets: [] };
-        yearGroup.rounds.push(roundGroup);
-      }
-
-      roundGroup.studySets.push(set);
-    });
-
-    // Sort years and rounds in descending order
-    Object.values(groups).forEach((group) => {
-      group.years.sort((a, b) => b.year - a.year);
-      group.years.forEach((year) => {
-        year.rounds.sort((a, b) => b.round - a.round);
-        // Sort study sets by session within each round
-        year.rounds.forEach((round) => {
-          round.studySets.sort((a, b) => (a.exam_session || 0) - (b.exam_session || 0));
-        });
-      });
-    });
-
-    const result = Object.values(groups);
-
-    // Add ungrouped items as separate group if exists
-    if (ungrouped.length > 0) {
-      result.push({
-        examName: "기타",
-        years: [{
-          year: 0,
-          rounds: [{
-            round: 0,
-            studySets: ungrouped,
-          }],
-        }],
-      });
-    }
-
-    return result;
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -299,41 +251,15 @@ export default function StudySetsPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">학습 세트</h1>
-        <div className="flex items-center gap-3">
-          {/* View Toggle */}
-          <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
-            <button
-              onClick={() => setViewMode("grouped")}
-              className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
-                viewMode === "grouped"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              그룹
-            </button>
-            <button
-              onClick={() => setViewMode("grid")}
-              className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
-                viewMode === "grid"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              전체
-            </button>
-          </div>
-
-          <Link
-            href="/dashboard/study-sets/new"
-            className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            새 학습 세트
-          </Link>
-        </div>
+        <Link
+          href="/dashboard/study-sets/new"
+          className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          새 학습 세트
+        </Link>
       </div>
 
       {studySets.length === 0 ? (
@@ -362,157 +288,115 @@ export default function StudySetsPage() {
             PDF 업로드하기
           </Link>
         </div>
-      ) : viewMode === "grid" ? (
-        /* Grid View - Original Layout */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {studySets.map((studySet) => (
-            <Link
-              key={studySet.id}
-              href={`/dashboard/study-sets/${studySet.id}`}
-              className="block bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all"
-            >
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="font-medium text-gray-900 flex-1 pr-2">{studySet.name}</h3>
-                {getStatusBadge(studySet.status)}
-              </div>
-
-              <div className="flex gap-1 mb-2">
-                {getLearningStatusButton(studySet)}
-              </div>
-
-              {studySet.exam_name && (
-                <div className="mt-2 flex flex-wrap gap-1">
-                  <span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded">
-                    {studySet.exam_name}
-                  </span>
-                  {studySet.exam_year && (
-                    <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded">
-                      {studySet.exam_year}년
-                    </span>
-                  )}
-                  {studySet.exam_round && (
-                    <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded">
-                      {studySet.exam_round}차
-                    </span>
-                  )}
-                </div>
-              )}
-
-              <p className="mt-2 text-sm text-gray-500">
-                {studySet.status === "ready"
-                  ? `${studySet.question_count}개 문제`
-                  : "처리 중..."}
-              </p>
-
-              <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center text-xs text-gray-400">
-                <span>
-                  {new Date(studySet.created_at).toLocaleDateString("ko-KR", {
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </span>
-                {studySet.is_cached && (
-                  <span className="text-green-600" title="캐시된 결과 사용">
-                    ⚡ 빠른 처리
-                  </span>
-                )}
-              </div>
-            </Link>
-          ))}
-        </div>
       ) : (
-        /* Grouped View - Hierarchical by Exam/Year/Round/Session */
-        <div className="space-y-6">
-          {groupedStudySets().map((examGroup) => (
-            <div key={examGroup.examName} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-              {/* Exam Name Header */}
-              <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
-                <h2 className="text-xl font-bold text-white">{examGroup.examName}</h2>
-              </div>
-
-              {/* Years */}
-              <div className="divide-y divide-gray-200">
-                {examGroup.years.map((yearGroup) => (
-                  <div key={yearGroup.year} className="p-6">
-                    {yearGroup.year > 0 && (
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                        {yearGroup.year}년
-                      </h3>
+        /* Table View */
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  년도
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  회차
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  문제집 제목
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  교시
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  문제 수
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  학습 상태
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  상태
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  작업
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {studySets.map((studySet) => (
+                <tr
+                  key={studySet.id}
+                  onClick={() => window.location.href = `/dashboard/study-sets/${studySet.id}`}
+                  className="hover:bg-gray-50 cursor-pointer transition-colors"
+                >
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {studySet.exam_year || "-"}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {studySet.exam_round ? `${studySet.exam_round}회` : "-"}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900">
+                    <div className="font-medium">{studySet.exam_name || studySet.name}</div>
+                    {studySet.exam_name && studySet.exam_name !== studySet.name && (
+                      <div className="text-xs text-gray-500 mt-1">{studySet.name}</div>
                     )}
-
-                    {/* Rounds */}
-                    <div className="space-y-4">
-                      {yearGroup.rounds.map((roundGroup) => (
-                        <div key={roundGroup.round}>
-                          {roundGroup.round > 0 && (
-                            <div className="flex items-center gap-2 mb-3">
-                              <span className="text-sm font-medium text-gray-700">
-                                제{roundGroup.round}회
-                              </span>
-                              <div className="flex-1 h-px bg-gray-200"></div>
-                            </div>
-                          )}
-
-                          {/* Study Sets */}
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                            {roundGroup.studySets.map((studySet) => (
-                              <Link
-                                key={studySet.id}
-                                href={`/dashboard/study-sets/${studySet.id}`}
-                                className="block p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all"
-                              >
-                                <div className="flex justify-between items-start mb-2">
-                                  <div className="flex-1">
-                                    {studySet.exam_session_name ? (
-                                      <h4 className="font-medium text-gray-900 text-sm">
-                                        {studySet.exam_session_name}
-                                      </h4>
-                                    ) : studySet.exam_session ? (
-                                      <h4 className="font-medium text-gray-900 text-sm">
-                                        {studySet.exam_session}교시
-                                      </h4>
-                                    ) : (
-                                      <h4 className="font-medium text-gray-900 text-sm line-clamp-1">
-                                        {studySet.name}
-                                      </h4>
-                                    )}
-                                  </div>
-                                  {getStatusBadge(studySet.status)}
-                                </div>
-
-                                <div className="mb-2">
-                                  {getLearningStatusButton(studySet)}
-                                </div>
-
-                                <p className="text-xs text-gray-500">
-                                  {studySet.status === "ready"
-                                    ? `${studySet.question_count}개 문제`
-                                    : "처리 중..."}
-                                </p>
-
-                                {studySet.tags && studySet.tags.length > 0 && (
-                                  <div className="mt-2 flex flex-wrap gap-1">
-                                    {studySet.tags.slice(0, 2).map((tag, i) => (
-                                      <span
-                                        key={i}
-                                        className="text-xs px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded"
-                                      >
-                                        {tag}
-                                      </span>
-                                    ))}
-                                  </div>
-                                )}
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {studySet.exam_session_name || (studySet.exam_session ? `${studySet.exam_session}교시` : "-")}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {studySet.status === "ready" ? `${studySet.question_count}개` : "-"}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm" onClick={(e) => e.stopPropagation()}>
+                    {getLearningStatusButton(studySet)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {getStatusBadge(studySet.status)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm" onClick={(e) => e.stopPropagation()}>
+                    {deleteConfirm === studySet.id ? (
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            deleteStudySet(studySet.id);
+                          }}
+                          disabled={deleting === studySet.id}
+                          className="px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+                        >
+                          {deleting === studySet.id ? "삭제 중..." : "확인"}
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setDeleteConfirm(null);
+                          }}
+                          disabled={deleting === studySet.id}
+                          className="px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50"
+                        >
+                          취소
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setDeleteConfirm(studySet.id);
+                        }}
+                        className="text-red-600 hover:text-red-800"
+                        title="삭제"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

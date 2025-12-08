@@ -32,10 +32,38 @@ export default function PdfUploader({
   // Exam metadata fields
   const [examName, setExamName] = useState("");
   const [examYear, setExamYear] = useState<number | "">(new Date().getFullYear());
-  const [examRound, setExamRound] = useState<number | "">(1);
-  const [examSession, setExamSession] = useState<number | "">(1);
+  const [examRound, setExamRound] = useState<number | "">("");
+  const [examSession, setExamSession] = useState<number | "">("");
   const [examSessionName, setExamSessionName] = useState("");
   const [showMetadata, setShowMetadata] = useState(false);
+
+  const extractRoundFromName = (name: string): number | null => {
+    // Match patterns like "제23회", "23회", "1회", etc.
+    const match = name.match(/제?(\d+)회/);
+    if (match) {
+      return parseInt(match[1]);
+    }
+    return null;
+  };
+
+  const extractSessionFromName = (name: string): number | null => {
+    // Match patterns like "3교시", "1교시", etc.
+    const match = name.match(/(\d+)교시/);
+    if (match) {
+      return parseInt(match[1]);
+    }
+    return null;
+  };
+
+  const cleanStudySetName = (name: string): string => {
+    // Remove year, round, and session info from filename
+    return name
+      .replace(/\d{4}년\s*/g, '')      // Remove "2025년 "
+      .replace(/제?\d+회\s*/g, '')      // Remove "제23회 " or "23회 "
+      .replace(/\d+교시\s*/g, '')       // Remove "1교시 "
+      .replace(/\s+/g, ' ')             // Normalize whitespace
+      .trim();
+  };
 
   const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: any[]) => {
     setError(null);
@@ -53,10 +81,24 @@ export default function PdfUploader({
     if (acceptedFiles.length > 0) {
       const file = acceptedFiles[0];
       setSelectedFile(file);
-      // Auto-fill name from filename (without extension)
+
+      const nameWithoutExt = file.name.replace(/\.pdf$/i, "");
+
+      // Auto-fill name from filename (without extension and metadata)
       if (!studySetName) {
-        const nameWithoutExt = file.name.replace(/\.pdf$/i, "");
-        setStudySetName(nameWithoutExt);
+        const cleanedName = cleanStudySetName(nameWithoutExt);
+        setStudySetName(cleanedName);
+      }
+
+      // Always auto-extract round number and session from filename
+      const roundNum = extractRoundFromName(nameWithoutExt);
+      if (roundNum !== null) {
+        setExamRound(roundNum);
+      }
+
+      const sessionNum = extractSessionFromName(nameWithoutExt);
+      if (sessionNum !== null) {
+        setExamSession(sessionNum);
       }
     }
   }, [studySetName]);
@@ -71,9 +113,12 @@ export default function PdfUploader({
     disabled: isUploading,
   });
 
-  const handleSubmit = async () => {
-    if (!selectedFile || !studySetName.trim()) return;
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const handleSubmit = async () => {
+    if (!selectedFile || !studySetName.trim() || isSubmitting) return;
+
+    setIsSubmitting(true);
     try {
       const metadata: ExamMetadata = {
         examName: examName.trim() || undefined,
@@ -86,6 +131,7 @@ export default function PdfUploader({
       await onUpload(selectedFile, studySetName.trim(), metadata);
     } catch (err) {
       setError(err instanceof Error ? err.message : "업로드 중 오류가 발생했습니다");
+      setIsSubmitting(false);
     }
   };
 
@@ -179,16 +225,16 @@ export default function PdfUploader({
             {/* Exam Round */}
             <div>
               <label htmlFor="examRound" className="block text-sm font-medium text-gray-700 mb-1">
-                n차 시험
+                회차
               </label>
               <input
                 type="number"
                 id="examRound"
                 value={examRound}
                 onChange={(e) => setExamRound(e.target.value ? parseInt(e.target.value) : "")}
-                placeholder="1"
+                placeholder="예: 23"
                 min="1"
-                max="10"
+                max="100"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
                 disabled={isUploading}
               />
@@ -204,7 +250,7 @@ export default function PdfUploader({
                 id="examSession"
                 value={examSession}
                 onChange={(e) => setExamSession(e.target.value ? parseInt(e.target.value) : "")}
-                placeholder="1"
+                placeholder="예: 1"
                 min="1"
                 max="10"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
@@ -341,17 +387,17 @@ export default function PdfUploader({
       <button
         type="button"
         onClick={handleSubmit}
-        disabled={!selectedFile || !studySetName.trim() || isUploading}
+        disabled={!selectedFile || !studySetName.trim() || isUploading || isSubmitting}
         className={`
           w-full py-3 px-4 rounded-lg font-medium transition-colors
           ${
-            selectedFile && studySetName.trim() && !isUploading
+            selectedFile && studySetName.trim() && !isUploading && !isSubmitting
               ? "bg-blue-600 text-white hover:bg-blue-700"
               : "bg-gray-100 text-gray-400 cursor-not-allowed"
           }
         `}
       >
-        {isUploading ? "업로드 중..." : "업로드 시작"}
+        {isUploading || isSubmitting ? "업로드 중..." : "업로드 시작"}
       </button>
     </div>
   );

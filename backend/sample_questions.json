@@ -1,0 +1,94 @@
+{
+  "questions": [
+    {
+      "question_number": 1,
+      "subject": "인간행동과 사회환경",
+      "question_text": "인간발달이론과 사회복지실천에 관한 설명으로 옳은 것은?",
+      "options": [
+        {
+          "number": 1,
+          "text": "인간발달이론은 문제의 사정단계에서만 유용하다."
+        },
+        {
+          "number": 2,
+          "text": "발달 단계별 욕구를 기반으로 사회복지서비스를 개발할 수 있다."
+        },
+        {
+          "number": 3,
+          "text": "클라이언트를 둘러싼 환경의 영향력을 평가할 수 없다."
+        },
+        {
+          "number": 4,
+          "text": "사회환경보다 클라이언트의 생물학적 요소를 더 중시한다."
+        },
+        {
+          "number": 5,
+          "text": "다양한 클라이언트의 발달과업을 획일적으로 이해할 수 있다."
+        }
+      ],
+      "correct_answer": 2,
+      "explanation": null,
+      "topic": null
+    },
+    {
+      "question_number": 2,
+      "subject": "인간행동과 사회환경",
+      "question_text": "인간발달의 개념과 원리에 관한 설명으로 옳은 것은?",
+      "options": [
+        {
+          "number": 1,
+          "text": "발달에는 개인차가 존재하므로 최적의 시기가 따로 존재하지 않는다."
+        },
+        {
+          "number": 2,
+          "text": "일정한 순서와 방향이 없어서 예측이 불가능하다."
+        },
+        {
+          "number": 3,
+          "text": "성숙(maturation)은 경험이나 훈련의 결과와 상관없이 진행된다."
+        },
+        {
+          "number": 4,
+          "text": "발달은 소근육 말초부위에서 대근육 중심부위로 진행된다."
+        },
+        {
+          "number": 5,
+          "text": "성장(growth)은 유전적으로 미리 정해진 정도까지 도달하는 생물학적 변화이다."
+        }
+      ],
+      "correct_answer": null,
+      "explanation": null,
+      "topic": null
+    },
+    {
+      "question_number": 3,
+      "subject": "인간행동과 사회환경",
+      "question_text": "인간행동에 관한 관점으로 옳지 않은 것은?",
+      "options": [
+        {
+          "number": 1,
+          "text": "정신분석이론은 유년기의 경험을 강조한다."
+        },
+        {
+          "number": 2,
+          "text": "생태체계이론은 환경속의 인간의 관점을 강조한다."
+        },
+        {
+          "number": 3,
+          "text": "인지이론은 인간의 사고가 감정과 행동을 결정한다고 본다."
+        },
+        {
+          "number": 4,
+          "text": "인본주의이론은 인간에 대한 무조건적인 존중을 강조한다."
+        },
+        {
+          "number": 5,
+          "text": "행동주의이론은 개인의 무의식을 강조한다."
+        }
+      ],
+      "correct_answer": 5,
+      "explanation": null,
+      "topic": null
+    }
+  ]
+}

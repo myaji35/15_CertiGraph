@@ -25,6 +25,7 @@ class TestStartRequest(BaseModel):
     study_set_id: str
     mode: TestMode = TestMode.ALL
     question_count: Optional[int] = None  # Required for random mode
+    shuffle_options: bool = False  # Shuffle answer options
 
 
 class QuestionForTest(BaseModel):

@@ -9,7 +9,16 @@ from app.core.config import get_settings
 from app.models.test import TestSessionStatus, TestMode
 
 
-class TestSessionRepository:
+def TestSessionRepository():
+    """Factory function to return appropriate repository based on mode."""
+    settings = get_settings()
+    if settings.dev_mode:
+        from app.repositories.mock_test_session import MockTestSessionRepository
+        return MockTestSessionRepository()
+    return _TestSessionRepository()
+
+
+class _TestSessionRepository:
     """Data access layer for test_sessions and user_answers."""
 
     def __init__(self):

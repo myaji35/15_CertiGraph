@@ -48,7 +48,7 @@ export default function TestResultPage() {
         }
 
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/tests/${sessionId}/result`,
+          `${process.env.NEXT_PUBLIC_API_URL}/tests/${sessionId}/result`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

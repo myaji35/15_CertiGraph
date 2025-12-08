@@ -32,3 +32,6 @@ venv/
 # Logs
 *.log
 logs/
+
+# Development storage
+mock_storage/

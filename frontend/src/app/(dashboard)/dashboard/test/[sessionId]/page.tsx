@@ -38,11 +38,22 @@ export default function TestPage() {
 
   // Fetch session data from localStorage (set during test start)
   useEffect(() => {
+    console.log("Looking for session ID:", sessionId);
     const stored = localStorage.getItem(`test_session_${sessionId}`);
+    console.log("Stored data:", stored);
+
     if (stored) {
-      setSession(JSON.parse(stored));
+      try {
+        const parsed = JSON.parse(stored);
+        console.log("Parsed session data:", parsed);
+        setSession(parsed);
+      } catch (e) {
+        console.error("Failed to parse session data:", e);
+        setError("세션 데이터 파싱 오류가 발생했습니다.");
+      }
       setLoading(false);
     } else {
+      console.log("No session found in localStorage for ID:", sessionId);
       setError("테스트 세션을 찾을 수 없습니다.");
       setLoading(false);
     }
@@ -83,7 +94,7 @@ export default function TestPage() {
       }));
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/tests/submit`,
+        `${process.env.NEXT_PUBLIC_API_URL}/tests/submit`,
         {
           method: "POST",
           headers: {

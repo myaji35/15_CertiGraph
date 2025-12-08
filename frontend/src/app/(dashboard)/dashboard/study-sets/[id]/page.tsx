@@ -22,6 +22,15 @@ interface ProcessingStatus {
   is_cached: boolean;
 }
 
+interface Question {
+  id: string;
+  question_number: number;
+  question_text: string;
+  options: string[];
+  correct_answer: number;
+  explanation?: string;
+}
+
 export default function StudySetDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -31,6 +40,8 @@ export default function StudySetDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [showTestModal, setShowTestModal] = useState(false);
   const [startingTest, setStartingTest] = useState(false);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [loadingQuestions, setLoadingQuestions] = useState(false);
 
   const studySetId = params.id as string;
 
@@ -44,7 +55,7 @@ export default function StudySetDetailPage() {
         }
 
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/study-sets/${studySetId}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/study-sets/${studySetId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -82,7 +93,7 @@ export default function StudySetDetailPage() {
         if (!token) return;
 
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/study-sets/${studySetId}/status`,
+          `${process.env.NEXT_PUBLIC_API_URL}/study-sets/${studySetId}/status`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -115,7 +126,52 @@ export default function StudySetDetailPage() {
     return () => clearInterval(interval);
   }, [studySet?.status, studySetId, getToken]);
 
-  const handleStartTest = async (mode: string, count?: number) => {
+  // Fetch questions when study set is ready
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      if (!studySet || studySet.status !== "ready" || studySet.question_count === 0) {
+        return;
+      }
+
+      setLoadingQuestions(true);
+      try {
+        const token = await getToken();
+        if (!token) {
+          console.error("No auth token available");
+          return;
+        }
+
+        console.log("Fetching questions for study set:", studySetId);
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/study-sets/${studySetId}/questions`;
+        console.log("Request URL:", url);
+
+        const response = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        console.log("Response status:", response.status);
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Questions data:", data);
+          setQuestions(data.data || []);
+        } else {
+          const errorData = await response.text();
+          console.error("Failed to fetch questions. Status:", response.status, "Error:", errorData);
+        }
+      } catch (err) {
+        console.error("Failed to fetch questions:", err);
+      } finally {
+        setLoadingQuestions(false);
+      }
+    };
+
+    fetchQuestions();
+  }, [studySet?.status, studySet?.question_count, studySetId, getToken]);
+
+  const handleStartLearning = async () => {
     if (!studySet) return;
 
     setStartingTest(true);
@@ -123,8 +179,115 @@ export default function StudySetDetailPage() {
       const token = await getToken();
       if (!token) throw new Error("인증이 필요합니다");
 
+      // If no questions exist, trigger PDF parsing first
+      if (studySet.question_count === 0) {
+        // Call parse endpoint
+        const parseResponse = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/study-sets/${studySet.id}/parse`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!parseResponse.ok) {
+          throw new Error("PDF 파싱 시작에 실패했습니다");
+        }
+
+        // Wait for parsing to complete by polling status
+        let isComplete = false;
+        while (!isComplete) {
+          await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait 2 seconds
+
+          const statusResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/study-sets/${studySet.id}/status`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (statusResponse.ok) {
+            const statusData = await statusResponse.json();
+            setProcessingStatus(statusData.data);
+
+            if (statusData.data.status === "ready") {
+              isComplete = true;
+              // Refresh study set data to get question count
+              const refreshResponse = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/study-sets/${studySet.id}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              );
+              if (refreshResponse.ok) {
+                const refreshData = await refreshResponse.json();
+                setStudySet(refreshData.data);
+                // Reload page to fetch questions
+                window.location.reload();
+              }
+            } else if (statusData.data.status === "failed") {
+              throw new Error("PDF 파싱에 실패했습니다");
+            }
+          }
+        }
+      } else {
+        // Start learning mode with all questions
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/tests/start`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              study_set_id: studySet.id,
+              mode: "all",
+              question_count: studySet.question_count,
+              shuffle_options: false,
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("학습 시작에 실패했습니다");
+        }
+
+        const data = await response.json();
+        const session = data.data;
+
+        // Store session data in localStorage for the learning page
+        localStorage.setItem(
+          `test_session_${session.session_id}`,
+          JSON.stringify(session)
+        );
+
+        // Navigate to learning/test page
+        router.push(`/dashboard/test/${session.session_id}`);
+      }
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "오류가 발생했습니다");
+      setStartingTest(false);
+    }
+  };
+
+  const handleStartTest = async (mode: string, count?: number, shuffleOptions?: boolean) => {
+    if (!studySet) return;
+
+    setStartingTest(true);
+    try {
+      const token = await getToken();
+      if (!token) throw new Error("인증이 필요합니다");
+
+      // Now start the test
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/tests/start`,
+        `${process.env.NEXT_PUBLIC_API_URL}/tests/start`,
         {
           method: "POST",
           headers: {
@@ -135,6 +298,7 @@ export default function StudySetDetailPage() {
             study_set_id: studySet.id,
             mode: mode,
             question_count: count,
+            shuffle_options: shuffleOptions || false,
           }),
         }
       );
@@ -287,24 +451,29 @@ export default function StudySetDetailPage() {
           {/* Actions */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <button
+              onClick={handleStartLearning}
               className="flex items-center justify-center gap-3 bg-blue-600 text-white p-6 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={studySet.question_count === 0}
+              disabled={startingTest}
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span className="font-medium">학습 시작</span>
+              {startingTest ? (
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+              ) : (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              )}
+              <span className="font-medium">{startingTest ? "학습 중..." : "학습 시작"}</span>
             </button>
             <button
               onClick={() => setShowTestModal(true)}
@@ -324,6 +493,38 @@ export default function StudySetDetailPage() {
               </span>
             </button>
           </div>
+
+          {/* Questions List */}
+          {questions.length > 0 && (
+            <div className="mt-8">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">학습 문제 목록</h2>
+              <div className="space-y-4">
+                {loadingQuestions ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  </div>
+                ) : (
+                  questions.map((question) => (
+                    <div
+                      key={question.id}
+                      className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold text-sm">
+                          {question.question_number}
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-gray-900 leading-relaxed whitespace-pre-wrap">
+                            {question.question_text}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
         </>
       )}
 

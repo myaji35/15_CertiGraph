@@ -3,7 +3,7 @@
 from fastapi import APIRouter
 from typing import Any
 
-from app.api.v1.deps import CurrentUser
+from app.api.v1.deps import CurrentUser, StudySetRepo
 from app.core.exceptions import ResourceNotFoundError, ValidationFormatError
 from app.models.test import (
     TestMode,
@@ -11,7 +11,6 @@ from app.models.test import (
     TestSubmitRequest,
 )
 from app.services.test_engine import TestSessionService, ScoringService
-from app.repositories.study_set import StudySetRepository
 
 
 router = APIRouter(prefix="/tests", tags=["tests"])
@@ -21,6 +20,7 @@ router = APIRouter(prefix="/tests", tags=["tests"])
 async def start_test(
     request: TestStartRequest,
     current_user: CurrentUser,
+    study_set_repo: StudySetRepo,
 ) -> dict[str, Any]:
     """
     Start a new test session.
@@ -31,7 +31,6 @@ async def start_test(
     - wrong_only: Only previously incorrect questions
     """
     # Verify study set exists and belongs to user
-    study_set_repo = StudySetRepository()
     study_set = await study_set_repo.get_by_id(request.study_set_id)
 
     if not study_set:
@@ -54,6 +53,7 @@ async def start_test(
         study_set_id=request.study_set_id,
         mode=request.mode,
         question_count=request.question_count,
+        shuffle_options=request.shuffle_options,
     )
 
     return {"data": result}
