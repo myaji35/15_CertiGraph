@@ -1,14 +1,40 @@
-FROM node:20-alpine
+# Build stage
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-RUN apk add --no-cache libc6-compat
+# Copy package files
+COPY package*.json ./
 
-COPY package.json package-lock.json* ./
+# Install dependencies
 RUN npm ci
 
+# Copy all files
 COPY . .
 
-EXPOSE 3015
+# Build the application
+RUN npm run build
 
-CMD ["npm", "run", "dev", "--", "-p", "3015", "-H", "0.0.0.0"]
+# Production stage
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+# Copy necessary files from builder
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/next.config.js ./
+
+# Install only production dependencies
+RUN npm ci --only=production
+
+# Create a non-root user
+RUN adduser -D -u 1001 nextjs
+USER nextjs
+
+# Expose port
+EXPOSE 3000
+
+# Start the application
+CMD ["npm", "start"]
