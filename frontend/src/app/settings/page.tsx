@@ -1,7 +1,7 @@
 'use client';
 
 import { NotionCard, NotionPageHeader } from '@/components/ui/NotionCard';
-import { User, Bell, Shield, Palette, Database, HelpCircle, Mail, Key, Moon, Globe } from 'lucide-react';
+import { User, Bell, Shield, Palette, Database, HelpCircle, Mail, Key, Moon, Globe, BookOpen } from 'lucide-react';
 import { useState } from 'react';
 
 export default function SettingsPage() {
