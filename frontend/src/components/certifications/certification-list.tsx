@@ -669,8 +669,7 @@ export function CertificationList({ onSelect }: CertificationListProps) {
                       <div>
                         <span className="text-gray-600">합격기준:</span>
                         <span className="ml-2 font-medium">
-                          {detailCert.passing_criteria.written}
-                          {detailCert.passing_criteria.practical && ` / ${detailCert.passing_criteria.practical}`}
+                          {detailCert.passing_criteria}
                         </span>
                       </div>
                     )}
@@ -751,41 +750,6 @@ export function CertificationList({ onSelect }: CertificationListProps) {
                   </div>
                 </div>
 
-                {/* 관련 통계 */}
-                {detailCert.statistics && (
-                  <div>
-                    <h3 className="font-bold text-lg mb-3 flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5 text-indigo-600" />
-                      관련 통계
-                    </h3>
-                    <div className="grid grid-cols-3 gap-4">
-                      {detailCert.statistics.pass_rate && (
-                        <div className="text-center p-3 bg-blue-50 rounded-lg">
-                          <div className="text-2xl font-bold text-blue-600">
-                            {detailCert.statistics.pass_rate}%
-                          </div>
-                          <div className="text-xs text-gray-600">합격률</div>
-                        </div>
-                      )}
-                      {detailCert.statistics.applicants && (
-                        <div className="text-center p-3 bg-green-50 rounded-lg">
-                          <div className="text-2xl font-bold text-green-600">
-                            {detailCert.statistics.applicants.toLocaleString()}
-                          </div>
-                          <div className="text-xs text-gray-600">연간 응시자</div>
-                        </div>
-                      )}
-                      {detailCert.statistics.popularity_rank && (
-                        <div className="text-center p-3 bg-purple-50 rounded-lg">
-                          <div className="text-2xl font-bold text-purple-600">
-                            {detailCert.statistics.popularity_rank}위
-                          </div>
-                          <div className="text-xs text-gray-600">인기 순위</div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
 
