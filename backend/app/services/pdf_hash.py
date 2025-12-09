@@ -45,3 +45,18 @@ class PdfHashService:
             Hexadecimal hash string
         """
         return hashlib.sha256(content).hexdigest()
+
+
+def calculate_pdf_hash(pdf_bytes: bytes) -> str:
+    """
+    Calculate SHA-256 hash for PDF bytes.
+
+    This is a standalone function for compatibility with tests.
+
+    Args:
+        pdf_bytes: PDF content as bytes
+
+    Returns:
+        Hexadecimal hash string
+    """
+    return PdfHashService.compute_hash_from_bytes(pdf_bytes)

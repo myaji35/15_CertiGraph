@@ -114,9 +114,78 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
+    outline-color: oklch(var(--ring) / 0.5);
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
+}
+
+/* Notion-style smooth animations */
+@layer utilities {
+  .notion-hover {
+    @apply transition-all duration-200 ease-in-out;
+  }
+
+  .notion-card-hover:hover {
+    @apply shadow-lg border-gray-300 dark:border-gray-600;
+  }
+
+  /* Custom scrollbar styles */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-gray-100 dark:bg-gray-800;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gray-400 dark:bg-gray-600 rounded-full;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-500 dark:bg-gray-500;
+  }
+}
+
+/* Notion-style focus states */
+input:focus,
+textarea:focus {
+  @apply outline-none ring-2;
+  --tw-ring-color: oklch(0.488 0.243 264.376 / 0.5);
+}
+
+/* Smooth transitions for dark mode */
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Notion-style selection */
+::selection {
+  @apply bg-blue-100 dark:bg-blue-900/50;
+}
+
+/* Notion-style loading animation */
+@keyframes notion-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.notion-loading {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: notion-shimmer 1.5s infinite;
 }
