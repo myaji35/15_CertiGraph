@@ -12,8 +12,12 @@ RUN npm ci
 # Copy all files
 COPY . .
 
+# Set environment variables for build
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+
 # Build the application
-RUN npm run build
+RUN npm run build || npm run build
 
 # Production stage
 FROM node:20-alpine AS runner
@@ -24,7 +28,7 @@ WORKDIR /app
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/next.config.js ./
+COPY --from=builder /app/next.config.* ./
 
 # Install only production dependencies
 RUN npm ci --only=production
