@@ -35,3 +35,9 @@ logs/
 
 # Development storage
 mock_storage/
+
+# Deployment files with sensitive data
+backend/.env.production
+dokploy-deploy-key.pub
+backend.tar.gz
+dokploy-config.json
