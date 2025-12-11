@@ -40,6 +40,15 @@ class Settings(BaseSettings):
     neo4j_user: str = "neo4j"
     neo4j_password: str = ""
 
+    # Plane (Project Management Integration)
+    plane_api_url: str = "http://localhost:8000/api/v1"
+    plane_api_key: str = ""
+    plane_workspace: str = "testgraph"
+    plane_project_id: str = "e9f6ed5d-adb5-4e5c-bee6-73e937cf08c4"
+
+    # Inngest (Background Jobs)
+    inngest_event_key: str = ""  # Optional: for production use
+
     # Server
     cors_origins: str = "http://localhost:3000,http://localhost:3015"
 
