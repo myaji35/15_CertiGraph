@@ -1,0 +1,54 @@
+{
+  "application": {
+    "name": "certigraph-backend",
+    "description": "AI-powered certification exam study platform backend",
+    "git": {
+      "repository": "git@github.com:myaji35/15_CertiGraph.git",
+      "branch": "main",
+      "buildPath": "/backend",
+      "dockerfile": "Dockerfile"
+    },
+    "build": {
+      "type": "dockerfile",
+      "dockerfilePath": "Dockerfile",
+      "buildContext": "/backend"
+    },
+    "deploy": {
+      "port": 8000,
+      "healthCheck": {
+        "enabled": true,
+        "path": "/health",
+        "port": 8000,
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3
+      }
+    },
+    "environment": {
+      "DEV_MODE": "false",
+      "CLERK_JWKS_URL": "https://your-clerk-domain.clerk.accounts.dev/.well-known/jwks.json",
+      "SUPABASE_URL": "https://your-project.supabase.co",
+      "SUPABASE_SERVICE_KEY": "your-supabase-service-key",
+      "ANTHROPIC_API_KEY": "your-anthropic-key",
+      "GOOGLE_API_KEY": "your-google-key",
+      "OPENAI_API_KEY": "your-openai-key",
+      "UPSTAGE_API_KEY": "your-upstage-key",
+      "CORS_ORIGINS": "https://your-frontend.vercel.app,http://localhost:3000",
+      "PINECONE_API_KEY": "",
+      "PINECONE_INDEX_NAME": "certigraph-questions",
+      "NEO4J_URI": "",
+      "NEO4J_USER": "neo4j",
+      "NEO4J_PASSWORD": "",
+      "PLANE_API_KEY": "",
+      "PLANE_API_URL": "http://localhost:8000/api/v1",
+      "PLANE_WORKSPACE": "testgraph",
+      "PLANE_PROJECT_ID": "e9f6ed5d-adb5-4e5c-bee6-73e937cf08c4",
+      "INNGEST_EVENT_KEY": ""
+    }
+  },
+  "sshKey": {
+    "alreadyAdded": true,
+    "publicKey": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDXgQgQJTer9w/1gCDpE4l+sTQXVBet/71tmu2+lUOH/CkAYERnuL4Xd0H2BY7wyNPeUJIbnqfFf/kYnae4RculHGwkHP8ElMCR0+mPo/szC4QL5xEu933yc3P7t4fn5v1phasMGRbfWhmYU78UbGWBlnfS9iWECQ7/cpLQOqc6PVEDeJYw65+STC8eF0OH39F6tkUS3MgY/bWGHzQ9yjmM7JRPILyU++QiaJhXRJmVLO36Ion/AjZNrGQTO8/glrpd4AwDNZhj7r3K//reho1N6UuisxBBnQnCcrm8eT2KE8ZNrmqZSYOPz0frDjWYqa1U3OvBjV6ALkMaHoEAfgDLwTWhWDC+VDLV36Z+1netHxgDIcENlTu5WPkKZ7TErsB1OGxsvVMG+O9AKyMpfQ3A7QlfBrwChy1/rgoA5sYor3JZnfEZrOS7zZZgUadAt98woGc55TuOgBvO+byT1G2R1WkdC6+hEN3qWb5yhpJsEjxLY6gZqQ/wrwQe1Ba+5WDL26dIpyDrDDrH++2n94GoX1eIWFfGpM4YBoBWx8Q5WoVTgxVE8dnxGOw9no6VilP5UrpEFJ/T2FVqQw7dqe6XLD8+hQEuFHWVcNbco5alSoJChXVAMRFkIZ2hdS3iw+AuoWuFx+Az9Kz5jgLxT6/+4V4v0WNY1gOYPot3S9DTpQ== dokploy",
+    "githubDeployKeyId": 138095262
+  }
+}
