@@ -1,4 +1,4 @@
-// Common types for CertiGraph
+// Common types for ExamsGraph
 
 export interface User {
   id: string;

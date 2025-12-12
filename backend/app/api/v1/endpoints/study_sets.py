@@ -81,16 +81,73 @@ async def process_study_set(study_set_id: str, pdf_path: str, repo, storage=None
     """
     Process a new PDF for question extraction.
 
-    Uses the full pipeline: Upstage Document Parse → Claude Question Extraction
+    Uses simple rule-based parser (no LLM API required)
     """
-    from app.services.parser.pipeline import PdfProcessingPipeline
-    from app.core import get_settings
+    import uuid
+    from app.services.parser.simple_pdf_parser import parse_pdf_simple
+    from app.models.study_set import StudySetStatus
+    from app.repositories.mock_question import MockQuestionRepository
 
-    settings = get_settings()
+    try:
+        # Update status
+        await repo.update_status(
+            study_set_id,
+            StudySetStatus.PARSING,
+            progress=10,
+            current_step="PDF 텍스트 추출 중...",
+        )
 
-    # Use real pipeline for both dev and production
-    pipeline = PdfProcessingPipeline(repo, storage)
-    await pipeline.process(study_set_id, pdf_path)
+        # Get full path if using mock storage
+        if not pdf_path.startswith('/'):
+            full_path = f"mock_storage/{pdf_path}"
+        else:
+            full_path = pdf_path
+
+        # Parse PDF
+        await repo.update_status(
+            study_set_id,
+            StudySetStatus.PROCESSING,
+            progress=30,
+            current_step="문제 파싱 중...",
+        )
+
+        questions = parse_pdf_simple(full_path)
+
+        # Add IDs to questions
+        for q in questions:
+            q['id'] = str(uuid.uuid4())
+            q['study_set_id'] = study_set_id
+
+        # Save questions
+        await repo.update_status(
+            study_set_id,
+            StudySetStatus.PROCESSING,
+            progress=70,
+            current_step="문제 저장 중...",
+        )
+
+        question_repo = MockQuestionRepository()
+        await question_repo.bulk_create(study_set_id, questions)
+
+        # Mark as ready
+        await repo.update_status(
+            study_set_id,
+            StudySetStatus.READY,
+            progress=100,
+            current_step="완료!",
+        )
+
+        # Update question count
+        await repo.update_question_count(study_set_id, len(questions))
+
+    except Exception as e:
+        print(f"Error processing study set: {e}")
+        await repo.update_status(
+            study_set_id,
+            StudySetStatus.FAILED,
+            progress=0,
+            current_step=f"오류 발생: {str(e)}",
+        )
 
 
 @router.post("/upload")

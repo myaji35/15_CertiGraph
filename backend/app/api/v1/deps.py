@@ -63,6 +63,19 @@ async def get_current_user(
 CurrentUser = Annotated[ClerkUser, Depends(get_current_user)]
 
 
+async def get_current_user_id(current_user: CurrentUser) -> str:
+    """
+    Dependency to get just the current user ID.
+
+    Args:
+        current_user: The current authenticated user
+
+    Returns:
+        User ID string
+    """
+    return current_user.clerk_id
+
+
 # Repository dependency - returns Mock in dev mode, real repo in production
 def get_study_set_repository(settings: Settings = Depends(get_settings)):
     """Get study set repository (mock in dev mode, real in production)."""

@@ -64,7 +64,7 @@ class MockQuestionRepository:
         randomize: bool = False,
     ) -> list[dict[str, Any]]:
         """Get questions for a study set."""
-        # Return existing questions or empty list (don't auto-generate mock questions)
+        # Return existing questions or empty list (no auto-generation)
         questions = self._storage.get(study_set_id, [])
 
         if randomize:

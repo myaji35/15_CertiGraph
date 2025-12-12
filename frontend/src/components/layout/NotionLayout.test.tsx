@@ -218,7 +218,7 @@ describe('NotionLayout 컴포넌트 테스트', () => {
       </NotionLayout>
     );
 
-    expect(screen.getByText('CertiGraph')).toBeInTheDocument();
+    expect(screen.getByText('ExamsGraph')).toBeInTheDocument();
   });
 
   // FE-UNIT-045: 새로고침 버튼 표시

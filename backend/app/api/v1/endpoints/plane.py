@@ -4,6 +4,7 @@ Plane Project Management Integration Endpoints
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from typing import Optional, List
+from inngest import Event
 from app.services.plane_integration import get_plane_integration, PlaneIntegration
 from app.api.v1.deps import get_current_user_id
 from app.core.inngest_client import inngest_client
@@ -37,7 +38,7 @@ async def create_work_item(
     try:
         # Send event to Inngest for background processing
         await inngest_client.send(
-            inngest_client.event(
+            Event(
                 name="plane/work-item.create",
                 data={
                     "title": request.title,
@@ -102,7 +103,7 @@ async def create_development_task(
     try:
         # Send event to Inngest for background processing
         await inngest_client.send(
-            inngest_client.event(
+            Event(
                 name="plane/development-task.create",
                 data={
                     "feature_name": request.feature_name,

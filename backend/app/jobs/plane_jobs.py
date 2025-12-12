@@ -2,14 +2,14 @@
 Inngest background jobs for Plane integration
 """
 from typing import Any, Dict, List, Optional
-from inngest import Inngest
+from inngest import Inngest, TriggerEvent
 from app.core.inngest_client import inngest_client
 from app.services.plane_integration import get_plane_integration
 
 
 @inngest_client.create_function(
     fn_id="plane-create-work-item",
-    trigger=inngest_client.event("plane/work-item.create"),
+    trigger=TriggerEvent(event="plane/work-item.create"),
     retries=3,
 )
 async def create_work_item_job(
@@ -61,7 +61,7 @@ async def create_work_item_job(
 
 @inngest_client.create_function(
     fn_id="plane-list-work-items",
-    trigger=inngest_client.event("plane/work-items.list"),
+    trigger=TriggerEvent(event="plane/work-items.list"),
     retries=3,
 )
 async def list_work_items_job(
@@ -98,7 +98,7 @@ async def list_work_items_job(
 
 @inngest_client.create_function(
     fn_id="plane-get-project-info",
-    trigger=inngest_client.event("plane/project.get"),
+    trigger=TriggerEvent(event="plane/project.get"),
     retries=3,
 )
 async def get_project_info_job(
@@ -130,7 +130,7 @@ async def get_project_info_job(
 
 @inngest_client.create_function(
     fn_id="plane-create-development-task",
-    trigger=inngest_client.event("plane/development-task.create"),
+    trigger=TriggerEvent(event="plane/development-task.create"),
     retries=3,
 )
 async def create_development_task_job(

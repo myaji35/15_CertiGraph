@@ -167,7 +167,7 @@ export default function NotionLayout({ children }: NotionLayoutProps) {
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
           <div className="flex items-center gap-2">
             <Brain className="w-5 h-5 text-blue-500" />
-            <span className="font-semibold text-gray-900 dark:text-gray-100">CertiGraph</span>
+            <span className="font-semibold text-gray-900 dark:text-gray-100">ExamsGraph</span>
           </div>
           <button
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}

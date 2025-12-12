@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface Option {
   number: number;
@@ -11,6 +13,9 @@ interface QuestionCardProps {
   questionNumber: number;
   totalQuestions: number;
   questionText: string;
+  question?: string;  // 순수 질문
+  passage?: string | null;  // 지문/표/사례
+  questionType?: string;  // 문제 유형
   options: Option[];
   selectedAnswer: number | null;
   onSelectAnswer: (answer: number) => void;
@@ -42,6 +47,9 @@ export default function QuestionCard({
   questionNumber,
   totalQuestions,
   questionText,
+  question,
+  passage,
+  questionType,
   options,
   selectedAnswer,
   onSelectAnswer,
@@ -63,23 +71,63 @@ export default function QuestionCard({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      {/* Question Header */}
-      <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
-        <span className="text-sm font-medium text-blue-600">
-          문제 {questionNumber} / {totalQuestions}
-        </span>
+    <div className="bg-white px-8 py-4">
+      {/* Question Number and Content - Exactly as original */}
+      <div className="mb-4">
+        <div className="flex items-start gap-2">
+          <span className="text-base font-normal text-black">
+            {questionNumber}.
+          </span>
+          <div className="flex-1">
+            {/* Display full question text as is - including any passages/tables inline */}
+            <div className="text-base text-black leading-relaxed">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  p: ({ node, ...props }) => (
+                    <p className="mb-2" {...props} />
+                  ),
+                  // Tables with black borders like exam paper
+                  table: ({ node, ...props }) => (
+                    <table className="border-collapse border border-black my-3" {...props} />
+                  ),
+                  thead: ({ node, ...props }) => (
+                    <thead {...props} />
+                  ),
+                  tbody: ({ node, ...props }) => (
+                    <tbody {...props} />
+                  ),
+                  tr: ({ node, ...props }) => (
+                    <tr {...props} />
+                  ),
+                  th: ({ node, ...props }) => (
+                    <th className="border border-black px-3 py-1 text-left text-sm font-normal" {...props} />
+                  ),
+                  td: ({ node, ...props }) => (
+                    <td className="border border-black px-3 py-1 text-sm" {...props} />
+                  ),
+                  // Blockquotes styled as boxed passages
+                  blockquote: ({ node, ...props }) => (
+                    <div className="border border-black p-3 my-3 text-sm" {...props} />
+                  ),
+                  // Lists for structured content
+                  ul: ({ node, ...props }) => (
+                    <ul className="ml-4 my-2" {...props} />
+                  ),
+                  li: ({ node, ...props }) => (
+                    <li className="mb-1" {...props} />
+                  ),
+                }}
+              >
+                {questionText}
+              </ReactMarkdown>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Question Text */}
-      <div className="px-6 py-6">
-        <p className="text-lg text-gray-900 leading-relaxed whitespace-pre-wrap">
-          {questionText}
-        </p>
-      </div>
-
-      {/* Options */}
-      <div className="px-6 pb-6 space-y-3">
+      {/* Options - Real exam paper style */}
+      <div className="ml-8 space-y-1">
         {shuffledOptions.map((option, displayIndex) => {
           const isSelected = displaySelectedIndex === displayIndex;
           const circleNumbers = ["①", "②", "③", "④", "⑤"];
@@ -88,39 +136,20 @@ export default function QuestionCard({
             <button
               key={option.number}
               onClick={() => handleSelect(displayIndex)}
-              className={`w-full p-4 rounded-lg border-2 transition-all text-left flex items-start gap-3 ${
+              className={`w-full text-left flex items-start gap-2 py-1 px-2 transition-colors ${
                 isSelected
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                  ? "bg-gray-100"
+                  : "hover:bg-gray-50"
               }`}
             >
-              <span
-                className={`text-lg font-medium ${
-                  isSelected ? "text-blue-600" : "text-gray-500"
-                }`}
-              >
+              <span className="text-base text-black">
                 {circleNumbers[displayIndex]}
               </span>
-              <span
-                className={`flex-1 ${
-                  isSelected ? "text-blue-900" : "text-gray-700"
-                }`}
-              >
+              <span className={`flex-1 text-base text-black ${
+                isSelected ? "font-medium" : ""
+              }`}>
                 {option.text}
               </span>
-              {isSelected && (
-                <svg
-                  className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              )}
             </button>
           );
         })}

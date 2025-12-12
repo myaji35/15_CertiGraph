@@ -181,6 +181,16 @@ class MockStudySetRepository:
         study_set = self._storage.get(study_set_id)
         return study_set.get("question_count", 0) if study_set else 0
 
+    async def update_question_count(self, study_set_id: str, count: int) -> bool:
+        """Update the question count for a study set."""
+        study_set = self._storage.get(study_set_id)
+        if not study_set:
+            return False
+        study_set["question_count"] = count
+        study_set["updated_at"] = datetime.utcnow().isoformat()
+        self._save_data()
+        return True
+
     async def get_by_id(self, study_set_id: str) -> Optional[dict[str, Any]]:
         """Get a study set by ID (alias for find_by_id)."""
         return await self.find_by_id(study_set_id)

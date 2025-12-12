@@ -158,30 +158,16 @@ export default function TestPage() {
   const seconds = elapsedTime % 60;
 
   return (
-    <div className="max-w-5xl mx-auto">
-      {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">모의고사</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            {answers.size} / {totalQuestions} 답변 완료
-          </p>
-        </div>
-        <div className="text-right">
-          <p className="text-2xl font-mono text-gray-700">
+    <div className="max-w-4xl mx-auto">
+      {/* Simple header with progress */}
+      <div className="mb-4 px-8 py-4 border-b border-gray-200">
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-gray-600">
+            {currentIndex + 1} / {totalQuestions} 문제
+          </div>
+          <div className="text-sm text-gray-600">
             {String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}
-          </p>
-          <p className="text-xs text-gray-500">경과 시간</p>
-        </div>
-      </div>
-
-      {/* Progress Bar */}
-      <div className="mb-6">
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div
-            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-            style={{ width: `${((currentIndex + 1) / totalQuestions) * 100}%` }}
-          />
+          </div>
         </div>
       </div>
 
@@ -192,6 +178,9 @@ export default function TestPage() {
             questionNumber={currentIndex + 1}
             totalQuestions={totalQuestions}
             questionText={currentQuestion.question_text}
+            question={currentQuestion.question}
+            passage={currentQuestion.passage}
+            questionType={currentQuestion.question_type}
             options={currentQuestion.options}
             selectedAnswer={answers.get(currentQuestion.id) || null}
             onSelectAnswer={handleSelectAnswer}

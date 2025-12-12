@@ -443,7 +443,7 @@ export default function SettingsPage() {
                         <h4 className="font-medium">사용자 가이드</h4>
                       </div>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        CertiGraph 사용법 알아보기
+                        ExamsGraph 사용법 알아보기
                       </p>
                     </a>
                     <a href="#" className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">
@@ -492,7 +492,7 @@ export default function SettingsPage() {
                       <div>
                         <h4 className="font-medium">버전 정보</h4>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          CertiGraph v1.0.0
+                          ExamsGraph v1.0.0
                         </p>
                       </div>
                       <button className="text-sm text-blue-600 dark:text-blue-400 hover:underline">

@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import TestStartModal from "@/components/test/TestStartModal";
 
 interface StudySet {
@@ -42,6 +44,7 @@ export default function StudySetDetailPage() {
   const [startingTest, setStartingTest] = useState(false);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
+  const [loadingLogs, setLoadingLogs] = useState<string[]>([]);
 
   const studySetId = params.id as string;
 
@@ -175,9 +178,26 @@ export default function StudySetDetailPage() {
     if (!studySet) return;
 
     setStartingTest(true);
+    setLoadingLogs([]);
+
+    const addLog = (message: string) => {
+      setLoadingLogs(prev => [...prev, message]);
+    };
+
+    // Clear any previous session data
+    const storedKeys = Object.keys(localStorage);
+    storedKeys.forEach(key => {
+      if (key.startsWith('test_session_')) {
+        localStorage.removeItem(key);
+      }
+    });
+
     try {
       const token = await getToken();
       if (!token) throw new Error("인증이 필요합니다");
+
+      addLog("🔄 새로운 학습 세션을 준비합니다...");
+      addLog("✨ 이전 학습 기록이 있어도 처음부터 다시 시작합니다");
 
       // If no questions exist, trigger PDF parsing first
       if (studySet.question_count === 0) {
@@ -238,6 +258,21 @@ export default function StudySetDetailPage() {
         }
       } else {
         // Start learning mode with all questions
+        addLog(`📚 ${studySet.question_count}개의 문제를 준비합니다...`);
+
+        // Simulate loading each question for better UX
+        for (let i = 1; i <= Math.min(studySet.question_count, 5); i++) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          addLog(`✓ ${i}번 문제 로딩`);
+        }
+        if (studySet.question_count > 5) {
+          addLog(`✓ ...나머지 ${studySet.question_count - 5}개 문제 로딩`);
+        }
+
+        addLog("🔀 보기 순서를 섞습니다...");
+        await new Promise(resolve => setTimeout(resolve, 300));
+        addLog("🚀 학습 세션을 시작합니다...");
+
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/tests/start`,
           {
@@ -250,7 +285,7 @@ export default function StudySetDetailPage() {
               study_set_id: studySet.id,
               mode: "all",
               question_count: studySet.question_count,
-              shuffle_options: false,
+              shuffle_options: true, // 보기 섞기 활성화
             }),
           }
         );
@@ -262,6 +297,8 @@ export default function StudySetDetailPage() {
         const data = await response.json();
         const session = data.data;
 
+        addLog("✅ 학습 세션 준비 완료!");
+
         // Store session data in localStorage for the learning page
         localStorage.setItem(
           `test_session_${session.session_id}`,
@@ -272,8 +309,11 @@ export default function StudySetDetailPage() {
         router.push(`/dashboard/test/${session.session_id}`);
       }
     } catch (err) {
+      addLog(`❌ 오류: ${err instanceof Error ? err.message : "알 수 없는 오류"}`);
       alert(err instanceof Error ? err.message : "오류가 발생했습니다");
       setStartingTest(false);
+      // Clear logs after a delay
+      setTimeout(() => setLoadingLogs([]), 3000);
     }
   };
 
@@ -448,6 +488,22 @@ export default function StudySetDetailPage() {
             </div>
           </div>
 
+          {/* Loading Logs */}
+          {loadingLogs.length > 0 && (
+            <div className="mb-6 bg-gray-50 border border-gray-200 rounded-lg p-4">
+              <div className="space-y-2">
+                {loadingLogs.map((log, index) => (
+                  <div
+                    key={index}
+                    className="text-sm text-gray-700 font-mono animate-fade-in"
+                  >
+                    {log}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Actions */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <button
@@ -473,7 +529,9 @@ export default function StudySetDetailPage() {
                   />
                 </svg>
               )}
-              <span className="font-medium">{startingTest ? "학습 중..." : "학습 시작"}</span>
+              <span className="font-medium">
+                {startingTest ? "새 세션 시작 중..." : questions.length > 0 ? "다시 학습하기" : "학습 시작"}
+              </span>
             </button>
             <button
               onClick={() => setShowTestModal(true)}
@@ -514,9 +572,33 @@ export default function StudySetDetailPage() {
                           {question.question_number}
                         </div>
                         <div className="flex-1">
-                          <p className="text-gray-900 leading-relaxed whitespace-pre-wrap">
-                            {question.question_text}
-                          </p>
+                          <div className="text-gray-900 leading-relaxed prose prose-sm max-w-none">
+                            <ReactMarkdown
+                              remarkPlugins={[remarkGfm]}
+                              components={{
+                                table: ({ node, ...props }) => (
+                                  <table className="min-w-full border-collapse border border-gray-300 my-2 text-sm" {...props} />
+                                ),
+                                thead: ({ node, ...props }) => (
+                                  <thead className="bg-gray-100" {...props} />
+                                ),
+                                tbody: ({ node, ...props }) => (
+                                  <tbody {...props} />
+                                ),
+                                tr: ({ node, ...props }) => (
+                                  <tr className="border-b border-gray-300" {...props} />
+                                ),
+                                th: ({ node, ...props }) => (
+                                  <th className="border border-gray-300 px-2 py-1 text-left font-semibold" {...props} />
+                                ),
+                                td: ({ node, ...props }) => (
+                                  <td className="border border-gray-300 px-2 py-1" {...props} />
+                                ),
+                              }}
+                            >
+                              {question.question_text}
+                            </ReactMarkdown>
+                          </div>
                         </div>
                       </div>
                     </div>
