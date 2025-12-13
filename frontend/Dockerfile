@@ -15,9 +15,11 @@ COPY . .
 # Set environment variables for build
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
+ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_dummy
+ENV NEXT_PUBLIC_API_URL=http://localhost:8000
 
 # Build the application
-RUN npm run build || npm run build
+RUN npm run build
 
 # Production stage
 FROM node:20-alpine AS runner
