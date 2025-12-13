@@ -5,7 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from supabase import Client
 
-from app.core.deps import get_current_user, get_supabase
+from app.api.v1.deps import get_current_user, get_supabase
 from app.models.trial import (
     PracticeSessionCreate,
     PracticeSessionResponse,

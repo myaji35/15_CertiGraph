@@ -3,6 +3,7 @@
 from typing import Annotated
 
 from fastapi import Depends, Header
+from supabase import create_client, Client
 
 from app.core import get_settings, Settings
 from app.core.security import verify_clerk_token, ClerkUser
@@ -56,7 +57,31 @@ async def get_current_user(
     # Verify token and get payload
     payload = await verify_clerk_token(token)
 
-    return ClerkUser(payload)
+    clerk_user = ClerkUser(payload)
+
+    # Auto-register user in user_profiles table if not exists
+    try:
+        supabase = create_client(settings.supabase_url, settings.supabase_service_key)
+
+        # Check if user exists
+        existing_user = supabase.table("user_profiles") \
+            .select("clerk_id") \
+            .eq("clerk_id", clerk_user.clerk_id) \
+            .execute()
+
+        # If user doesn't exist, create profile
+        if not existing_user.data:
+            from datetime import datetime
+            supabase.table("user_profiles").insert({
+                "clerk_id": clerk_user.clerk_id,
+                "email": clerk_user.email,
+                "created_at": datetime.utcnow().isoformat(),
+            }).execute()
+    except Exception as e:
+        # Log error but don't fail authentication
+        print(f"Failed to auto-register user {clerk_user.email}: {e}")
+
+    return clerk_user
 
 
 # Type alias for dependency injection
@@ -113,3 +138,9 @@ def get_storage_service(settings: Settings = Depends(get_settings)):
 StorageServiceDep = Annotated[
     StorageService | MockStorageService, Depends(get_storage_service)
 ]
+
+
+# Supabase dependency
+def get_supabase(settings: Settings = Depends(get_settings)) -> Client:
+    """Get Supabase client."""
+    return create_client(settings.supabase_url, settings.supabase_service_role_key)

@@ -9,7 +9,10 @@ from app.api.v1.endpoints import (
     external_certifications_router,
     plane_router,
     payment_router,
-    trial_router
+    trial_router,
+    subscriptions_router,
+    mlflow_tracking_router,
+    admin_router
 )
 
 api_router = APIRouter()
@@ -23,6 +26,9 @@ api_router.include_router(external_certifications_router, prefix="/external-cert
 api_router.include_router(plane_router)
 api_router.include_router(payment_router, prefix="/payment", tags=["Payment"])
 api_router.include_router(trial_router, prefix="/trial", tags=["Free Trial"])
+api_router.include_router(subscriptions_router, prefix="/subscriptions", tags=["Subscriptions"])
+api_router.include_router(mlflow_tracking_router, prefix="/mlflow", tags=["MLflow Tracking"])
+api_router.include_router(admin_router)
 
 
 # Health check for API v1

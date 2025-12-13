@@ -86,9 +86,13 @@ class ExamPredictionService:
         Returns:
             예측 결과
         """
-        # Get all completed sessions
-        sessions = await self._get_user_sessions(user_id)
-        if not sessions:
+        try:
+            # Get all completed sessions
+            sessions = await self._get_user_sessions(user_id)
+            if not sessions:
+                return self._empty_result()
+        except Exception as e:
+            # If there's an error connecting to the database, return empty result
             return self._empty_result()
 
         # Get all answers with question details

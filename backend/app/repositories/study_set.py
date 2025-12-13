@@ -148,6 +148,27 @@ class StudySetRepository:
             response.raise_for_status()
             return response.json()
 
+    async def find_all_by_user(
+        self,
+        user_id: str,
+        skip: int = 0,
+        limit: int = 100,
+    ) -> list[dict[str, Any]]:
+        """Find all study sets for a user."""
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{self.base_url}/study_sets",
+                headers=self.headers,
+                params={
+                    "user_id": f"eq.{user_id}",
+                    "order": "created_at.desc",
+                    "offset": str(skip),
+                    "limit": str(limit),
+                },
+            )
+            response.raise_for_status()
+            return response.json()
+
     async def update_status(
         self,
         study_set_id: str,

@@ -32,19 +32,30 @@ class DashboardService:
         Returns:
             Dashboard statistics
         """
-        # Get study sets count
-        study_sets = await self._get_study_sets(user_id)
-        study_set_count = len(study_sets)
+        try:
+            # Get study sets count
+            study_sets = await self._get_study_sets(user_id)
+            study_set_count = len(study_sets)
 
-        # Calculate total questions across all study sets
-        total_questions = sum(
-            ss.get("question_count", 0) for ss in study_sets
-            if ss.get("status") == "ready"
-        )
+            # Calculate total questions across all study sets
+            total_questions = sum(
+                ss.get("question_count", 0) for ss in study_sets
+                if ss.get("status") == "ready"
+            )
 
-        # Get test sessions
-        sessions = await self._get_test_sessions(user_id)
-        test_count = len(sessions)
+            # Get test sessions
+            sessions = await self._get_test_sessions(user_id)
+            test_count = len(sessions)
+        except Exception as e:
+            # If there's an error connecting to the database, return empty stats
+            return {
+                "study_set_count": 0,
+                "total_questions": 0,
+                "test_count": 0,
+                "avg_accuracy": 0,
+                "recent_activity": [],
+                "has_data": False,
+            }
 
         # Calculate average accuracy
         total_score = 0

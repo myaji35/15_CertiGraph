@@ -158,6 +158,7 @@ async def upload_study_set(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     name: str = Form(...),
+    certification_id: str = Form(...),  # 자격증 ID 필수
     exam_name: str = Form(None),
     exam_year: int = Form(None),
     exam_round: int = Form(None),
@@ -168,12 +169,32 @@ async def upload_study_set(
     """
     Upload a PDF file to create a new study set.
 
+    Requires active subscription for the specified certification.
     If a duplicate PDF is detected (same hash), we reuse cached results
     while showing fake processing progress to the user.
 
     Exam metadata (exam_name, exam_year, etc.) helps organize study sets
     hierarchically by certification exam, year, round, and session.
     """
+    from fastapi import HTTPException, status as http_status
+    from app.api.v1.deps import get_supabase
+
+    # 구독 확인: 해당 자격증에 대한 활성 구독이 있는지 검사
+    supabase = get_supabase()
+    has_subscription = supabase.rpc(
+        'has_active_subscription',
+        {
+            'p_clerk_user_id': current_user.clerk_id,
+            'p_certification_id': certification_id
+        }
+    ).execute()
+
+    if not has_subscription.data:
+        raise HTTPException(
+            status_code=http_status.HTTP_402_PAYMENT_REQUIRED,
+            detail=f"이 자격증에 대한 구독이 필요합니다. 먼저 구독을 구매해주세요."
+        )
+
     # Validate file type
     if file.content_type not in ALLOWED_CONTENT_TYPES:
         raise InvalidFileTypeError()
@@ -223,6 +244,7 @@ async def upload_study_set(
         pdf_hash=pdf_hash,
         status=StudySetStatus.READY,  # Ready for parsing when user starts learning
         source_study_set_id=None,
+        certification_id=certification_id,  # 자격증 ID 저장
         exam_name=exam_name,
         exam_year=exam_year,
         exam_round=exam_round,
