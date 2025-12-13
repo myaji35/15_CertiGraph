@@ -203,23 +203,33 @@ function LoggedOutHero() {
         initial={{ scale: 0.9 }}
         animate={{ scale: 1 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="inline-block mb-4 px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium"
+        className="inline-block mb-6 px-6 py-3 bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-full"
       >
-        🎯 AI 기반 맞춤형 학습
+        <span className="text-blue-700 font-semibold text-sm md:text-base">
+          📄 PDF 업로드만으로 자동 문제 분석
+        </span>
       </motion.div>
 
-      <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+      <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
         <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-          AI와 함께하는
+          기출문제 PDF를 업로드하면
         </span>
         <br />
-        스마트한 자격증 준비
+        <span className="text-gray-900">
+          AI가 문제, 보기, 해설을
+        </span>
+        <br />
+        <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          자동으로 분리합니다
+        </span>
       </h1>
 
-      <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-        사회복지사 1급 시험 대비를 위한 차별화된 학습 경험.
+      <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+        번거로운 문제 입력은 그만!
+        <span className="font-semibold text-gray-800"> PDF 한 번 업로드로 </span>
+        CBT 모의고사부터 AI 취약점 분석까지.
         <br />
-        PDF 기출문제를 업로드하면 AI가 자동으로 분석하고 맞춤형 학습을 제공합니다.
+        <span className="text-blue-600 font-medium">사회복지사 1급</span> 시험 대비의 새로운 기준을 경험하세요.
       </p>
 
       <div className="flex gap-4 justify-center">
@@ -315,7 +325,7 @@ function LoggedInDashboard() {
       {/* Quick Actions */}
       <div className="grid md:grid-cols-3 gap-6">
         <QuickActionCard
-          href="/dashboard/study-sets"
+          href="/study-sets"
           icon="📖"
           title="학습 이어하기"
           description="저번에 공부하던 문제집으로 이동합니다"
@@ -323,7 +333,7 @@ function LoggedInDashboard() {
           color="blue"
         />
         <QuickActionCard
-          href="/dashboard/test/new"
+          href="/dashboard/test"
           icon="🎓"
           title="모의고사 보기"
           description="실전과 동일한 환경에서 실력을 테스트하세요"
