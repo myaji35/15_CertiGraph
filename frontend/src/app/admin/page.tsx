@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Book, Users, FileText, TrendingUp, Activity, Clock, Award, BarChart } from 'lucide-react';
+import { Book, Users, FileText, TrendingUp, Activity, Clock, Award, BarChart, Plus } from 'lucide-react';
+import { useAuth } from '@clerk/nextjs';
 
 export default function AdminDashboard() {
+  const { getToken } = useAuth();
   const [stats, setStats] = useState({
     totalStudySets: 0,
     totalUsers: 0,
@@ -12,6 +14,7 @@ export default function AdminDashboard() {
     testsToday: 0,
     avgScore: 0,
   });
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
   useEffect(() => {
     // TODO: API에서 실제 통계 데이터 가져오기
@@ -152,6 +155,173 @@ export default function AdminDashboard() {
           <QuickAction href="/admin/users" label="사용자 관리" />
           <QuickAction href="/admin/certifications" label="자격증 관리" />
           <QuickAction href="/admin/settings" label="시스템 설정" />
+          <button
+            onClick={() => setShowSubscriptionModal(true)}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition-colors text-sm font-medium flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            강제 구독 생성
+          </button>
+        </div>
+      </div>
+
+      {/* 강제 구독 생성 모달 */}
+      {showSubscriptionModal && (
+        <ForceSubscriptionModal
+          onClose={() => setShowSubscriptionModal(false)}
+          getToken={getToken}
+        />
+      )}
+    </div>
+  );
+}
+
+function ForceSubscriptionModal({ onClose, getToken }: { onClose: () => void; getToken: any }) {
+  const [certifications, setCertifications] = useState<any[]>([]);
+  const [selectedCertId, setSelectedCertId] = useState('');
+  const [selectedExamDateId, setSelectedExamDateId] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetchCertifications();
+  }, []);
+
+  const fetchCertifications = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/certifications`);
+      if (response.ok) {
+        const data = await response.json();
+        setCertifications(data.certifications || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch certifications:', err);
+    }
+  };
+
+  const handleCreateSubscription = async () => {
+    if (!selectedCertId || !selectedExamDateId) {
+      setError('자격증과 시험일을 모두 선택해주세요.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError('');
+      const token = await getToken();
+
+      const selectedCert = certifications.find(c => c.id === selectedCertId);
+      const selectedExamDate = selectedCert?.exam_dates.find((d: any) => d.id === selectedExamDateId);
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/subscriptions`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          certification_id: selectedCertId,
+          exam_date_id: selectedExamDateId,
+          payment_amount: 10000,
+          payment_method: 'admin_force',
+        }),
+      });
+
+      if (response.ok) {
+        alert('구독이 생성되었습니다!');
+        onClose();
+        window.location.reload(); // 페이지 새로고침으로 대시보드 업데이트
+      } else {
+        const errorData = await response.json();
+        setError(errorData.detail || '구독 생성에 실패했습니다.');
+      }
+    } catch (err: any) {
+      console.error('Failed to create subscription:', err);
+      setError(err.message || '오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const selectedCert = certifications.find(c => c.id === selectedCertId);
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-md w-full p-6">
+        <h2 className="text-xl font-bold mb-4">강제 구독 생성 (테스트용)</h2>
+
+        <div className="space-y-4">
+          {/* 자격증 선택 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              자격증 선택
+            </label>
+            <select
+              value={selectedCertId}
+              onChange={(e) => {
+                setSelectedCertId(e.target.value);
+                setSelectedExamDateId(''); // Reset exam date
+              }}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">자격증을 선택하세요</option>
+              {certifications.map((cert) => (
+                <option key={cert.id} value={cert.id}>
+                  {cert.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* 시험일 선택 */}
+          {selectedCert && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                시험일 선택
+              </label>
+              <select
+                value={selectedExamDateId}
+                onChange={(e) => setSelectedExamDateId(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">시험일을 선택하세요</option>
+                {selectedCert.exam_dates?.map((examDate: any) => (
+                  <option key={examDate.id} value={examDate.id}>
+                    {new Date(examDate.exam_date).toLocaleDateString('ko-KR', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* 에러 메시지 */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+              <p className="text-sm text-red-800">{error}</p>
+            </div>
+          )}
+
+          {/* 버튼 */}
+          <div className="flex gap-3 mt-6">
+            <button
+              onClick={onClose}
+              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              disabled={loading}
+            >
+              취소
+            </button>
+            <button
+              onClick={handleCreateSubscription}
+              className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+              disabled={loading || !selectedCertId || !selectedExamDateId}
+            >
+              {loading ? '생성 중...' : '구독 생성'}
+            </button>
+          </div>
         </div>
       </div>
     </div>

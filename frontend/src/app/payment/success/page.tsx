@@ -4,47 +4,65 @@ import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { CheckCircle } from 'lucide-react';
 import Link from 'next/link';
+import { useAuth } from '@clerk/nextjs';
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { getToken } = useAuth();
   const [paymentInfo, setPaymentInfo] = useState<any>(null);
+  const [processing, setProcessing] = useState(true);
 
   const orderId = searchParams.get('orderId');
   const amount = searchParams.get('amount');
   const paymentKey = searchParams.get('paymentKey');
+  const certificationId = searchParams.get('certification_id');
+  const examDateId = searchParams.get('exam_date_id');
 
   useEffect(() => {
-    if (paymentKey && orderId && amount) {
-      // 결제 확인 처리
-      confirmPayment();
+    if (paymentKey && orderId && amount && certificationId && examDateId) {
+      confirmPaymentAndCreateSubscription();
     }
-  }, [paymentKey, orderId, amount]);
+  }, [paymentKey, orderId, amount, certificationId, examDateId]);
 
-  const confirmPayment = async () => {
+  const confirmPaymentAndCreateSubscription = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payment/confirm`, {
+      setProcessing(true);
+      const token = await getToken();
+
+      // 1. 결제 확인 (optional - 토스페이먼츠 API로 검증)
+      // 생략하고 바로 구독 생성
+
+      // 2. 구독 생성
+      const subscriptionResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/subscriptions`, {
         method: 'POST',
         headers: {
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          payment_key: paymentKey,
-          order_id: orderId,
-          amount: parseInt(amount || '0'),
+          certification_id: certificationId,
+          exam_date_id: examDateId,
+          payment_amount: parseInt(amount || '10000'),
+          payment_method: 'toss_payments',
         }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
+      if (subscriptionResponse.ok) {
+        const data = await subscriptionResponse.json();
         setPaymentInfo(data);
       } else {
-        // 실패 시 에러 페이지로 리다이렉트
+        const errorData = await subscriptionResponse.json();
+        console.error('Subscription creation failed:', errorData);
+        alert('구독 생성에 실패했습니다: ' + (errorData.detail || '알 수 없는 오류'));
         router.push('/payment/fail');
       }
     } catch (error) {
-      console.error('Payment confirmation failed:', error);
+      console.error('Payment confirmation or subscription creation failed:', error);
+      alert('결제 처리 중 오류가 발생했습니다.');
       router.push('/payment/fail');
+    } finally {
+      setProcessing(false);
     }
   };
 
@@ -52,19 +70,36 @@ function PaymentSuccessContent() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
         <div className="text-center">
-          {/* Success Icon */}
-          <div className="mx-auto w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-6">
-            <CheckCircle className="w-16 h-16 text-green-600" />
-          </div>
+          {processing ? (
+            <>
+              {/* Processing State */}
+              <div className="mx-auto w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600"></div>
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                구독 생성 중...
+              </h1>
+              <p className="text-gray-600 mb-6">
+                잠시만 기다려주세요.
+              </p>
+            </>
+          ) : (
+            <>
+              {/* Success Icon */}
+              <div className="mx-auto w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-6">
+                <CheckCircle className="w-16 h-16 text-green-600" />
+              </div>
 
-          {/* Success Message */}
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            결제가 완료되었습니다!
-          </h1>
+              {/* Success Message */}
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                결제가 완료되었습니다!
+              </h1>
 
-          <p className="text-gray-600 mb-6">
-            사회복지사 1급 시험 준비를 시작하세요.
-          </p>
+              <p className="text-gray-600 mb-6">
+                자격증 시험 준비를 시작하세요.
+              </p>
+            </>
+          )}
 
           {/* Payment Details */}
           {orderId && (

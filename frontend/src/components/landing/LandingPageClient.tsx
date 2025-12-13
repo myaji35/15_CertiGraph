@@ -199,76 +199,151 @@ function LoggedOutHero() {
       transition={{ duration: 0.5 }}
       className="max-w-4xl mx-auto text-center relative"
     >
-      {/* Animated Background Elements */}
+      {/* Epic Animated Background */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
-        {/* Large gradient blob - top right */}
+        {/* Animated Mesh Gradient Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 opacity-60" />
+
+        {/* Large animated orb - top right */}
         <motion.div
           animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, 90, 0],
-            x: [0, 50, 0],
-            y: [0, -30, 0],
+            scale: [1, 1.3, 1.1, 1],
+            rotate: [0, 180, 360],
+            x: [0, 100, -50, 0],
+            y: [0, -50, 50, 0],
+          }}
+          transition={{
+            duration: 25,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute -top-48 -right-48 w-[600px] h-[600px]"
+          style={{
+            background: 'radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, rgba(147, 51, 234, 0.3) 50%, transparent 70%)',
+            filter: 'blur(60px)',
+          }}
+        />
+
+        {/* Medium orb - bottom left with opposite motion */}
+        <motion.div
+          animate={{
+            scale: [1.2, 1, 1.4, 1.2],
+            rotate: [360, 180, 0],
+            x: [0, -80, 60, 0],
+            y: [0, 80, -40, 0],
           }}
           transition={{
             duration: 20,
             repeat: Infinity,
             ease: "easeInOut",
+            delay: 0.5,
           }}
-          className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-blue-400/30 to-purple-400/30 rounded-full blur-3xl"
+          className="absolute -bottom-48 -left-48 w-[500px] h-[500px]"
+          style={{
+            background: 'radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, rgba(236, 72, 153, 0.3) 50%, transparent 70%)',
+            filter: 'blur(60px)',
+          }}
         />
 
-        {/* Medium gradient blob - bottom left */}
+        {/* Accent orb - center */}
         <motion.div
           animate={{
-            scale: [1, 1.3, 1],
-            rotate: [0, -90, 0],
-            x: [0, -30, 0],
-            y: [0, 50, 0],
+            scale: [1, 1.6, 1],
+            rotate: [0, 360],
+            opacity: [0.3, 0.6, 0.3],
           }}
           transition={{
-            duration: 15,
+            duration: 18,
             repeat: Infinity,
             ease: "easeInOut",
             delay: 1,
           }}
-          className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-purple-400/30 to-pink-400/30 rounded-full blur-3xl"
+          className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[400px] h-[400px]"
+          style={{
+            background: 'radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, rgba(59, 130, 246, 0.2) 50%, transparent 70%)',
+            filter: 'blur(50px)',
+          }}
         />
 
-        {/* Small accent blob - top left */}
-        <motion.div
-          animate={{
-            scale: [1, 1.5, 1],
-            x: [0, -20, 0],
-            y: [0, 30, 0],
-          }}
-          transition={{
-            duration: 12,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 2,
-          }}
-          className="absolute top-20 left-10 w-64 h-64 bg-gradient-to-br from-blue-300/20 to-cyan-300/20 rounded-full blur-2xl"
-        />
-
-        {/* Floating particles */}
-        {[...Array(5)].map((_, i) => (
+        {/* Floating geometric shapes */}
+        {[...Array(8)].map((_, i) => (
           <motion.div
-            key={i}
+            key={`shape-${i}`}
             animate={{
-              y: [0, -100, 0],
-              x: [0, Math.random() * 50 - 25, 0],
-              opacity: [0, 1, 0],
+              y: [0, -150, 0],
+              x: [0, Math.sin(i) * 100, 0],
+              rotate: [0, 360],
+              opacity: [0.2, 0.8, 0.2],
             }}
             transition={{
-              duration: 5 + i * 2,
+              duration: 10 + i * 3,
               repeat: Infinity,
               ease: "easeInOut",
-              delay: i * 0.5,
+              delay: i * 0.8,
             }}
-            className="absolute w-2 h-2 bg-blue-400/50 rounded-full blur-sm"
+            className="absolute"
             style={{
-              left: `${20 + i * 15}%`,
-              top: `${30 + i * 10}%`,
+              left: `${10 + i * 12}%`,
+              top: `${20 + (i % 3) * 25}%`,
+              width: `${30 + i * 10}px`,
+              height: `${30 + i * 10}px`,
+              background: i % 3 === 0
+                ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(147, 51, 234, 0.2))'
+                : i % 3 === 1
+                ? 'linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(236, 72, 153, 0.2))'
+                : 'linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(59, 130, 246, 0.2))',
+              borderRadius: i % 2 === 0 ? '50%' : '20%',
+              filter: 'blur(2px)',
+            }}
+          />
+        ))}
+
+        {/* Sparkle particles */}
+        {[...Array(15)].map((_, i) => (
+          <motion.div
+            key={`particle-${i}`}
+            animate={{
+              y: [0, -200, 0],
+              x: [0, Math.random() * 100 - 50, 0],
+              opacity: [0, 1, 0],
+              scale: [0, 1.5, 0],
+            }}
+            transition={{
+              duration: 6 + i * 1.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: i * 0.4,
+            }}
+            className="absolute w-1 h-1 bg-white rounded-full"
+            style={{
+              left: `${5 + i * 6}%`,
+              top: `${15 + (i % 4) * 20}%`,
+              boxShadow: '0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(59, 130, 246, 0.4)',
+            }}
+          />
+        ))}
+
+        {/* Animated lines/connections */}
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={`line-${i}`}
+            animate={{
+              scaleX: [0, 1, 0],
+              opacity: [0, 0.3, 0],
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: i * 1.5,
+            }}
+            className="absolute h-[2px]"
+            style={{
+              left: `${i * 15}%`,
+              top: `${25 + i * 10}%`,
+              width: '200px',
+              background: 'linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.4), transparent)',
+              transformOrigin: 'left',
             }}
           />
         ))}

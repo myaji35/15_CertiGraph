@@ -7,6 +7,8 @@ type PaymentWidgetInstance = any; // Temporary type for build
 import { useAuth } from '@clerk/nextjs';
 
 interface TossPaymentProps {
+  certificationId: string;
+  examDateId: string;
   examDate: string;
   amount?: number;
   onSuccess?: () => void;
@@ -14,6 +16,8 @@ interface TossPaymentProps {
 }
 
 export default function TossPayment({
+  certificationId,
+  examDateId,
   examDate,
   amount = 10000,
   onSuccess,
@@ -69,35 +73,20 @@ export default function TossPayment({
 
     try {
       const token = await getToken();
-      const orderId = `ORDER_${userId}_${examDate}_${Date.now()}`;
+      const orderId = `ORDER_${userId}_${certificationId}_${examDateId}_${Date.now()}`;
 
       // 토스페이먼츠 결제 요청
       await paymentWidget.requestPayment({
         orderId: orderId,
-        orderName: `사회복지사 1급 시험 대비 (${examDate})`,
+        orderName: `자격증 시험 대비 (${examDate})`,
         customerName: userId || "Guest",
         customerEmail: `${userId}@examsgraph.com`,
-        successUrl: `${window.location.origin}/payment/success`,
+        successUrl: `${window.location.origin}/payment/success?certification_id=${certificationId}&exam_date_id=${examDateId}`,
         failUrl: `${window.location.origin}/payment/fail`,
       });
 
-      // 성공 시 백엔드에 결제 정보 저장
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payment/confirm`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          payment_key: orderId,
-          order_id: orderId,
-          amount: amount,
-        }),
-      });
-
-      if (response.ok && onSuccess) {
-        onSuccess();
-      }
+      // 토스페이먼츠 결제 후 successUrl로 리다이렉트됨
+      // payment/success 페이지에서 구독 생성 API 호출
 
     } catch (error: any) {
       console.error("결제 요청 실패:", error);
@@ -114,27 +103,39 @@ export default function TossPayment({
       {/* 상품 정보 */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
         <h2 className="text-xl font-bold mb-4">주문 정보</h2>
-        <div className="flex justify-between items-start">
-          <div>
-            <h3 className="font-semibold text-gray-900">사회복지사 1급 시험 대비</h3>
-            <p className="text-sm text-gray-600 mt-1">시험일: {examDate}</p>
-            <ul className="mt-3 space-y-1">
+        <div className="flex justify-between items-start mb-4">
+          <div className="flex-1">
+            <h3 className="font-semibold text-gray-900 text-lg">사회복지사 1급 시험 대비</h3>
+
+            {/* 구독 기간 안내 */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-3 mb-3">
+              <p className="text-sm font-semibold text-blue-900 mb-1">📅 이용 기간</p>
+              <p className="text-sm text-blue-800">
+                결제일부터 <strong className="text-blue-900">{examDate} 시험일까지</strong>
+              </p>
+            </div>
+
+            <ul className="mt-3 space-y-1.5">
               <li className="text-sm text-gray-600 flex items-center">
                 <span className="text-blue-500 mr-2">✓</span>
-                모든 문제 무제한 학습
+                무제한 PDF 업로드 및 문제풀이
               </li>
               <li className="text-sm text-gray-600 flex items-center">
                 <span className="text-blue-500 mr-2">✓</span>
-                AI 기반 취약점 분석
+                AI 기반 취약점 분석 및 맞춤 학습
               </li>
               <li className="text-sm text-gray-600 flex items-center">
                 <span className="text-blue-500 mr-2">✓</span>
-                맞춤형 학습 추천
+                합격 예측 및 학습 진도 관리
+              </li>
+              <li className="text-sm text-gray-600 flex items-center">
+                <span className="text-blue-500 mr-2">✓</span>
+                3D 지식 그래프 시각화
               </li>
             </ul>
           </div>
-          <div className="text-right">
-            <p className="text-2xl font-bold text-blue-600">
+          <div className="text-right ml-6">
+            <p className="text-3xl font-bold text-blue-600">
               ₩{formatPrice(amount)}
             </p>
             <p className="text-sm text-gray-500 line-through mt-1">

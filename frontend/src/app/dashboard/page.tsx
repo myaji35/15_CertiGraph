@@ -27,6 +27,17 @@ interface ExamPrediction {
   cutoff_subjects: string[];
 }
 
+interface Subscription {
+  id: string;
+  certification_id: string;
+  certification_name: string;
+  exam_date: string;
+  subscription_end_date: string;
+  days_remaining: number;
+  status: string;
+  amount: number;
+}
+
 const probabilityLabels = {
   high: { text: "합격 가능", color: "text-green-600", bg: "bg-green-100" },
   medium: { text: "합격 근접", color: "text-blue-600", bg: "bg-blue-100" },
@@ -40,6 +51,7 @@ export default function DashboardPage() {
   const { user } = useUser();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [prediction, setPrediction] = useState<ExamPrediction | null>(null);
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -48,11 +60,14 @@ export default function DashboardPage() {
         const token = await getToken();
         if (!token) return;
 
-        const [statsRes, predictionRes] = await Promise.all([
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/analysis/dashboard`, {
+        const [statsRes, predictionRes, subscriptionsRes] = await Promise.all([
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/analysis/dashboard`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/analysis/exam-prediction`, {
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/analysis/exam-prediction`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/subscriptions/my-subscriptions`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
@@ -65,6 +80,11 @@ export default function DashboardPage() {
         if (predictionRes.ok) {
           const data = await predictionRes.json();
           setPrediction(data.data);
+        }
+
+        if (subscriptionsRes.ok) {
+          const data = await subscriptionsRes.json();
+          setSubscriptions(data.subscriptions || []);
         }
       } catch (err) {
         console.error("Failed to fetch dashboard data:", err);
@@ -114,6 +134,100 @@ export default function DashboardPage() {
           <p className="text-3xl font-bold text-gray-900">{stats?.test_count || 0}회</p>
         </div>
       </div>
+
+      {/* Subscription Information */}
+      {subscriptions.length > 0 && (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">내 구독 정보</h2>
+          <div className="space-y-4">
+            {subscriptions.map((sub) => {
+              const examDate = new Date(sub.exam_date);
+              const isExpiringSoon = sub.days_remaining <= 7 && sub.days_remaining > 0;
+              const isExpired = sub.days_remaining <= 0;
+
+              return (
+                <div
+                  key={sub.id}
+                  className={`p-4 rounded-lg border-2 ${
+                    isExpired
+                      ? "border-gray-300 bg-gray-50"
+                      : isExpiringSoon
+                      ? "border-orange-300 bg-orange-50"
+                      : "border-blue-300 bg-blue-50"
+                  }`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-lg font-bold text-gray-900">
+                          {sub.certification_name}
+                        </h3>
+                        <span
+                          className={`text-xs px-2 py-1 rounded-full font-semibold ${
+                            isExpired
+                              ? "bg-gray-200 text-gray-700"
+                              : "bg-green-100 text-green-700"
+                          }`}
+                        >
+                          {isExpired ? "만료됨" : "활성"}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                        <div>
+                          <p className="text-gray-600">시험일</p>
+                          <p className="font-semibold text-gray-900">
+                            {examDate.toLocaleDateString("ko-KR", {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            })}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-gray-600">남은 기간</p>
+                          <p
+                            className={`font-semibold ${
+                              isExpired
+                                ? "text-gray-700"
+                                : isExpiringSoon
+                                ? "text-orange-600"
+                                : "text-blue-600"
+                            }`}
+                          >
+                            {isExpired ? "만료됨" : `D-${sub.days_remaining}일`}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-gray-600">결제 금액</p>
+                          <p className="font-semibold text-gray-900">
+                            ₩{sub.amount.toLocaleString("ko-KR")}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    {!isExpired && (
+                      <Link
+                        href="/dashboard/study-sets"
+                        className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                      >
+                        학습하기
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <Link
+              href="/pricing"
+              className="text-sm text-blue-600 hover:underline"
+            >
+              다른 자격증 구독하기 →
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Exam Prediction Summary */}
       {prediction && prediction.predicted_score > 0 && (

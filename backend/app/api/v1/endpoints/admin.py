@@ -5,7 +5,7 @@ from typing import List
 from pydantic import BaseModel
 from datetime import datetime
 
-from app.api.v1.deps import CurrentUser, get_supabase
+from app.api.v1.deps import CurrentUser, get_supabase, SettingsDep
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
@@ -29,6 +29,7 @@ class UsersListResponse(BaseModel):
 @router.get("/users", response_model=UsersListResponse)
 async def get_all_users(
     current_user: CurrentUser,
+    settings: SettingsDep,
     supabase=Depends(get_supabase)
 ):
     """
@@ -37,6 +38,51 @@ async def get_all_users(
     Admin endpoint to list all users and their subscription status.
     This helps identify users who need promotional subscriptions.
     """
+
+    # In dev mode, return mock data
+    if settings.dev_mode:
+        from datetime import datetime, timedelta
+        mock_users = [
+            UserSubscriptionInfo(
+                clerk_id="dev_user_001",
+                email="alice@example.com",
+                created_at=datetime.utcnow().isoformat(),
+                subscription_count=2,
+                has_active_subscription=True,
+                latest_subscription={
+                    "id": "sub_001",
+                    "certification_name": "정보처리기사",
+                    "exam_date": (datetime.utcnow() + timedelta(days=30)).isoformat(),
+                    "payment_amount": 10000,
+                    "payment_method": "card",
+                    "created_at": datetime.utcnow().isoformat(),
+                }
+            ),
+            UserSubscriptionInfo(
+                clerk_id="dev_user_002",
+                email="bob@example.com",
+                created_at=datetime.utcnow().isoformat(),
+                subscription_count=1,
+                has_active_subscription=False,
+                latest_subscription={
+                    "id": "sub_002",
+                    "certification_name": "SQLD",
+                    "exam_date": (datetime.utcnow() - timedelta(days=10)).isoformat(),
+                    "payment_amount": 10000,
+                    "payment_method": "admin_promotional",
+                    "created_at": datetime.utcnow().isoformat(),
+                }
+            ),
+            UserSubscriptionInfo(
+                clerk_id="dev_user_003",
+                email="charlie@example.com",
+                created_at=datetime.utcnow().isoformat(),
+                subscription_count=0,
+                has_active_subscription=False,
+                latest_subscription=None
+            ),
+        ]
+        return UsersListResponse(users=mock_users, total_count=len(mock_users))
 
     try:
         # Get all users from user_profiles table
