@@ -12,9 +12,6 @@ RUN npm ci
 # Copy all files
 COPY . .
 
-# Generate Prisma Client (if schema exists)
-RUN npx prisma generate || true
-
 # Set environment variables for build
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
