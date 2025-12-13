@@ -41,3 +41,5 @@ backend/.env.production
 dokploy-deploy-key.pub
 backend.tar.gz
 dokploy-config.json
+dokploy-complete-setup.json
+.dokploy.env
