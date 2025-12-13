@@ -32,8 +32,8 @@ export default function QuestionNavigator({
                 ${isCurrent
                   ? "bg-blue-600 text-white ring-2 ring-blue-300"
                   : isAnswered
-                  ? "bg-green-100 text-green-700 hover:bg-green-200"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  ? "bg-green-500 text-white hover:bg-green-600"
+                  : "bg-gray-300 text-gray-800 hover:bg-gray-400"
                 }
               `}
             >
@@ -50,11 +50,11 @@ export default function QuestionNavigator({
           현재
         </div>
         <div className="flex items-center gap-1">
-          <span className="w-3 h-3 bg-green-100 rounded"></span>
+          <span className="w-3 h-3 bg-green-500 rounded"></span>
           답변함
         </div>
         <div className="flex items-center gap-1">
-          <span className="w-3 h-3 bg-gray-100 rounded"></span>
+          <span className="w-3 h-3 bg-gray-300 rounded"></span>
           미답변
         </div>
       </div>

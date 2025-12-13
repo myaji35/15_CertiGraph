@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useMemo } from 'react';
-import { ChevronRight, ChevronDown, Search, Settings, Plus, Book, Brain, Target, Award, Calendar, Home, Menu, X, Moon, Sun } from 'lucide-react';
+import { ChevronRight, ChevronDown, Search, Settings, Plus, Book, BookOpen, Brain, Target, Award, Calendar, Home, Menu, X, Moon, Sun } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
@@ -39,19 +39,25 @@ export default function NotionLayout({ children }: NotionLayoutProps) {
           id: 'study-sets',
           title: '문제집',
           icon: <Book className="w-4 h-4" />,
-          path: '/dashboard/study-sets',
+          path: '/study-sets',
+        },
+        {
+          id: 'study-materials',
+          title: '학습 자료',
+          icon: <BookOpen className="w-4 h-4" />,
+          path: '/study-materials',
         },
         {
           id: 'knowledge-graph',
           title: '지식 그래프',
           icon: <Brain className="w-4 h-4" />,
-          path: '/dashboard/knowledge-graph',
+          path: '/knowledge-graph',
         },
         {
           id: 'weak-points',
           title: '취약점 분석',
           icon: <Target className="w-4 h-4" />,
-          path: '/dashboard/weak-points',
+          path: '/weak-points',
         },
       ],
     },
@@ -64,20 +70,34 @@ export default function NotionLayout({ children }: NotionLayoutProps) {
         {
           id: 'achievements',
           title: '성취도',
-          path: '/dashboard/achievements',
+          path: '/achievements',
         },
         {
           id: 'statistics',
           title: '통계',
-          path: '/dashboard/statistics',
+          path: '/statistics',
         },
       ],
     },
     {
-      id: 'schedule',
-      title: '시험 일정',
-      icon: <Calendar className="w-4 h-4" />,
-      path: '/dashboard/certifications',
+      id: 'certifications',
+      title: '자격증',
+      icon: <Award className="w-4 h-4" />,
+      expanded: true,
+      children: [
+        {
+          id: 'exam-schedule',
+          title: '시험 일정',
+          icon: <Calendar className="w-4 h-4" />,
+          path: '/certifications',
+        },
+        {
+          id: 'cert-search',
+          title: '자격증 검색',
+          icon: <Search className="w-4 h-4" />,
+          path: '/certifications/search',
+        },
+      ],
     },
   ]);
 
@@ -234,9 +254,9 @@ export default function NotionLayout({ children }: NotionLayoutProps) {
             <ChevronRight className="w-3 h-3" />
             <span className="text-gray-900 dark:text-gray-100">대시보드</span>
           </div>
-          <button className="flex items-center gap-2 px-3 py-1.5 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
-            <Plus className="w-4 h-4" />
-            새 문제집
+          <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors whitespace-nowrap">
+            <Plus className="w-3.5 h-3.5 flex-shrink-0" />
+            <span>새 문제집</span>
           </button>
         </div>
 

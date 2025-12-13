@@ -107,7 +107,8 @@ export default function TestStartModal({
           ))}
 
           {/* Shuffle Options Checkbox */}
-          <div className="mt-4 pt-4 border-t border-gray-200">
+          {/* 섞기 기능 비활성화 - 추후 정답 DB 구축 후 활성화 예정 */}
+          {/* <div className="mt-4 pt-4 border-t border-gray-200">
             <label className="flex items-center gap-3 cursor-pointer">
               <input
                 type="checkbox"
@@ -120,7 +121,7 @@ export default function TestStartModal({
                 <p className="text-sm text-gray-500">문제 순서와 보기를 섞어서 출제</p>
               </div>
             </label>
-          </div>
+          </div> */}
         </div>
 
         {/* Actions */}

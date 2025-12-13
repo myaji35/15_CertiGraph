@@ -7,7 +7,8 @@ from app.api.v1.endpoints import (
     analysis_router,
     certifications_router,
     external_certifications_router,
-    plane_router
+    plane_router,
+    payment_router
 )
 
 api_router = APIRouter()
@@ -19,6 +20,7 @@ api_router.include_router(analysis_router)
 api_router.include_router(certifications_router)
 api_router.include_router(external_certifications_router, prefix="/external-certifications", tags=["External Certifications"])
 api_router.include_router(plane_router)
+api_router.include_router(payment_router, prefix="/payment", tags=["Payment"])
 
 
 # Health check for API v1

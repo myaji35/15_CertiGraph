@@ -17,6 +17,12 @@ export default async function Home() {
           <div className="text-2xl font-bold text-gray-900">ExamsGraph</div>
           <div className="flex items-center gap-4">
             <Link
+              href="/pricing"
+              className="text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              요금제
+            </Link>
+            <Link
               href="/sign-in"
               className="text-gray-600 hover:text-gray-900 transition-colors"
             >

@@ -1,329 +1,480 @@
-'use client';
+"use client";
 
-import { NotionCard, NotionPageHeader, NotionStatCard } from '@/components/ui/NotionCard';
-import { Brain, Network, Layers, TrendingUp, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import dynamic from 'next/dynamic';
+import { UserButton } from '@clerk/nextjs';
+import Link from 'next/link';
+import {
+  Home,
+  BookOpen,
+  Brain,
+  ChevronLeft,
+  ZoomIn,
+  ZoomOut,
+  Maximize2,
+  RefreshCw,
+  Info,
+  Layers,
+  Target
+} from 'lucide-react';
+
+// Dynamic import for force graph (client-side only)
+const ForceGraph2D = dynamic(
+  () => import('react-force-graph-2d').then(mod => mod.default),
+  { ssr: false }
+);
+
+interface GraphNode {
+  id: string;
+  name: string;
+  val: number;
+  color: string;
+  category: 'chapter' | 'topic' | 'concept';
+  mastery: number; // 0-100
+  questions: number;
+  correct: number;
+}
+
+interface GraphLink {
+  source: string;
+  target: string;
+  value: number;
+}
+
+interface GraphData {
+  nodes: GraphNode[];
+  links: GraphLink[];
+}
 
 export default function KnowledgeGraphPage() {
-  const [selectedNode, setSelectedNode] = useState<string | null>(null);
-  const [zoomLevel, setZoomLevel] = useState(1);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [graphData, setGraphData] = useState<GraphData>({ nodes: [], links: [] });
+  const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
+  const [highlightNodes, setHighlightNodes] = useState(new Set());
+  const [highlightLinks, setHighlightLinks] = useState(new Set());
+  const [hoverNode, setHoverNode] = useState<GraphNode | null>(null);
+  const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
+  const graphRef = useRef<any>(null);
 
-  // 3D 그래프 시뮬레이션 (실제로는 React Three Fiber를 사용할 예정)
+  // Generate sample data
   useEffect(() => {
-    if (!canvasRef.current) return;
-
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    // 캔버스 크기 설정
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-
-    // 노드 그리기 예시
-    const drawGraph = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // 중심점
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
-
-      // 노드 데이터
-      const nodes = [
-        { x: centerX, y: centerY, label: 'DB', color: '#10b981', size: 30 },
-        { x: centerX - 100, y: centerY - 80, label: 'SQL', color: '#3b82f6', size: 25 },
-        { x: centerX + 100, y: centerY - 80, label: '정규화', color: '#3b82f6', size: 25 },
-        { x: centerX - 150, y: centerY + 50, label: '인덱싱', color: '#ef4444', size: 20 },
-        { x: centerX + 150, y: centerY + 50, label: '트랜잭션', color: '#3b82f6', size: 22 },
-        { x: centerX, y: centerY + 120, label: 'NoSQL', color: '#6b7280', size: 18 },
+    const generateSampleData = (): GraphData => {
+      const chapters = [
+        { id: 'ch1', name: '사회복지정책론', mastery: 75 },
+        { id: 'ch2', name: '사회복지행정론', mastery: 60 },
+        { id: 'ch3', name: '사회복지법제론', mastery: 45 },
       ];
 
-      // 연결선 그리기
-      ctx.strokeStyle = '#e5e7eb';
-      ctx.lineWidth = 1;
-      nodes.forEach((node, i) => {
-        if (i === 0) return;
-        ctx.beginPath();
-        ctx.moveTo(nodes[0].x, nodes[0].y);
-        ctx.lineTo(node.x, node.y);
-        ctx.stroke();
+      const topics = [
+        { id: 't1', name: '복지국가', chapter: 'ch1', mastery: 80 },
+        { id: 't2', name: '사회보장', chapter: 'ch1', mastery: 70 },
+        { id: 't3', name: '조직이론', chapter: 'ch2', mastery: 65 },
+        { id: 't4', name: '인적자원관리', chapter: 'ch2', mastery: 55 },
+        { id: 't5', name: '사회복지법', chapter: 'ch3', mastery: 50 },
+        { id: 't6', name: '권리구제', chapter: 'ch3', mastery: 40 },
+      ];
+
+      const concepts = [
+        { id: 'c1', name: '베버리지 보고서', topic: 't1', mastery: 85 },
+        { id: 'c2', name: '복지다원주의', topic: 't1', mastery: 75 },
+        { id: 'c3', name: '사회보험', topic: 't2', mastery: 70 },
+        { id: 'c4', name: '공공부조', topic: 't2', mastery: 65 },
+        { id: 'c5', name: '관료제', topic: 't3', mastery: 60 },
+        { id: 'c6', name: '매트릭스 조직', topic: 't3', mastery: 70 },
+        { id: 'c7', name: '동기부여이론', topic: 't4', mastery: 55 },
+        { id: 'c8', name: '리더십', topic: 't4', mastery: 50 },
+        { id: 'c9', name: '사회보장기본법', topic: 't5', mastery: 45 },
+        { id: 'c10', name: '국민기초생활보장법', topic: 't5', mastery: 55 },
+        { id: 'c11', name: '행정심판', topic: 't6', mastery: 35 },
+        { id: 'c12', name: '행정소송', topic: 't6', mastery: 40 },
+      ];
+
+      const nodes: GraphNode[] = [];
+      const links: GraphLink[] = [];
+
+      // Add chapter nodes
+      chapters.forEach(ch => {
+        nodes.push({
+          id: ch.id,
+          name: ch.name,
+          val: 30,
+          color: getMasteryColor(ch.mastery),
+          category: 'chapter',
+          mastery: ch.mastery,
+          questions: Math.floor(Math.random() * 50) + 20,
+          correct: Math.floor(ch.mastery * 0.5)
+        });
       });
 
-      // 노드 그리기
-      nodes.forEach(node => {
-        ctx.fillStyle = node.color;
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, node.size * zoomLevel, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = 'white';
-        ctx.font = `${12 * zoomLevel}px sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(node.label, node.x, node.y);
+      // Add topic nodes and links
+      topics.forEach(topic => {
+        nodes.push({
+          id: topic.id,
+          name: topic.name,
+          val: 20,
+          color: getMasteryColor(topic.mastery),
+          category: 'topic',
+          mastery: topic.mastery,
+          questions: Math.floor(Math.random() * 30) + 10,
+          correct: Math.floor(topic.mastery * 0.3)
+        });
+        links.push({
+          source: topic.chapter,
+          target: topic.id,
+          value: 3
+        });
       });
+
+      // Add concept nodes and links
+      concepts.forEach(concept => {
+        nodes.push({
+          id: concept.id,
+          name: concept.name,
+          val: 10,
+          color: getMasteryColor(concept.mastery),
+          category: 'concept',
+          mastery: concept.mastery,
+          questions: Math.floor(Math.random() * 15) + 5,
+          correct: Math.floor(concept.mastery * 0.15)
+        });
+        links.push({
+          source: concept.topic,
+          target: concept.id,
+          value: 1
+        });
+      });
+
+      // Add some cross-links between related concepts
+      links.push(
+        { source: 'c3', target: 'c4', value: 0.5 }, // 사회보험 - 공공부조
+        { source: 'c1', target: 'c3', value: 0.5 }, // 베버리지 - 사회보험
+        { source: 'c11', target: 'c12', value: 0.5 }, // 행정심판 - 행정소송
+      );
+
+      return { nodes, links };
     };
 
-    drawGraph();
-  }, [zoomLevel]);
+    const data = generateSampleData();
+    setGraphData(data);
 
-  const knowledgeStats = {
-    totalConcepts: 247,
-    masteredConcepts: 185,
-    weakConcepts: 31,
-    unknownConcepts: 31,
-    connections: 892
+    // Set dimensions
+    if (typeof window !== 'undefined') {
+      const updateDimensions = () => {
+        setDimensions({
+          width: window.innerWidth - 300, // Account for sidebar
+          height: window.innerHeight - 200
+        });
+      };
+      updateDimensions();
+      window.addEventListener('resize', updateDimensions);
+      return () => window.removeEventListener('resize', updateDimensions);
+    }
+  }, []);
+
+  const getMasteryColor = (mastery: number): string => {
+    if (mastery >= 80) return '#10b981'; // green
+    if (mastery >= 60) return '#3b82f6'; // blue
+    if (mastery >= 40) return '#f59e0b'; // amber
+    if (mastery >= 20) return '#ef4444'; // red
+    return '#6b7280'; // gray
   };
 
-  const weakAreas = [
-    { name: 'B-Tree 인덱스', category: '데이터베이스', strength: 35, relatedQuestions: 12 },
-    { name: '동적 계획법', category: '알고리즘', strength: 42, relatedQuestions: 18 },
-    { name: '정규화 3NF', category: '데이터베이스', strength: 48, relatedQuestions: 8 },
-    { name: '트랜잭션 격리', category: '데이터베이스', strength: 52, relatedQuestions: 15 }
-  ];
+  const handleNodeClick = useCallback((node: GraphNode) => {
+    setSelectedNode(node);
+
+    // Highlight neighbors
+    const neighbors = new Set<string>();
+    const links = new Set();
+
+    graphData.links.forEach(link => {
+      if (link.source === node.id || (link.source as any).id === node.id) {
+        neighbors.add(typeof link.target === 'string' ? link.target : (link.target as any).id);
+        links.add(link);
+      }
+      if (link.target === node.id || (link.target as any).id === node.id) {
+        neighbors.add(typeof link.source === 'string' ? link.source : (link.source as any).id);
+        links.add(link);
+      }
+    });
+
+    setHighlightNodes(neighbors);
+    setHighlightLinks(links);
+  }, [graphData]);
+
+  const handleNodeHover = (node: GraphNode | null) => {
+    setHoverNode(node);
+  };
+
+  const handleZoomIn = () => {
+    if (graphRef.current) {
+      graphRef.current.zoom(1.2);
+    }
+  };
+
+  const handleZoomOut = () => {
+    if (graphRef.current) {
+      graphRef.current.zoom(0.8);
+    }
+  };
+
+  const handleZoomFit = () => {
+    if (graphRef.current) {
+      graphRef.current.zoomToFit(400);
+    }
+  };
+
+  const handleReset = () => {
+    setSelectedNode(null);
+    setHighlightNodes(new Set());
+    setHighlightLinks(new Set());
+    handleZoomFit();
+  };
 
   return (
-    <div className="space-y-6">
-      <NotionPageHeader
-        title="지식 그래프"
-        icon="🧠"
-        breadcrumbs={[
-          { label: '대시보드' },
-          { label: '학습' },
-          { label: '지식 그래프' }
-        ]}
-      />
-
-      {/* 통계 카드 */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <NotionStatCard
-          title="전체 개념"
-          value={knowledgeStats.totalConcepts.toString()}
-          icon={<Brain className="w-5 h-5 text-blue-500" />}
-        />
-        <NotionStatCard
-          title="마스터"
-          value={knowledgeStats.masteredConcepts.toString()}
-          icon={<CheckCircle className="w-5 h-5 text-green-500" />}
-        />
-        <NotionStatCard
-          title="취약"
-          value={knowledgeStats.weakConcepts.toString()}
-          icon={<AlertTriangle className="w-5 h-5 text-yellow-500" />}
-        />
-        <NotionStatCard
-          title="미학습"
-          value={knowledgeStats.unknownConcepts.toString()}
-          icon={<XCircle className="w-5 h-5 text-gray-500" />}
-        />
-        <NotionStatCard
-          title="연결"
-          value={knowledgeStats.connections.toString()}
-          icon={<Network className="w-5 h-5 text-purple-500" />}
-        />
-      </div>
-
-      {/* 3D 그래프 영역 */}
-      <NotionCard title="지식 네트워크 시각화" icon={<Network className="w-5 h-5" />}>
-        <div className="p-6">
-          <div className="mb-4 flex items-center justify-between">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <button
-                onClick={() => setZoomLevel(Math.max(0.5, zoomLevel - 0.1))}
-                className="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
               >
-                축소
-              </button>
-              <span className="text-sm">줌: {Math.round(zoomLevel * 100)}%</span>
-              <button
-                onClick={() => setZoomLevel(Math.min(2, zoomLevel + 0.1))}
-                className="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
-              >
-                확대
-              </button>
+                <ChevronLeft className="w-5 h-5" />
+                <span>대시보드</span>
+              </Link>
+              <div className="h-6 w-px bg-gray-300" />
+              <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <Brain className="w-6 h-6 text-blue-600" />
+                지식 그래프
+              </h1>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs px-2 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded">
-                마스터
-              </span>
-              <span className="text-xs px-2 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300 rounded">
-                학습중
-              </span>
-              <span className="text-xs px-2 py-1 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded">
-                취약
-              </span>
-              <span className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded">
-                미학습
-              </span>
-            </div>
-          </div>
-          <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4" style={{ height: '400px' }}>
-            <canvas
-              ref={canvasRef}
-              className="w-full h-full"
-              style={{ cursor: 'grab' }}
-            />
-          </div>
-          <div className="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
-            * 실제 서비스에서는 React Three Fiber를 사용한 3D 인터랙티브 그래프로 구현됩니다
+            <UserButton />
           </div>
         </div>
-      </NotionCard>
+      </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* 취약 영역 분석 */}
-        <NotionCard title="취약 영역 TOP" icon={<AlertTriangle className="w-5 h-5" />}>
-          <div className="p-6 space-y-3">
-            {weakAreas.map((area, index) => (
-              <div
-                key={index}
-                className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <div>
-                    <h3 className="font-medium">{area.name}</h3>
-                    <span className="text-xs text-gray-500">{area.category}</span>
-                  </div>
-                  <span className="text-sm font-medium text-red-600 dark:text-red-400">
-                    {area.strength}%
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2">
-                  <div
-                    className="bg-red-500 h-2 rounded-full"
-                    style={{ width: `${area.strength}%` }}
-                  />
-                </div>
-                <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
-                  <span>관련 문제: {area.relatedQuestions}개</span>
-                  <button className="text-blue-500 hover:underline">집중 학습</button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </NotionCard>
-
-        {/* 학습 경로 추천 */}
-        <NotionCard title="추천 학습 경로" icon={<TrendingUp className="w-5 h-5" />}>
+      <div className="flex h-[calc(100vh-73px)]">
+        {/* Sidebar */}
+        <div className="w-80 bg-white border-r border-gray-200 overflow-y-auto">
           <div className="p-6">
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                  1
+            {/* Stats */}
+            <div className="space-y-4 mb-6">
+              <div className="bg-blue-50 rounded-lg p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <Layers className="w-5 h-5 text-blue-600" />
+                  <span className="font-semibold">전체 개요</span>
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-medium">인덱싱 기초</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    B-Tree 구조와 인덱스 스캔 방식 이해
-                  </p>
-                  <div className="mt-2 flex items-center gap-2">
-                    <span className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded">
-                      15문제
-                    </span>
-                    <span className="text-xs text-gray-500">예상 시간: 30분</span>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <p className="text-gray-600">총 개념</p>
+                    <p className="font-bold">{graphData.nodes.length}개</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600">연결 관계</p>
+                    <p className="font-bold">{graphData.links.length}개</p>
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                  2
+              {/* Selected Node Info */}
+              {selectedNode ? (
+                <div className="bg-white border rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: selectedNode.color }}
+                    />
+                    <span className="font-semibold text-sm">{selectedNode.name}</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">학습도</span>
+                        <span className="font-medium">{selectedNode.mastery}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+                        <div
+                          className="h-2 rounded-full transition-all"
+                          style={{
+                            width: `${selectedNode.mastery}%`,
+                            backgroundColor: selectedNode.color
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">문제 수</span>
+                      <span>{selectedNode.questions}개</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">정답률</span>
+                      <span>{Math.round((selectedNode.correct / selectedNode.questions) * 100)}%</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-medium">정규화 심화</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    3NF, BCNF 개념과 정규화 실습
-                  </p>
-                  <div className="mt-2 flex items-center gap-2">
-                    <span className="text-xs px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded">
-                      20문제
-                    </span>
-                    <span className="text-xs text-gray-500">예상 시간: 45분</span>
+              ) : (
+                <div className="bg-gray-50 rounded-lg p-4 text-center text-sm text-gray-500">
+                  노드를 클릭하여 상세 정보를 확인하세요
+                </div>
+              )}
+
+              {/* Legend */}
+              <div className="bg-white border rounded-lg p-4">
+                <p className="font-semibold text-sm mb-3">범례</p>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm">
+                    <div className="w-3 h-3 rounded-full bg-green-500" />
+                    <span>높은 학습도 (80%+)</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <div className="w-3 h-3 rounded-full bg-blue-500" />
+                    <span>중간 학습도 (60-79%)</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <div className="w-3 h-3 rounded-full bg-amber-500" />
+                    <span>낮은 학습도 (40-59%)</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <div className="w-3 h-3 rounded-full bg-red-500" />
+                    <span>매우 낮음 (20-39%)</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <div className="w-3 h-3 rounded-full bg-gray-500" />
+                    <span>미학습 (&lt;20%)</span>
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                  3
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-medium">트랜잭션 관리</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    격리 수준과 동시성 제어 메커니즘
-                  </p>
-                  <div className="mt-2 flex items-center gap-2">
-                    <span className="text-xs px-2 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded">
-                      25문제
+              {/* Node Categories */}
+              <div className="bg-white border rounded-lg p-4">
+                <p className="font-semibold text-sm mb-3">카테고리</p>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span>📚 챕터</span>
+                    <span className="text-gray-500">
+                      {graphData.nodes.filter(n => n.category === 'chapter').length}개
                     </span>
-                    <span className="text-xs text-gray-500">예상 시간: 60분</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span>📖 주제</span>
+                    <span className="text-gray-500">
+                      {graphData.nodes.filter(n => n.category === 'topic').length}개
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span>💡 개념</span>
+                    <span className="text-gray-500">
+                      {graphData.nodes.filter(n => n.category === 'concept').length}개
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
 
-            <button className="mt-6 w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-              학습 경로 시작하기
+        {/* Graph Container */}
+        <div className="flex-1 relative bg-gray-100">
+          {/* Controls */}
+          <div className="absolute top-4 right-4 z-10 flex gap-2">
+            <button
+              onClick={handleZoomIn}
+              className="bg-white p-2 rounded-lg shadow hover:bg-gray-50"
+              title="확대"
+            >
+              <ZoomIn className="w-5 h-5" />
+            </button>
+            <button
+              onClick={handleZoomOut}
+              className="bg-white p-2 rounded-lg shadow hover:bg-gray-50"
+              title="축소"
+            >
+              <ZoomOut className="w-5 h-5" />
+            </button>
+            <button
+              onClick={handleZoomFit}
+              className="bg-white p-2 rounded-lg shadow hover:bg-gray-50"
+              title="화면에 맞추기"
+            >
+              <Maximize2 className="w-5 h-5" />
+            </button>
+            <button
+              onClick={handleReset}
+              className="bg-white p-2 rounded-lg shadow hover:bg-gray-50"
+              title="초기화"
+            >
+              <RefreshCw className="w-5 h-5" />
             </button>
           </div>
-        </NotionCard>
-      </div>
 
-      {/* 개념 관계도 */}
-      <NotionCard title="개념 관계 분석" icon={<Layers className="w-5 h-5" />}>
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <h3 className="font-medium mb-2">선수 지식</h3>
-              <div className="space-y-2">
-                <div className="text-sm">
-                  <span className="font-medium">SQL 기본</span>
-                  <span className="text-gray-600 dark:text-gray-400 ml-2">→ JOIN</span>
-                </div>
-                <div className="text-sm">
-                  <span className="font-medium">집합론</span>
-                  <span className="text-gray-600 dark:text-gray-400 ml-2">→ 정규화</span>
-                </div>
-                <div className="text-sm">
-                  <span className="font-medium">자료구조</span>
-                  <span className="text-gray-600 dark:text-gray-400 ml-2">→ 인덱싱</span>
-                </div>
-              </div>
+          {/* Hover Info */}
+          {hoverNode && (
+            <div className="absolute top-4 left-4 z-10 bg-white rounded-lg shadow-lg p-3 max-w-xs">
+              <p className="font-semibold text-sm">{hoverNode.name}</p>
+              <p className="text-xs text-gray-600 mt-1">
+                학습도: {hoverNode.mastery}% | 문제: {hoverNode.questions}개
+              </p>
             </div>
+          )}
 
-            <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-              <h3 className="font-medium mb-2">강한 연결</h3>
-              <div className="space-y-2">
-                <div className="text-sm">
-                  <span>인덱싱 ↔ 쿼리 최적화</span>
-                </div>
-                <div className="text-sm">
-                  <span>정규화 ↔ 무결성 제약</span>
-                </div>
-                <div className="text-sm">
-                  <span>트랜잭션 ↔ 동시성 제어</span>
-                </div>
-              </div>
-            </div>
+          {/* Force Graph */}
+          {typeof window !== 'undefined' && graphData.nodes.length > 0 && (
+            <ForceGraph2D
+              ref={graphRef}
+              graphData={graphData}
+              width={dimensions.width}
+              height={dimensions.height}
+              nodeLabel=""
+              nodeRelSize={1}
+              nodeVal={(node: any) => node.val}
+              nodeColor={(node: any) => node.color}
+              linkColor={() => '#d1d5db'}
+              linkWidth={(link: any) => link.value}
+              linkDirectionalParticles={2}
+              linkDirectionalParticleSpeed={0.01}
+              onNodeClick={handleNodeClick as any}
+              onNodeHover={handleNodeHover as any}
+              nodeCanvasObject={(node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
+                const label = node.name;
+                const fontSize = 12 / globalScale;
+                ctx.font = `${fontSize}px Sans-Serif`;
 
-            <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-              <h3 className="font-medium mb-2">응용 분야</h3>
-              <div className="space-y-2">
-                <div className="text-sm">
-                  <span>NoSQL 데이터베이스</span>
-                </div>
-                <div className="text-sm">
-                  <span>분산 데이터베이스</span>
-                </div>
-                <div className="text-sm">
-                  <span>데이터 웨어하우스</span>
-                </div>
-              </div>
-            </div>
-          </div>
+                // Draw node circle
+                ctx.fillStyle = node.color;
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, node.val, 0, 2 * Math.PI, false);
+                ctx.fill();
+
+                // Draw label
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = node.category === 'chapter' ? '#ffffff' : '#374151';
+                const lines = label.length > 8 ? [label.slice(0, 8), label.slice(8)] : [label];
+                lines.forEach((line, i) => {
+                  ctx.fillText(line, node.x, node.y + (i * fontSize) - ((lines.length - 1) * fontSize / 2));
+                });
+
+                // Highlight on hover or selection
+                if (highlightNodes.has(node.id) || node === hoverNode) {
+                  ctx.strokeStyle = '#3b82f6';
+                  ctx.lineWidth = 3 / globalScale;
+                  ctx.beginPath();
+                  ctx.arc(node.x, node.y, node.val + 2, 0, 2 * Math.PI, false);
+                  ctx.stroke();
+                }
+              }}
+              onBackgroundClick={() => {
+                setSelectedNode(null);
+                setHighlightNodes(new Set());
+                setHighlightLinks(new Set());
+              }}
+              cooldownTicks={100}
+              onEngineStop={() => graphRef.current && graphRef.current.zoomToFit(400)}
+            />
+          )}
         </div>
-      </NotionCard>
+      </div>
     </div>
   );
 }
