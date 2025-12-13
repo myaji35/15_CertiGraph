@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from 'react';
-import { loadPaymentWidget, PaymentWidgetInstance } from '@tosspayments/payment-sdk';
+import { loadTossPayments } from '@tosspayments/payment-sdk';
+
+type PaymentWidgetInstance = any; // Temporary type for build
 import { useAuth } from '@clerk/nextjs';
 
 interface TossPaymentProps {
@@ -30,7 +32,8 @@ export default function TossPayment({
     (async () => {
       try {
         // 토스 결제 위젯 로드
-        const paymentWidget = await loadPaymentWidget(clientKey, customerKey);
+        const tossPayments = await loadTossPayments(clientKey);
+        const paymentWidget = tossPayments.widgets({ customerKey });
 
         // 결제 UI 렌더링
         const paymentMethodsWidget = paymentWidget.renderPaymentMethods(

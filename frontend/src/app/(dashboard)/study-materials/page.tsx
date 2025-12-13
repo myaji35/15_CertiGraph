@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Search, Book, Video, FileText, Download, ExternalLink, Star, Clock, Users, Filter, ChevronRight, BookOpen, Youtube, Globe, ShoppingCart } from 'lucide-react';
 
@@ -170,7 +170,7 @@ const getStudyMaterials = (certName: string): StudyMaterial[] => {
   return materials;
 };
 
-export default function StudyMaterialsPage() {
+function StudyMaterialsContent() {
   const searchParams = useSearchParams();
   const certName = searchParams.get('cert') || '';
   const [materials, setMaterials] = useState<StudyMaterial[]>([]);
@@ -438,5 +438,19 @@ export default function StudyMaterialsPage() {
         </ul>
       </div>
     </div>
+  );
+}
+
+export default function StudyMaterialsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      }
+    >
+      <StudyMaterialsContent />
+    </Suspense>
   );
 }
