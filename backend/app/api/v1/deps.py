@@ -143,4 +143,4 @@ StorageServiceDep = Annotated[
 # Supabase dependency
 def get_supabase(settings: Settings = Depends(get_settings)) -> Client:
     """Get Supabase client."""
-    return create_client(settings.supabase_url, settings.supabase_service_role_key)
+    return create_client(settings.supabase_url, settings.supabase_service_key)
