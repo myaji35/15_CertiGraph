@@ -55,8 +55,10 @@ async def process_study_set_with_upstage(
     from app.services.parser.upstage import UpstageDocumentParser
     from app.services.parser.question_extractor import QuestionExtractor
     from app.repositories.mock_question import MockQuestionRepository
+    from app.services.graph.knowledge_graph_pipeline import KnowledgeGraphPipeline
 
     settings = get_settings()
+    kg_pipeline = KnowledgeGraphPipeline()
 
     try:
         # Step 1: Update status - Starting
@@ -123,7 +125,28 @@ async def process_study_set_with_upstage(
         question_repo = MockQuestionRepository()
         await question_repo.bulk_create(study_set_id, questions)
 
-        # Step 5: Mark as ready
+        # Step 5: Build Knowledge Graph (vectors, concepts, Neo4j)
+        # Get user_id from the study set
+        study_set = await repo.get_by_id(study_set_id)
+        user_id = study_set.get("user_id", "") if study_set else ""
+
+        async def kg_progress_callback(progress: int, step: str):
+            await repo.update_status(
+                study_set_id,
+                StudySetStatus.PROCESSING,
+                progress=progress,
+                current_step=step,
+            )
+
+        kg_results = await kg_pipeline.process_study_set(
+            study_set_id=study_set_id,
+            user_id=user_id,
+            questions=questions,
+            on_progress=kg_progress_callback,
+        )
+        print(f"Knowledge Graph results: {kg_results}")
+
+        # Step 6: Mark as ready
         await repo.update_status(
             study_set_id,
             StudySetStatus.READY,
@@ -133,6 +156,9 @@ async def process_study_set_with_upstage(
 
         # Update question count
         await repo.update_question_count(study_set_id, len(questions))
+
+        # Close KG pipeline connections
+        await kg_pipeline.close()
 
     except Exception as e:
         print(f"Error processing study set: {e}")
@@ -403,6 +429,8 @@ async def delete_study_set(
     storage: StorageServiceDep,
 ) -> dict[str, Any]:
     """Delete a study set and its associated questions."""
+    from app.services.graph.knowledge_graph_pipeline import KnowledgeGraphPipeline
+
     study_set = await repo.get_by_id(study_set_id)
 
     if not study_set:
@@ -415,6 +443,14 @@ async def delete_study_set(
     # Delete from storage if PDF exists
     if study_set.get("pdf_path"):
         await storage.delete_file(study_set["pdf_path"])
+
+    # Clean up Knowledge Graph data (Pinecone vectors, Neo4j nodes)
+    try:
+        kg_pipeline = KnowledgeGraphPipeline()
+        await kg_pipeline.cleanup_study_set(study_set_id, current_user.clerk_id)
+        await kg_pipeline.close()
+    except Exception as e:
+        print(f"Warning: Failed to clean up Knowledge Graph data: {e}")
 
     # Delete study set (questions cascade delete via FK)
     await repo.delete(study_set_id)

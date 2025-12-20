@@ -7,7 +7,7 @@ python-multipart>=0.0.9
 
 # Database Clients
 supabase>=2.0.0
-pinecone-client>=3.0.0
+pinecone>=5.0.0
 neo4j>=5.0.0
 
 # AI/LLM
