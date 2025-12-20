@@ -94,6 +94,13 @@ class MockStudySetRepository:
             return self._storage.get(study_set_id)
         return None
 
+    async def find_by_hash_for_user(self, pdf_hash: str, user_id: str) -> Optional[dict[str, Any]]:
+        """Find study set by PDF hash for a specific user."""
+        for study_set in self._storage.values():
+            if study_set.get("pdf_hash") == pdf_hash and study_set.get("user_id") == user_id:
+                return study_set
+        return None
+
     async def find_by_id(self, study_set_id: str) -> Optional[dict[str, Any]]:
         """Find study set by ID."""
         return self._storage.get(study_set_id)

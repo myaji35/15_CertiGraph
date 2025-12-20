@@ -52,12 +52,12 @@ development_status:
   epic-2-retrospective: optional
 
   # Epic 3: PDF Processing Pipeline
-  epic-3: backlog
-  3-1-pdf-upload-ui: backlog
-  3-2-backend-upload-endpoint-storage: backlog
-  3-3-upstage-document-parse-integration: backlog
-  3-4-question-extraction-intelligent-chunking: backlog
-  3-5-study-set-detail-page: backlog
+  epic-3: done
+  3-1-pdf-upload-ui: done
+  3-2-backend-upload-endpoint-storage: done
+  3-3-upstage-document-parse-integration: done
+  3-4-question-extraction-intelligent-chunking: done
+  3-5-study-set-detail-page: done
   epic-3-retrospective: optional
 
   # Epic 4: Knowledge Graph & Embeddings

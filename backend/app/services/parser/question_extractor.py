@@ -345,3 +345,72 @@ class QuestionExtractor:
             "subject": question.subject,
             "topic": question.topic,
         }
+
+    async def extract_with_llm(self, text: str) -> list[dict[str, Any]]:
+        """
+        Extract questions using LLM (Google Gemini).
+
+        Args:
+            text: Full document text (markdown)
+
+        Returns:
+            List of questions in database format
+        """
+        questions = await self.extract_questions(text)
+        return [self.to_db_format(q) for q in questions]
+
+    def extract_with_rules(self, text: str) -> list[dict[str, Any]]:
+        """
+        Extract questions using rule-based parsing.
+
+        Fallback for when no LLM API is available.
+
+        Args:
+            text: Full document text
+
+        Returns:
+            List of questions in database format
+        """
+        import re
+
+        questions = []
+        # Pattern: 문제 번호 + 내용 + 보기들
+        question_pattern = r'(\d{1,3})\.\s+(.+?)(?=\d{1,3}\.\s+|\Z)'
+        option_pattern = r'[①②③④⑤]\s*(.+?)(?=[①②③④⑤]|\Z)'
+
+        matches = re.findall(question_pattern, text, re.DOTALL)
+
+        for num_str, content in matches:
+            q_num = int(num_str)
+            content = content.strip()
+
+            # Split question text and options
+            parts = content.split('\n')
+            question_text = parts[0] if parts else ""
+
+            # Extract options
+            options = []
+            option_markers = ['①', '②', '③', '④', '⑤']
+            for i, marker in enumerate(option_markers, 1):
+                if marker in content:
+                    start = content.find(marker) + 1
+                    end = len(content)
+                    for next_marker in option_markers[i:]:
+                        next_pos = content.find(next_marker)
+                        if next_pos != -1 and next_pos < end:
+                            end = next_pos
+                    opt_text = content[start:end].strip()
+                    options.append({"number": i, "text": opt_text})
+
+            if question_text and len(options) >= 2:
+                questions.append({
+                    "question_number": q_num,
+                    "question_text": question_text,
+                    "options": options,
+                    "correct_answer": 0,  # Unknown without answer key
+                    "explanation": None,
+                    "subject": None,
+                    "topic": None,
+                })
+
+        return questions
