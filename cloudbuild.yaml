@@ -1,0 +1,47 @@
+steps:
+  # Build and deploy backend
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/certigraph/backend:$COMMIT_SHA', './backend']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/certigraph/backend:$COMMIT_SHA']
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'certigraph-backend'
+      - '--image=asia-northeast3-docker.pkg.dev/$PROJECT_ID/certigraph/backend:$COMMIT_SHA'
+      - '--region=asia-northeast3'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--port=3030'
+      - '--memory=512Mi'
+
+  # Build and deploy frontend
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/certigraph/frontend:$COMMIT_SHA', './frontend']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/certigraph/frontend:$COMMIT_SHA']
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'certigraph-frontend'
+      - '--image=asia-northeast3-docker.pkg.dev/$PROJECT_ID/certigraph/frontend:$COMMIT_SHA'
+      - '--region=asia-northeast3'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--port=3000'
+      - '--memory=512Mi'
+
+images:
+  - 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/certigraph/backend:$COMMIT_SHA'
+  - 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/certigraph/frontend:$COMMIT_SHA'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
