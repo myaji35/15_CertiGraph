@@ -51,13 +51,13 @@ development_status:
   2-4-user-sync-dashboard-layout: done
   epic-2-retrospective: optional
 
-  # Epic 3: PDF Processing Pipeline
+  # Epic 3: PDF Processing Pipeline (Rewritten)
   epic-3: done
-  3-1-pdf-upload-ui: done
-  3-2-backend-upload-endpoint-storage: done
-  3-3-upstage-document-parse-integration: done
-  3-4-question-extraction-intelligent-chunking: done
-  3-5-study-set-detail-page: done
+  3-1-pdf-upload-ui: done  # PdfUploader component integrated
+  3-2-backend-upload-endpoint-storage: done  # Simplified upload, removed subscription check
+  3-3-upstage-document-parse-integration: done  # Upstage + fallback parser
+  3-4-question-extraction-intelligent-chunking: done  # Gemini LLM + rule-based fallback
+  3-5-study-set-detail-page: done  # Real API, polling, processing status
   epic-3-retrospective: optional
 
   # Epic 4: Knowledge Graph & Embeddings
