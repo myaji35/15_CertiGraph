@@ -69,11 +69,11 @@ development_status:
   epic-4-retrospective: optional
 
   # Epic 5: CBT Test Engine
-  epic-5: backlog
-  5-1-test-session-initialization: backlog
-  5-2-cbt-test-interface: backlog
-  5-3-answer-submission-scoring: backlog
-  5-4-test-result-review-page: backlog
+  epic-5: done
+  5-1-test-session-initialization: done  # Real API integration, mode selection
+  5-2-cbt-test-interface: done  # Full CBT UI with navigation
+  5-3-answer-submission-scoring: done  # Backend reused, submit flow
+  5-4-test-result-review-page: done  # Score summary, question review
   epic-5-retrospective: optional
 
   # Epic 6: Analytics & Dashboard
