@@ -1,209 +1,430 @@
 'use client';
 
-import { NotionCard, NotionPageHeader, NotionStatCard } from '@/components/ui/NotionCard';
-import { FileText, Play, Clock, Trophy, AlertCircle, CheckCircle } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useAuth } from '@clerk/nextjs';
+import Link from 'next/link';
+import {
+  FileText,
+  Play,
+  Clock,
+  Trophy,
+  AlertCircle,
+  Loader2,
+  ArrowLeft,
+  Shuffle,
+  Target,
+  RotateCcw,
+} from 'lucide-react';
 
-export default function TestPage() {
-  const [mockExams] = useState([
-    {
-      id: 1,
-      title: "2024년 정보처리기사 실기 모의고사 #1",
-      questions: 100,
-      duration: 180,
-      difficulty: "실전",
-      attempts: 2,
-      bestScore: 78
-    },
-    {
-      id: 2,
-      title: "2024년 정보처리기사 필기 모의고사 #3",
-      questions: 100,
-      duration: 120,
-      difficulty: "중급",
-      attempts: 0,
-      bestScore: null
-    },
-    {
-      id: 3,
-      title: "데이터베이스 집중 모의고사",
-      questions: 50,
-      duration: 60,
-      difficulty: "고급",
-      attempts: 1,
-      bestScore: 84
+interface StudySet {
+  id: string;
+  name: string;
+  question_count: number;
+  status: string;
+}
+
+interface TestSession {
+  id: string;
+  study_set_id: string;
+  study_set_name: string;
+  score: number;
+  total_questions: number;
+  percentage: number;
+  started_at: string;
+  completed_at: string;
+  mode: string;
+}
+
+type TestMode = 'all' | 'random' | 'wrong_only';
+
+function TestPageContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const { getToken } = useAuth();
+
+  const studySetId = searchParams.get('study_set_id');
+
+  const [studySet, setStudySet] = useState<StudySet | null>(null);
+  const [testHistory, setTestHistory] = useState<TestSession[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [starting, setStarting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Test options
+  const [selectedMode, setSelectedMode] = useState<TestMode>('all');
+  const [questionCount, setQuestionCount] = useState(20);
+  const [shuffleOptions, setShuffleOptions] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = await getToken();
+        if (!token) return;
+
+        // Fetch study set if ID provided
+        if (studySetId) {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/v1/study-sets/${studySetId}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          if (response.ok) {
+            const data = await response.json();
+            setStudySet(data.data);
+          }
+        }
+
+        // Fetch test history
+        const historyUrl = studySetId
+          ? `${process.env.NEXT_PUBLIC_API_URL}/v1/tests/history?study_set_id=${studySetId}`
+          : `${process.env.NEXT_PUBLIC_API_URL}/v1/tests/history`;
+
+        const historyResponse = await fetch(historyUrl, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (historyResponse.ok) {
+          const data = await historyResponse.json();
+          setTestHistory(data.data || []);
+        }
+      } catch (err) {
+        console.error('Failed to fetch data:', err);
+        setError('데이터를 불러오는데 실패했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [studySetId, getToken]);
+
+  const handleStartTest = async () => {
+    if (!studySetId) return;
+
+    try {
+      setStarting(true);
+      const token = await getToken();
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/v1/tests/start`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            study_set_id: studySetId,
+            mode: selectedMode,
+            question_count: selectedMode === 'random' ? questionCount : null,
+            shuffle_options: shuffleOptions,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error?.message || '테스트 시작에 실패했습니다.');
+      }
+
+      const data = await response.json();
+      // Store session data in sessionStorage for the test page
+      sessionStorage.setItem('testSession', JSON.stringify(data.data));
+      router.push(`/dashboard/test/${data.data.session_id}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '오류가 발생했습니다.');
+    } finally {
+      setStarting(false);
     }
-  ]);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    );
+  }
+
+  // If no study set ID, show study set selection
+  if (!studySetId) {
+    return (
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">모의고사</h1>
+
+        {/* Test History */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <Trophy className="w-5 h-5 text-yellow-500" />
+            최근 시험 결과
+          </h2>
+          {testHistory.length === 0 ? (
+            <p className="text-gray-500 text-center py-8">
+              아직 응시한 시험이 없습니다.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {testHistory.slice(0, 5).map((session) => (
+                <Link
+                  key={session.id}
+                  href={`/dashboard/test/result/${session.id}`}
+                  className="flex items-center justify-between p-4 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors"
+                >
+                  <div>
+                    <p className="font-medium text-gray-900">
+                      {session.study_set_name}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {new Date(session.completed_at).toLocaleDateString('ko-KR')}
+                    </p>
+                  </div>
+                  <div
+                    className={`text-lg font-bold ${
+                      session.percentage >= 80
+                        ? 'text-green-600'
+                        : session.percentage >= 60
+                        ? 'text-yellow-600'
+                        : 'text-red-600'
+                    }`}
+                  >
+                    {session.score}/{session.total_questions} ({session.percentage}%)
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Prompt to select study set */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
+          <AlertCircle className="w-12 h-12 text-blue-500 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-blue-900 mb-2">
+            학습 세트를 선택하세요
+          </h3>
+          <p className="text-blue-700 mb-4">
+            모의고사를 시작하려면 먼저 학습 세트를 선택해야 합니다.
+          </p>
+          <Link
+            href="/dashboard/study-sets"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <FileText className="w-4 h-4" />
+            학습 세트 목록
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      <NotionPageHeader
-        title="모의고사"
-        icon="📝"
-        breadcrumbs={[
-          { label: '홈' },
-          { label: '모의고사' }
-        ]}
-        actions={
-          <button className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
-            <Play className="w-4 h-4" />
-            <span>빠른 시험 시작</span>
-          </button>
-        }
-      />
+    <div className="max-w-2xl mx-auto">
+      {/* Back button */}
+      <Link
+        href={`/dashboard/study-sets/${studySetId}`}
+        className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-4 transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        학습 세트로 돌아가기
+      </Link>
 
-      {/* 통계 카드 */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <NotionStatCard
-          title="응시한 모의고사"
-          value={5}
-          icon={<FileText className="w-5 h-5 text-blue-500" />}
-          description="총 10개 중"
-        />
-        <NotionStatCard
-          title="평균 점수"
-          value="72%"
-          icon={<Trophy className="w-5 h-5 text-yellow-500" />}
-          trend={{ value: 5, isUp: true }}
-        />
-        <NotionStatCard
-          title="총 학습 시간"
-          value="8.5h"
-          icon={<Clock className="w-5 h-5 text-purple-500" />}
-        />
-        <NotionStatCard
-          title="합격 예상률"
-          value="65%"
-          icon={<CheckCircle className="w-5 h-5 text-green-500" />}
-          trend={{ value: 12, isUp: true }}
-        />
+      {/* Header */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          {studySet?.name || '모의고사'}
+        </h1>
+        <p className="text-gray-600">
+          총 {studySet?.question_count || 0}개 문제
+        </p>
       </div>
 
-      {/* 추천 모의고사 */}
-      <NotionCard title="오늘의 추천 모의고사" icon={<AlertCircle className="w-5 h-5" />}>
-        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-          <div className="flex items-start justify-between">
-            <div>
-              <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">
-                취약 분야 집중 모의고사
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                최근 학습 데이터 기반으로 취약한 부분을 집중 테스트합니다
-              </p>
-              <div className="flex items-center gap-4 mt-3 text-sm">
-                <span className="flex items-center gap-1">
-                  <FileText className="w-4 h-4" />
-                  30문제
-                </span>
-                <span className="flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
-                  45분
-                </span>
-                <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 rounded">
-                  맞춤형
-                </span>
+      {/* Test Options */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          시험 옵션 설정
+        </h2>
+
+        {/* Mode Selection */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            출제 모드
+          </label>
+          <div className="grid grid-cols-1 gap-3">
+            <button
+              onClick={() => setSelectedMode('all')}
+              className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-colors ${
+                selectedMode === 'all'
+                  ? 'border-blue-500 bg-blue-50'
+                  : 'border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              <Target className="w-5 h-5 text-blue-600" />
+              <div className="text-left">
+                <p className="font-medium">전체 문제</p>
+                <p className="text-sm text-gray-500">
+                  모든 문제를 순서대로 풀기
+                </p>
               </div>
-            </div>
-            <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-              시작하기
+            </button>
+
+            <button
+              onClick={() => setSelectedMode('random')}
+              className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-colors ${
+                selectedMode === 'random'
+                  ? 'border-blue-500 bg-blue-50'
+                  : 'border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              <Shuffle className="w-5 h-5 text-purple-600" />
+              <div className="text-left">
+                <p className="font-medium">랜덤 출제</p>
+                <p className="text-sm text-gray-500">
+                  무작위로 선택된 문제 풀기
+                </p>
+              </div>
+            </button>
+
+            <button
+              onClick={() => setSelectedMode('wrong_only')}
+              className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-colors ${
+                selectedMode === 'wrong_only'
+                  ? 'border-blue-500 bg-blue-50'
+                  : 'border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              <RotateCcw className="w-5 h-5 text-red-600" />
+              <div className="text-left">
+                <p className="font-medium">오답 복습</p>
+                <p className="text-sm text-gray-500">
+                  이전에 틀린 문제만 다시 풀기
+                </p>
+              </div>
             </button>
           </div>
         </div>
-      </NotionCard>
 
-      {/* 모의고사 목록 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <NotionCard title="최신 모의고사" icon={<FileText className="w-5 h-5" />}>
-          <div className="space-y-3 p-4">
-            {mockExams.map((exam) => (
-              <div
-                key={exam.id}
-                className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h4 className="font-medium text-gray-900 dark:text-gray-100">
-                      {exam.title}
-                    </h4>
-                    <div className="flex items-center gap-3 mt-2 text-sm text-gray-600 dark:text-gray-400">
-                      <span>{exam.questions}문제</span>
-                      <span>•</span>
-                      <span>{exam.duration}분</span>
-                      <span>•</span>
-                      <span>{exam.difficulty}</span>
-                    </div>
-                    {exam.attempts > 0 && (
-                      <div className="mt-2 text-sm">
-                        <span className="text-gray-500">최고 점수: </span>
-                        <span className="font-medium text-blue-600 dark:text-blue-400">
-                          {exam.bestScore}점
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  <button className="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                    {exam.attempts > 0 ? '재응시' : '시작'}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </NotionCard>
-
-        <NotionCard title="시험 결과 히스토리" icon={<Trophy className="w-5 h-5" />}>
-          <div className="p-4">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 border-l-4 border-green-500 bg-green-50 dark:bg-green-900/20">
-                <div>
-                  <p className="font-medium">필기 모의고사 #2</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">2일 전</p>
-                </div>
-                <span className="text-lg font-bold text-green-600 dark:text-green-400">85점</span>
-              </div>
-              <div className="flex items-center justify-between p-3 border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20">
-                <div>
-                  <p className="font-medium">실기 모의고사 #1</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">5일 전</p>
-                </div>
-                <span className="text-lg font-bold text-yellow-600 dark:text-yellow-400">72점</span>
-              </div>
-              <div className="flex items-center justify-between p-3 border-l-4 border-red-500 bg-red-50 dark:bg-red-900/20">
-                <div>
-                  <p className="font-medium">종합 모의고사</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">1주 전</p>
-                </div>
-                <span className="text-lg font-bold text-red-600 dark:text-red-400">58점</span>
-              </div>
+        {/* Question Count (for random mode) */}
+        {selectedMode === 'random' && (
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              문제 수
+            </label>
+            <div className="flex gap-2">
+              {[10, 20, 30, 50].map((count) => (
+                <button
+                  key={count}
+                  onClick={() => setQuestionCount(count)}
+                  className={`px-4 py-2 rounded-lg border-2 transition-colors ${
+                    questionCount === count
+                      ? 'border-blue-500 bg-blue-50 text-blue-700'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  {count}문제
+                </button>
+              ))}
             </div>
           </div>
-        </NotionCard>
+        )}
+
+        {/* Shuffle Options */}
+        <div className="mb-6">
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={shuffleOptions}
+              onChange={(e) => setShuffleOptions(e.target.checked)}
+              className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <div>
+              <p className="font-medium text-gray-900">보기 순서 섞기</p>
+              <p className="text-sm text-gray-500">
+                매번 다른 순서로 보기가 표시됩니다
+              </p>
+            </div>
+          </label>
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+            {error}
+          </div>
+        )}
+
+        {/* Start Button */}
+        <button
+          onClick={handleStartTest}
+          disabled={starting || !studySet || studySet.status !== 'ready'}
+          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+        >
+          {starting ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              시작 중...
+            </>
+          ) : (
+            <>
+              <Play className="w-5 h-5" />
+              시험 시작
+            </>
+          )}
+        </button>
       </div>
 
-      {/* 시험 유형별 카테고리 */}
-      <NotionCard title="시험 유형별 선택" icon={<FileText className="w-5 h-5" />}>
-        <div className="p-4 grid grid-cols-2 md:grid-cols-4 gap-4">
-          <button className="p-4 text-center border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-            <div className="text-2xl mb-2">⚡</div>
-            <div className="font-medium">빠른 테스트</div>
-            <div className="text-sm text-gray-500">10분 / 20문제</div>
-          </button>
-          <button className="p-4 text-center border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-            <div className="text-2xl mb-2">📚</div>
-            <div className="font-medium">단원별</div>
-            <div className="text-sm text-gray-500">선택 학습</div>
-          </button>
-          <button className="p-4 text-center border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-            <div className="text-2xl mb-2">🎯</div>
-            <div className="font-medium">실전 모의</div>
-            <div className="text-sm text-gray-500">실제 시험 형식</div>
-          </button>
-          <button className="p-4 text-center border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-            <div className="text-2xl mb-2">🔥</div>
-            <div className="font-medium">오답 복습</div>
-            <div className="text-sm text-gray-500">틀린 문제만</div>
-          </button>
+      {/* Test History for this study set */}
+      {testHistory.length > 0 && (
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <Clock className="w-5 h-5 text-gray-500" />
+            이전 시험 결과
+          </h2>
+          <div className="space-y-3">
+            {testHistory.slice(0, 5).map((session) => (
+              <Link
+                key={session.id}
+                href={`/dashboard/test/result/${session.id}`}
+                className="flex items-center justify-between p-4 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors"
+              >
+                <div>
+                  <p className="text-sm text-gray-500">
+                    {new Date(session.completed_at).toLocaleDateString('ko-KR', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </p>
+                </div>
+                <div
+                  className={`text-lg font-bold ${
+                    session.percentage >= 80
+                      ? 'text-green-600'
+                      : session.percentage >= 60
+                      ? 'text-yellow-600'
+                      : 'text-red-600'
+                  }`}
+                >
+                  {session.percentage}%
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
-      </NotionCard>
+      )}
     </div>
+  );
+}
+
+export default function TestPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        </div>
+      }
+    >
+      <TestPageContent />
+    </Suspense>
   );
 }
