@@ -1,10 +1,14 @@
 """Scoring service for test submissions."""
 
+import logging
 from datetime import datetime
 from typing import Any
 
 from app.repositories.test_session import TestSessionRepository
 from app.repositories.question import QuestionRepository
+from app.core.config import get_settings
+
+logger = logging.getLogger(__name__)
 
 
 class ScoringService:
@@ -13,6 +17,16 @@ class ScoringService:
     def __init__(self):
         self.session_repo = TestSessionRepository()
         self.question_repo = QuestionRepository()
+        self.settings = get_settings()
+        self.neo4j_repo = None
+
+        # Initialize Neo4j repository if configured
+        if self.settings.neo4j_uri:
+            try:
+                from app.repositories.neo4j_concepts import Neo4jConceptRepository
+                self.neo4j_repo = Neo4jConceptRepository()
+            except Exception as e:
+                logger.warning(f"Failed to initialize Neo4j for progress tracking: {e}")
 
     async def submit_and_score(
         self,
@@ -62,6 +76,11 @@ class ScoringService:
 
         # Complete session
         await self.session_repo.complete_session(session_id, correct_count)
+
+        # Update user mastery in Knowledge Graph
+        if self.neo4j_repo:
+            user_id = session["user_id"]
+            await self._update_user_mastery(user_id, scored_answers, question_map)
 
         # Calculate time taken
         started_at = datetime.fromisoformat(
@@ -148,3 +167,52 @@ class ScoringService:
             "completed_at": session.get("completed_at"),
             "questions": question_results,
         }
+
+    async def _update_user_mastery(
+        self,
+        user_id: str,
+        scored_answers: list[dict[str, Any]],
+        question_map: dict[str, dict[str, Any]],
+    ) -> None:
+        """
+        Update user's mastery in Knowledge Graph based on answers.
+
+        Args:
+            user_id: User ID
+            scored_answers: List of scored answers
+            question_map: Map of question_id to question data
+        """
+        try:
+            for answer in scored_answers:
+                question = question_map.get(answer["question_id"])
+                if not question:
+                    continue
+
+                # Use subject as the concept for mastery tracking
+                subject = question.get("subject")
+                if subject:
+                    await self.neo4j_repo.update_user_mastery(
+                        user_id=user_id,
+                        concept_name=subject,
+                        is_correct=answer["is_correct"],
+                    )
+
+                # Also track topic-level mastery if available
+                topic = question.get("topic")
+                if topic:
+                    await self.neo4j_repo.update_user_mastery(
+                        user_id=user_id,
+                        concept_name=topic,
+                        is_correct=answer["is_correct"],
+                    )
+
+            logger.info(f"Updated mastery for user {user_id}: {len(scored_answers)} answers")
+
+        except Exception as e:
+            # Don't fail the entire submission if mastery update fails
+            logger.error(f"Failed to update user mastery: {e}")
+
+    async def close(self):
+        """Clean up resources."""
+        if self.neo4j_repo:
+            await self.neo4j_repo.close()

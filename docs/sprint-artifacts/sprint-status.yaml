@@ -77,9 +77,9 @@ development_status:
   epic-5-retrospective: optional
 
   # Epic 6: Analytics & Dashboard
-  epic-6: backlog
-  6-1-weak-concept-analysis-api: backlog
-  6-2-weak-concept-analysis-ui: backlog
-  6-3-learning-dashboard: backlog
-  6-4-user-progress-tracking: backlog
+  epic-6: done
+  6-1-weak-concept-analysis-api: done  # WeaknessAnalyzer, ExamPredictionService
+  6-2-weak-concept-analysis-ui: done  # Analysis page with real API integration
+  6-3-learning-dashboard: done  # Dashboard with stats and predictions
+  6-4-user-progress-tracking: done  # Neo4j mastery updates from test scoring
   epic-6-retrospective: optional
