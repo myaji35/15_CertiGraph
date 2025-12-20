@@ -61,11 +61,11 @@ development_status:
   epic-3-retrospective: optional
 
   # Epic 4: Knowledge Graph & Embeddings
-  epic-4: backlog
-  4-1-vector-embedding-pinecone-storage: backlog
-  4-2-llm-concept-extraction: backlog
-  4-3-neo4j-graph-construction: backlog
-  4-4-study-set-list-page: backlog
+  epic-4: done
+  4-1-vector-embedding-pinecone-storage: done  # OpenAI embeddings + Pinecone
+  4-2-llm-concept-extraction: done  # Gemini concept extraction
+  4-3-neo4j-graph-construction: done  # Neo4j concepts + relationships
+  4-4-study-set-list-page: done  # Already implemented
   epic-4-retrospective: optional
 
   # Epic 5: CBT Test Engine
