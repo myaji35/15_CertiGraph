@@ -44,11 +44,11 @@ development_status:
   epic-1-retrospective: optional
 
   # Epic 2: User Authentication
-  epic-2: backlog
-  2-1-clerk-project-setup: backlog
-  2-2-frontend-auth-pages: backlog
-  2-3-backend-jwt-verification: backlog
-  2-4-user-sync-dashboard-layout: backlog
+  epic-2: done
+  2-1-clerk-project-setup: done
+  2-2-frontend-auth-pages: done
+  2-3-backend-jwt-verification: done
+  2-4-user-sync-dashboard-layout: done
   epic-2-retrospective: optional
 
   # Epic 3: PDF Processing Pipeline
