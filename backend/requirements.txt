@@ -8,17 +8,20 @@ python-multipart>=0.0.9
 # Database Clients
 supabase>=2.0.0
 pinecone-client>=3.0.0
-neo4j>=5.0.0
+# neo4j>=5.0.0  # FUTURE: For knowledge graph feature (not currently used)
 
-# AI/LLM
-langchain>=0.2.0
-langchain-openai>=0.1.0
-openai>=1.0.0
+# AI/LLM - Active
 google-generativeai>=0.3.0
+
+# AI/LLM - Future (uncomment when implementing these features)
+# SECURITY NOTE: langchain must be >=0.3.81 or >=1.2.5 to fix CVE-2025-68664
+# langchain>=0.3.81
+# langchain-openai>=0.1.0
+# openai>=1.0.0
 
 # Utilities
 python-dotenv>=1.0.0
-python-jose[cryptography]>=3.3.0
+python-jose[cryptography]>=3.3.1  # SECURITY: Updated for CVE-2024-33663/33664
 httpx>=0.27.0
 pdfplumber>=0.11.0
 
