@@ -96,6 +96,13 @@ class ScoringService:
         if not session:
             raise ValueError("Session not found")
 
+        # Get study set name
+        from app.repositories.study_set import StudySetRepository
+        from app.core.config import get_settings
+        study_set_repo = StudySetRepository(get_settings())
+        study_set = await study_set_repo.get_by_id(session["study_set_id"])
+        study_set_name = study_set["name"] if study_set else "Unknown"
+
         # Get answers
         answers = await self.session_repo.get_session_answers(session_id)
         answer_map = {a["question_id"]: a for a in answers}
@@ -141,6 +148,8 @@ class ScoringService:
 
         return {
             "session_id": session_id,
+            "study_set_id": session["study_set_id"],
+            "study_set_name": study_set_name,
             "score": score,
             "total": total,
             "percentage": percentage,

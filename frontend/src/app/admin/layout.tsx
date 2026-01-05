@@ -44,11 +44,11 @@ export default async function AdminLayout({
             </li>
             <li>
               <Link
-                href="/admin/study-sets"
+                href="/admin/content"
                 className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-700 hover:text-gray-900"
               >
                 <Book className="w-5 h-5" />
-                문제집 관리
+                공식 콘텐츠 관리
               </Link>
             </li>
             <li>
@@ -71,11 +71,11 @@ export default async function AdminLayout({
             </li>
             <li>
               <Link
-                href="/admin/content"
+                href="/admin/statistics"
                 className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-700 hover:text-gray-900"
               >
                 <FileText className="w-5 h-5" />
-                콘텐츠 관리
+                통계 및 분석
               </Link>
             </li>
             <li>

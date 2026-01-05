@@ -41,13 +41,13 @@ export default function UsersManagementPage() {
       setLoading(true);
       console.log('[1] Starting fetchUsers...');
       console.log('[2] API URL:', process.env.NEXT_PUBLIC_API_URL);
-      console.log('[3] Full URL:', `${process.env.NEXT_PUBLIC_API_URL}/v1/admin/users`);
+      console.log('[3] Full URL:', `${process.env.NEXT_PUBLIC_API_URL}/admin/users`);
 
       const token = await getToken();
       console.log('[4] Token obtained:', token ? `Yes (${token.substring(0, 20)}...)` : 'No');
 
       console.log('[5] Making fetch request...');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/admin/users`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -276,7 +276,7 @@ function ForceSubscriptionModal({
 
       // Use admin endpoint to create subscription for specific user
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/v1/admin/users/${user.clerk_id}/force-subscription?certification_id=${selectedCertId}&exam_date_id=${selectedExamDateId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/users/${user.clerk_id}/force-subscription?certification_id=${selectedCertId}&exam_date_id=${selectedExamDateId}`,
         {
           method: 'POST',
           headers: {

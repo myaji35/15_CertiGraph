@@ -109,3 +109,12 @@ class MockQuestionRepository:
         self._storage[study_set_id] = questions
         self._save_data()
         return questions
+
+    async def get_by_material(
+        self,
+        material_id: str,
+        limit: Optional[int] = None,
+        randomize: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Get questions for a material (alias for get_by_study_set)."""
+        return await self.get_by_study_set(material_id, limit, randomize)

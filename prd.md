@@ -57,25 +57,46 @@
 
 | ID | Actor | User Story | Acceptance Criteria |
 | :--- | :--- | :--- | :--- |
-| **US-01** | User | 보유한 기출문제 PDF를 시스템에 업로드하고 싶다. | 업로드 시 진행률 표시, 완료 후 '학습 세트' 생성 알림. |
-| **US-02** | System | 업로드된 문서에서 문제, 보기, 해설, 지문을 정확히 분리해야 한다. | Upstage API 활용, 지문이 있는 경우 문제마다 지문 복제 청킹. |
-| **US-03** | User | 생성된 문제 세트로 모의고사를 응시하고 싶다. (CBT 환경) | 실제 시험과 유사한 UI, **보기 순서 랜덤 셔플링** 적용. |
-| **US-04** | System | 사용자의 오답을 분석해 취약 개념을 도출해야 한다. | GraphRAG 기반 추론, 오답 원인(개념 부족 vs 실수) 태깅. |
-| **US-05** | User | 이메일 또는 소셜 계정으로 회원가입/로그인하고 싶다. | 이메일/비밀번호 또는 Google/Kakao 소셜 로그인 지원, 로그인 후 대시보드 이동. |
-| **US-06** | User | [Phase 2] 나의 학습 상태를 3D 지도로 확인하고 싶다. | 3D 공간에 노드(개념) 표시, 취약 노드(Red) 클릭 시 집중 문제 풀이 연결. |
+| **US-01** | User | 문제집을 생성하고 관리하고 싶다. (CRUD) | 문제집명, 개요, 자격증, 시험일자 입력/수정/삭제 가능. |
+| **US-02** | User | 생성한 문제집에 PDF 학습자료를 업로드하고 싶다. | 문제집 선택 → PDF 업로드 → 진행률 표시 → 파싱 완료 알림. |
+| **US-03** | System | 업로드된 PDF에서 문제, 보기, 해설, 지문을 정확히 분리해야 한다. | Upstage API 활용, 지문이 있는 경우 문제마다 지문 복제 청킹. |
+| **US-04** | User | 문제집으로 모의고사를 응시하고 싶다. (CBT 환경) | 실제 시험과 유사한 UI, **보기 순서 랜덤 셔플링** 적용. |
+| **US-05** | System | 사용자의 오답을 분석해 취약 개념을 도출해야 한다. | GraphRAG 기반 추론, 오답 원인(개념 부족 vs 실수) 태깅. |
+| **US-06** | User | 이메일 또는 소셜 계정으로 회원가입/로그인하고 싶다. | 이메일/비밀번호 또는 Google/Kakao 소셜 로그인 지원, 로그인 후 대시보드 이동. |
+| **US-07** | User | 1만원 시즌권을 결제하고 무제한 서비스를 이용하고 싶다. | 가입 후 결제 페이지 유도, 결제 완료 시 권한 부여. |
+| **US-08** | User | 실제 시험을 대비해 내가 틀린 문제만 모아서 다시 풀고 싶다. | 오답 노트(틀린 문제) 모드 제공, 맞히면 오답 목록에서 제거 선택 가능. |
+| **US-09** | User | [Phase 2] 나의 학습 상태를 3D 지도로 확인하고 싶다. | 3D 공간에 노드(개념) 표시, 취약 노드(Red) 클릭 시 집중 문제 풀이 연결. |
 
 ---
 
 ## 4. Functional Requirements (기능 명세)
 
-### 4.1. Data Ingestion Pipeline (The Core)
-* **OCR & Parsing:**
-    * **Solution:** `Upstage Document Parse API` 사용.
-    * **Logic:** 문서 구조(Heading, Paragraph, Table)를 인식하여 마크다운 형태로 변환.
-    * **Image Handling:** 문제 내 이미지는 Crop 후 LLM(GPT-4o)으로 Captioning(텍스트 설명)하여 메타데이터로 저장.
-* **Intelligent Chunking:**
-    * **지문 복제 전략:** "다음 글을 읽고 물음에 답하시오" 유형 감지 시, 해당 지문(Context)을 하위 문제(Q1, Q2...) 각각의 청크에 모두 포함시켜 저장.
-    * **Schema:** `Question`, `Options(List)`, `Answer`, `Explanation`, `Linked_Concept`, `Difficulty`.
+### 4.1. 문제집 관리 (Study Set Management)
+* **CRUD 기능:**
+    * **Create:** 문제집명, 개요(설명), 자격증 선택. **(시험일 선택 시 오늘 기준 가장 가까운 자격증 시험일 자동 추천)**
+    * **Read:** 사용자의 문제집 목록 조회, 문제집 상세 정보 조회
+    * **Update:** 문제집명, 개요 수정
+    * **Delete:** 문제집 삭제 (하위 학습자료 및 문제도 함께 삭제)
+* **메타데이터:**
+    * 문제집 ID, 문제집명, 개요, 자격증 ID, 시험일자
+    * 생성일, 수정일, 총 학습자료 수, 총 문제 수
+    * 학습 상태 (not_started, in_progress, completed)
+
+### 4.2. 학습자료 관리 (Study Material Management)
+* **업로드 프로세스:**
+    1. 사용자가 문제집 선택
+    2. PDF 파일 업로드 (최대 50MB)
+    3. 파일 중복 감지 (해시 기반)
+    4. 업로드 진행률 표시
+    5. 파싱 작업 시작 (백그라운드)
+* **파싱 프로세스:**
+    * **OCR & Parsing:** Upstage Document Parse API 사용
+    * **문서 구조 인식:** Heading, Paragraph, Table을 마크다운으로 변환
+    * **Image Handling:** 이미지 Crop 후 GPT-4o로 Captioning
+    * **지문 복제 전략:** "다음 글을 읽고..." 유형 감지 시 지문을 하위 문제 각각에 포함
+* **데이터 스키마:**
+    * 학습자료: PDF 경로, 파싱 상태, 문제 수
+    * 문제: Question, Options(List), Answer, Explanation, Linked_Concept, Difficulty
 
 ### 4.2. Knowledge Graph Construction
 * **Strategy:** Aggressive LLM Utilization (품질 최우선).
@@ -86,6 +107,10 @@
 
 ### 4.3. Test Engine & Analysis
 * **Randomization:** DB 저장 순서와 무관하게 Frontend 렌더링 시 보기 순서 무작위 섞기 (Anti-Memorization).
+* **Modes:**
+    * **Standard:** 랜덤 셔플 모의고사.
+    * **Retest (오답 노트):** 과거 틀린 문제만 모아서 다시 풀기.
+    * **Drill (약점 공략):** 취약 개념(Weak Concept)과 연관된 문제 집중 풀이.
 * **GraphRAG Reasoning:**
     * 오답 발생 시, 연결된 Knowledge Graph를 탐색.
     * LLM 프롬프트: "사용자가 개념 A와 B가 연결된 문제를 틀렸다. 과거 C문제 오답 이력을 볼 때, 사용자는 어떤 원리 이해가 부족한가?"
@@ -96,6 +121,17 @@
     * Zoom/Pan 가능한 3D 네트워크 그래프.
     * Node Color: Green(숙련), Red(취약), Gray(미응시).
     * Click Event: 해당 개념 관련 문제만 모은 'Drill Mode' 진입.
+
+---
+
+
+### 4.5. Payment System (Season Pass)
+* **Provider:** Toss Payments (or PortOne).
+* **Product:** Season Pass (10,000 KRW).
+* **Flow:**
+    1. 회원가입/로그인 완료.
+    2. 무료 체험(맛보기) 제한 도달 or 메인 진입 시 결제 모달 팝업.
+    3. 결제 완료 → `user.is_paid = true` 및 `user.valid_until = test_date` 업데이트.
 
 ---
 
@@ -131,10 +167,11 @@
 
 ## 6. Roadmap & Milestones
 
-### Phase 1: Core Engine (MVP) - 2 Weeks
+### Phase 1: Core Engine & Payment (MVP) - 2 Weeks
 * [ ] Upstage API 연동 및 파싱 파이프라인 구축 (Python).
 * [ ] 지문 복제 청킹 로직 구현 및 Vector DB 적재.
 * [ ] 기본적인 문제 풀이 UI 및 채점 기능 개발.
+* [ ] **결제 모듈 연동 (토스페이먼츠) 및 권한 제어 로직 구현.**
 
 ### Phase 2: Intelligence & Graph - 3 Weeks
 * [ ] Neo4j 스키마 설계 및 LLM 자동 태깅 구현.
@@ -143,7 +180,6 @@
 
 ### Phase 3: Visualization & Launch - 3 Weeks
 * [ ] React Three Fiber 기반 3D 뇌지도(Brain Map) 구현.
-* [ ] 결제 모듈(PG) 연동 (시즌 패스 1만원).
 * [ ] 배포 및 안정화.
 
 ---
@@ -253,6 +289,8 @@
 | ✅ PDF 업로드 | 사회복지사 1급 기출문제 PDF 업로드 | P0 |
 | ✅ 문서 파싱 | Upstage API 기반 문제/보기/해설 분리 | P0 |
 | ✅ CBT 모의고사 | 보기 랜덤 셔플링, 타이머, 채점 | P0 |
+| ✅ 오답 노트 | 틀린 문제 모아 풀기, 취약점 모아 풀기 | P0 |
+| ✅ 결제 시스템 | 토스페이먼츠 연동 (1만원 시즌패스) | P0 |
 | ✅ 오답 분석 | 틀린 문제 목록 + LLM 기반 취약 개념 도출 | P0 |
 | ✅ 기본 대시보드 | 학습 진도, 정답률 통계 | P1 |
 | ✅ 사용자 인증 | 이메일/소셜 로그인 (Supabase Auth) | P0 |
@@ -262,7 +300,6 @@
 | 기능 | 이유 | 예정 Phase |
 |------|------|-----------|
 | ❌ 3D Brain Map 시각화 | 개발 복잡도 높음, MVP 핵심 아님 | Phase 3 |
-| ❌ 결제 시스템 (PG) | MVP는 무료 베타로 운영 | Phase 2 |
 | ❌ 모바일 앱 (iOS/Android) | 웹 우선, 반응형으로 대응 | Phase 3+ |
 | ❌ 다중 자격증 지원 | 사회복지사 1급 특화 후 확장 | Phase 2 |
 | ❌ 커뮤니티/게시판 | 핵심 기능 아님 | 미정 |

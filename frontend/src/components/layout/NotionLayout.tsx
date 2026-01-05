@@ -56,7 +56,13 @@ export default function NotionLayout({ children }: NotionLayoutProps) {
           id: 'knowledge-graph',
           title: '지식 그래프',
           icon: <Brain className="w-4 h-4" />,
-          path: '/knowledge-graph',
+          path: '/dashboard/knowledge-graph',
+        },
+        {
+          id: 'test-dashboard',
+          title: '실전 모의고사',
+          icon: <Target className="w-4 h-4" />,
+          path: '/dashboard/test',
         },
         {
           id: 'weak-points',
@@ -386,13 +392,6 @@ export default function NotionLayout({ children }: NotionLayoutProps) {
             <ChevronRight className="w-3 h-3" />
             <span className="text-gray-900 dark:text-gray-100">대시보드</span>
           </div>
-          <button
-            onClick={() => router.push('/dashboard/study-sets/new')}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors whitespace-nowrap"
-          >
-            <Plus className="w-3.5 h-3.5 flex-shrink-0" />
-            <span>새 문제집</span>
-          </button>
         </div>
 
         {/* Page Content */}

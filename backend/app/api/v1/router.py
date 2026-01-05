@@ -3,6 +3,8 @@ from fastapi import APIRouter
 from app.api.v1.deps import CurrentUser
 from app.api.v1.endpoints import (
     study_sets_router,
+    study_materials_router,
+    questions_router,
     tests_router,
     analysis_router,
     certifications_router,
@@ -19,6 +21,8 @@ api_router = APIRouter()
 
 # Include routers
 api_router.include_router(study_sets_router)
+api_router.include_router(study_materials_router)
+api_router.include_router(questions_router)
 api_router.include_router(tests_router)
 api_router.include_router(analysis_router)
 api_router.include_router(certifications_router)

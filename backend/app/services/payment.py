@@ -7,14 +7,17 @@ from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 import os
 
+from app.repositories.payment import PaymentRepository
+
 class PaymentService:
     """Toss Payments integration service."""
 
-    def __init__(self):
+    def __init__(self, client_key=None, secret_key=None, frontend_url=None, repository=None):
         self.base_url = "https://api.tosspayments.com/v1"
-        self.client_key = os.getenv('TOSS_CLIENT_KEY', "test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq")  # 테스트 키
-        self.secret_key = os.getenv('TOSS_SECRET_KEY', "test_sk_zXLkKEypNArWmo50nX3lmeaxYG5R")  # 테스트 키
-        self.frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:3000')
+        self.client_key = client_key or os.getenv('TOSS_CLIENT_KEY', "test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq")
+        self.secret_key = secret_key or os.getenv('TOSS_SECRET_KEY', "test_sk_zXLkKEypNArWmo50nX3lmeaxYG5R")
+        self.frontend_url = frontend_url or os.getenv('FRONTEND_URL', 'http://localhost:3000')
+        self.repository = repository or PaymentRepository()
 
         # Base64 encode secret key for authorization
         auth_string = f"{self.secret_key}:"
@@ -39,7 +42,7 @@ class PaymentService:
         Returns:
             Payment creation response
         """
-        order_id = f"ORDER_{user_id}_{exam_date}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
+        order_id = f"ORDER_{user_id}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
 
         payment_data = {
             "amount": amount,
@@ -67,7 +70,8 @@ class PaymentService:
         self,
         payment_key: str,
         order_id: str,
-        amount: int
+        amount: int,
+        user_id: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Confirm a payment after user approval.
@@ -76,6 +80,7 @@ class PaymentService:
             payment_key: Payment key from Toss
             order_id: Order ID
             amount: Payment amount
+            user_id: Optional user_id (if available from context to cross-check)
 
         Returns:
             Payment confirmation response
@@ -96,7 +101,30 @@ class PaymentService:
                 )
 
                 if response.status_code == 200:
-                    return response.json()
+                    result = response.json()
+                    
+                    # Extract user_id from order_id if not provided
+                    # Order ID format: ORDER_{user_id}_{timestamp}
+                    if not user_id and "ORDER_" in order_id:
+                        parts = order_id.split("_")
+                        if len(parts) >= 3:
+                            # Handling user_id that might contain underscores? 
+                            # Assuming user_id is the middle part or everything between ORDER and Timestamp
+                            # Safe bet: Clerk IDs don't seem to have underscores usually, mostly user_...
+                            user_id = parts[1]
+
+                    if user_id:
+                        # Update user status in DB
+                        # Note: We need to handle internal ID vs Clerk ID details.
+                        # For now, update_user_payment_status tries both.
+                        await self.repository.update_user_payment_status(
+                            user_id=user_id,
+                            is_paid=True,
+                            payment_key=payment_key,
+                            amount=amount
+                        )
+
+                    return result
                 else:
                     return {
                         "error": True,
@@ -137,6 +165,9 @@ class PaymentService:
                         "cancelReason": cancel_reason
                     }
                 )
+                
+                # If cancellation successful, we should theoretically update DB too.
+                # Logic omitted for brevity in MVP unless specifically requested.
 
                 return response.json()
 

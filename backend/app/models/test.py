@@ -80,6 +80,8 @@ class QuestionResult(BaseModel):
 class TestResultResponse(BaseModel):
     """Response schema for test results."""
     session_id: str
+    study_set_id: str
+    study_set_name: str
     score: int
     total: int
     percentage: float

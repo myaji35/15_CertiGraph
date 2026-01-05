@@ -148,7 +148,9 @@ class _TestSessionRepository:
         user_id: str,
         study_set_id: str,
     ) -> list[str]:
-        """Get question IDs that user answered incorrectly."""
+        """
+        Get question IDs that user currently has incorrect (based on latest attempt).
+        """
         # First get all sessions for this study set
         async with httpx.AsyncClient() as client:
             sessions_response = await client.get(
@@ -168,25 +170,40 @@ class _TestSessionRepository:
             return []
 
         session_ids = [s["id"] for s in sessions]
-
-        # Get wrong answers from these sessions
-        wrong_ids = set()
-        for session_id in session_ids:
+        
+        # Batch fetch answers for these sessions
+        # Logic: fetch all answers, sort by time, keep latest status
+        
+        all_answers = []
+        
+        # Split session_ids into chunks to avoid URL length issues
+        chunk_size = 15
+        for i in range(0, len(session_ids), chunk_size):
+            chunk = session_ids[i:i + chunk_size]
+            sessions_str = ",".join(chunk)
+            
             async with httpx.AsyncClient() as client:
                 answers_response = await client.get(
                     f"{self.base_url}/user_answers",
                     headers=self.headers,
                     params={
-                        "session_id": f"eq.{session_id}",
-                        "is_correct": "eq.false",
-                        "select": "question_id",
+                        "session_id": f"in.({sessions_str})",
+                        "select": "question_id,is_correct,answered_at"
                     },
                 )
-                answers_response.raise_for_status()
-                for ans in answers_response.json():
-                    wrong_ids.add(ans["question_id"])
+                if answers_response.status_code == 200:
+                    all_answers.extend(answers_response.json())
 
-        return list(wrong_ids)
+        # Sort all answers by answered_at
+        all_answers.sort(key=lambda x: x["answered_at"])
+        
+        # Replay history
+        question_status = {}
+        for ans in all_answers:
+            question_status[ans["question_id"]] = ans["is_correct"]
+            
+        # Return questions where status is False (Incorrect)
+        return [qid for qid, status in question_status.items() if not status]
 
     async def get_user_sessions(
         self,

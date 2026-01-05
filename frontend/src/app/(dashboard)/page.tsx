@@ -191,16 +191,16 @@ export default function DashboardPage() {
       {!stats?.has_data && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
           <h2 className="text-lg font-semibold text-blue-900 mb-2">
-            첫 번째 PDF를 업로드하고 학습을 시작해보세요!
+            문제집을 선택하고 학습을 시작해보세요!
           </h2>
           <p className="text-blue-700 mb-4">
-            사회복지사 1급 기출문제 PDF를 업로드하면 AI가 자동으로 문제를 분석합니다.
+            문제집을 만들고 사회복지사 1급 기출문제 PDF를 업로드하면 AI가 자동으로 문제를 분석합니다.
           </p>
           <Link
-            href="/dashboard/study-sets/new"
+            href="/dashboard/study-sets"
             className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
-            PDF 업로드하기
+            문제집 선택하기
           </Link>
         </div>
       )}
@@ -209,17 +209,17 @@ export default function DashboardPage() {
       {stats?.has_data && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Link
-            href="/dashboard/study-sets/new"
+            href="/dashboard/study-sets"
             className="flex items-center gap-3 p-4 bg-white rounded-lg shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors"
           >
             <div className="p-2 bg-blue-100 rounded-lg">
               <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
             </div>
             <div>
-              <p className="font-medium text-gray-900">새 PDF 업로드</p>
-              <p className="text-sm text-gray-500">기출문제 추가</p>
+              <p className="font-medium text-gray-900">문제집 선택</p>
+              <p className="text-sm text-gray-500">학습자료 관리</p>
             </div>
           </Link>
           <Link

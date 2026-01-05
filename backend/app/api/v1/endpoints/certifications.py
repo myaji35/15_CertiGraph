@@ -168,7 +168,47 @@ async def get_certification_detail(certification_id: str):
         )
 
     raise HTTPException(status_code=404, detail="자격증을 찾을 수 없습니다")
+    raise HTTPException(status_code=404, detail="자격증을 찾을 수 없습니다")
 
+
+@router.get("/{certification_id}/nearest-exam-date")
+async def get_nearest_exam_date(certification_id: str):
+    """
+    Get the nearest upcoming exam date for a certification.
+    
+    Returns:
+        JSON with 'nearest_exam_date' (YYYY-MM-DD or None) and 'd_day' (int).
+    """
+    data_loader = get_data_loader()
+    cert_data = data_loader.get_certification_by_id(certification_id)
+    
+    if not cert_data:
+        raise HTTPException(status_code=404, detail="자격증을 찾을 수 없습니다")
+        
+    upcoming = data_loader.get_upcoming_exams(days=365)
+    
+    # Filter for this certification
+    exams = [
+        e for e in upcoming 
+        if e["certification_id"] == certification_id 
+        and e["exam_type"] == ExamType.WRITTEN  # Usually focus on Written exams for study sets
+    ]
+    
+    if not exams:
+        return {
+            "nearest_exam_date": None,
+            "d_day": None,
+            "message": "향후 1년 내 예정된 필기 시험이 없습니다."
+        }
+        
+    nearest = exams[0]
+    
+    return {
+        "nearest_exam_date": nearest["exam_date"],
+        "d_day": nearest["days_until"],
+        "exam_round": nearest["round"],
+        "description": f"제{nearest['round']}회 {nearest['exam_type']} 시험"
+    }
 
 @router.post("/preferences")
 async def save_certification_preference(

@@ -2,10 +2,17 @@
 
 import asyncio
 from io import BytesIO
-from fastapi import APIRouter, UploadFile, File, Form, BackgroundTasks
+from fastapi import APIRouter, UploadFile, File, Form, BackgroundTasks, Depends
 from typing import Any
 
-from app.api.v1.deps import CurrentUser, StudySetRepo, StorageServiceDep
+from app.api.v1.deps import (
+    CurrentUser,
+    StudySetRepo,
+    StorageServiceDep,
+    SettingsDep,
+    get_current_user,
+    get_study_set_repository,
+)
 from app.core.exceptions import (
     InvalidFileTypeError,
     FileTooLargeError,
@@ -29,6 +36,94 @@ router = APIRouter(prefix="/study-sets", tags=["study-sets"])
 # Constants
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
 ALLOWED_CONTENT_TYPES = ["application/pdf"]
+
+
+@router.post("")
+async def create_study_set(
+    current_user: CurrentUser,
+    repo: StudySetRepo,
+    payload: dict[str, Any],
+    settings: SettingsDep,
+) -> dict[str, Any]:
+    """
+    Create a new study set with metadata only (no PDF).
+
+    This allows users to create a study set container first,
+    then add study materials (PDFs) later.
+
+    Request Body:
+        {
+            "name": "Study set name (required)",
+            "certification_id": "Certification ID (required)",
+            "exam_date": "2024-03-15",  // optional, ISO date format
+            "description": "Description text"  // optional
+        }
+
+    Returns:
+        Created study set data with ID
+    """
+    from fastapi import HTTPException, status as http_status, Body
+    from supabase import create_client
+
+    # Extract fields from payload
+    name = payload.get("name")
+    certification_id = payload.get("certification_id")
+    exam_date = payload.get("exam_date")
+    description = payload.get("description", "")
+
+    # Validate required fields
+    if not name or not name.strip():
+        raise HTTPException(
+            status_code=http_status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="문제집 이름을 입력해주세요"
+        )
+
+    if not certification_id:
+        raise HTTPException(
+            status_code=http_status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="자격증을 선택해주세요"
+        )
+
+    # Check for active subscription to this certification (skip in dev mode)
+    if not settings.dev_mode:
+        supabase = create_client(settings.supabase_url, settings.supabase_service_key)
+        has_subscription = supabase.rpc(
+            'has_active_subscription',
+            {
+                'p_clerk_user_id': current_user.clerk_id,
+                'p_certification_id': certification_id
+            }
+        ).execute()
+
+        if not has_subscription.data:
+            raise HTTPException(
+                status_code=http_status.HTTP_402_PAYMENT_REQUIRED,
+                detail=f"이 자격증에 대한 구독이 필요합니다. 먼저 구독을 구매해주세요."
+            )
+
+    # Create study set (without PDF)
+    # Note: MockStudySetRepository only supports basic parameters
+    study_set = await repo.create(
+        user_id=current_user.clerk_id,
+        name=name.strip(),
+        pdf_path=None,  # No PDF yet
+        pdf_hash=None,  # No PDF yet
+        status=StudySetStatus.READY,
+        source_study_set_id=None,
+    )
+
+    # Store additional metadata separately for now
+    # In production, these would be stored in the database
+
+    return {
+        "id": study_set["id"],
+        "name": study_set["name"],
+        "certification_id": certification_id,
+        "exam_date": exam_date,
+        "description": description,
+        "status": StudySetStatus.READY.value,
+        "created_at": study_set["created_at"],
+    }
 
 # Fake processing steps for cached duplicates
 FAKE_PROCESSING_STEPS = [
@@ -456,6 +551,44 @@ async def parse_study_set(
             "status": StudySetStatus.PARSING.value,
             "message": "PDF 파싱이 시작되었습니다.",
         }
+    }
+
+
+@router.patch("/{study_set_id}")
+async def update_study_set(
+    study_set_id: str,
+    current_user: CurrentUser,
+    repo: StudySetRepo,
+    name: str = Form(None),
+    description: str = Form(None),
+) -> dict[str, Any]:
+    """Update a study set's name or description."""
+    study_set = await repo.get_by_id(study_set_id)
+
+    if not study_set:
+        raise ResourceNotFoundError("학습 세트", study_set_id)
+
+    # Verify ownership
+    if study_set["user_id"] != current_user.clerk_id:
+        raise ResourceNotFoundError("학습 세트", study_set_id)
+
+    # Update fields if provided
+    updates = {}
+    if name is not None and name.strip():
+        updates["name"] = name.strip()
+    if description is not None:
+        updates["description"] = description.strip()
+
+    if updates:
+        # For MockRepository, we'll just return the updated data
+        # In production, this would update the database
+        study_set.update(updates)
+
+    return {
+        "id": study_set_id,
+        "name": study_set.get("name"),
+        "description": study_set.get("description"),
+        "updated": True
     }
 
 

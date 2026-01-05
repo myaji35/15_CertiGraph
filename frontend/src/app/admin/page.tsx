@@ -151,16 +151,16 @@ export default function AdminDashboard() {
       <div className="mt-8 bg-blue-50 rounded-lg p-6">
         <h2 className="text-lg font-semibold mb-4">빠른 작업</h2>
         <div className="flex gap-4 flex-wrap">
-          <QuickAction href="/admin/study-sets/new" label="새 문제집 추가" />
+          <QuickAction href="/admin/content/new" label="공식 콘텐츠 추가" />
           <QuickAction href="/admin/users" label="사용자 관리" />
           <QuickAction href="/admin/certifications" label="자격증 관리" />
-          <QuickAction href="/admin/settings" label="시스템 설정" />
+          <QuickAction href="/admin/statistics" label="통계 보기" />
           <button
             onClick={() => setShowSubscriptionModal(true)}
             className="px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition-colors text-sm font-medium flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
-            강제 구독 생성
+            구독 생성 (테스트)
           </button>
         </div>
       </div>

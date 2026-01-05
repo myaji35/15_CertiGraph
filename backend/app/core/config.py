@@ -14,6 +14,7 @@ class Settings(BaseSettings):
 
     # Clerk (for JWT verification)
     clerk_jwks_url: str
+    clerk_secret_key: str = ""
 
     # Supabase (Database only)
     supabase_url: str
@@ -59,6 +60,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
+        extra = "ignore"
 
 
 @lru_cache

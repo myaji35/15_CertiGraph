@@ -9,10 +9,20 @@ export async function GET(request: NextRequest) {
   const API_KEY = process.env.NEXT_PUBLIC_DATA_GO_KR_API_KEY;
 
   if (!API_KEY) {
-    return NextResponse.json(
-      { error: '공공데이터포털 API 키가 설정되지 않았습니다.' },
-      { status: 500 }
-    );
+    console.warn('공공데이터포털 API 키가 설정되지 않아 샘플 데이터를 반환합니다.');
+    const currentYear = new Date().getFullYear();
+    const years = requestYear
+      ? [requestYear]
+      : [currentYear - 1, currentYear, currentYear + 1, currentYear + 2].map(y => y.toString());
+
+    const sampleData = years.flatMap(y => getSampleData(y));
+
+    return NextResponse.json({
+      success: true,
+      data: sampleData,
+      count: sampleData.length,
+      isSample: true
+    });
   }
 
   try {
@@ -57,10 +67,13 @@ export async function GET(request: NextRequest) {
     console.error('API 호출 실패:', error);
 
     // 에러 발생시 샘플 데이터 반환
+    const fallbackYear = requestYear || new Date().getFullYear().toString();
+    const sampleData = getSampleData(fallbackYear);
+
     return NextResponse.json({
       success: true,
-      data: getSampleData(year),
-      count: getSampleData(year).length,
+      data: sampleData,
+      count: sampleData.length,
       message: 'API 호출 실패로 샘플 데이터를 반환합니다.'
     });
   }
@@ -402,7 +415,7 @@ function getExamStatus(
 function getSampleData(year: string) {
   return [
     {
-      id: 'sample-1',
+      id: `sample-1-${year}`,
       examName: '정보처리기사 1회 필기',
       examType: 'written',
       category: 'IT',

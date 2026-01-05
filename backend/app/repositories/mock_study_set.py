@@ -149,6 +149,23 @@ class MockStudySetRepository:
         self._save_data()
         return study_set
 
+    async def update_material_counts(
+        self,
+        study_set_id: str,
+        total_materials: int,
+        total_questions: int
+    ) -> Optional[dict[str, Any]]:
+        """Update study set material and question counts."""
+        study_set = self._storage.get(study_set_id)
+        if not study_set:
+            return None
+
+        study_set["total_materials"] = total_materials
+        study_set["total_questions"] = total_questions
+        study_set["updated_at"] = datetime.utcnow().isoformat()
+        self._save_data()
+        return study_set
+
     async def delete(self, study_set_id: str) -> bool:
         """Delete a study set."""
         study_set = self._storage.get(study_set_id)
