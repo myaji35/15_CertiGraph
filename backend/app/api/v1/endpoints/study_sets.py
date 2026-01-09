@@ -486,21 +486,28 @@ async def list_study_sets(
     offset: int = 0,
 ) -> dict[str, Any]:
     """List all study sets for the current user."""
+    from app.repositories.mock_study_material import MockStudyMaterialRepository
+    
     result = []
+    material_repo = MockStudyMaterialRepository()
 
     # First, add mock study sets for the current user
     for study_set_id, study_set in MOCK_STUDY_SETS.items():
         if study_set["user_id"] == current_user.clerk_id:
+            # Calculate actual counts from materials
+            material_count = await material_repo.count_by_study_set(study_set_id)
+            total_questions = await material_repo.get_total_questions(study_set_id)
+            
             result.append({
                 "id": study_set["id"],
                 "name": study_set["name"],
                 "status": study_set.get("status", "ready"),
-                "question_count": study_set.get("total_questions", 0),
+                "question_count": total_questions,  # For backward compatibility
                 "created_at": study_set["created_at"],
                 "is_cached": False,
                 "certification_id": study_set.get("certification_id"),
-                "total_materials": study_set.get("total_materials", 0),
-                "total_questions": study_set.get("total_questions", 0),
+                "total_materials": material_count,
+                "total_questions": total_questions,
                 "learning_status": study_set.get("learning_status", "not_learned"),
                 "description": study_set.get("description"),
             })
@@ -515,14 +522,16 @@ async def list_study_sets(
             limit=limit,
         )
 
-        # Get question counts
+        # Get question counts and material counts
         for ss in study_sets:
-            question_count = await repo.get_question_count(ss["id"])
+            material_count = await material_repo.count_by_study_set(ss["id"])
+            total_questions = await material_repo.get_total_questions(ss["id"])
+            
             result.append({
                 "id": ss["id"],
                 "name": ss["name"],
                 "status": ss["status"],
-                "question_count": question_count,
+                "question_count": total_questions,  # For backward compatibility
                 "created_at": ss["created_at"],
                 "is_cached": ss.get("source_study_set_id") is not None,
                 "exam_name": ss.get("exam_name"),
@@ -531,6 +540,8 @@ async def list_study_sets(
                 "exam_session": ss.get("exam_session"),
                 "exam_session_name": ss.get("exam_session_name"),
                 "tags": ss.get("tags"),
+                "total_materials": material_count,
+                "total_questions": total_questions,
                 "learning_status": ss.get("learning_status", "not_learned"),
                 "last_studied_at": ss.get("last_studied_at"),
             })
@@ -542,6 +553,7 @@ async def list_study_sets(
         "data": result,
         "total": len(result),
     }
+
 
 
 @router.patch("/{study_set_id}/learning-status")

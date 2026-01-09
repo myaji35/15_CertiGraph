@@ -366,6 +366,56 @@ export default function StudySetDetailPage() {
     setExpandedLogs(newExpanded);
   };
 
+  const handleStartTest = async (materialId: string) => {
+    try {
+      const token = await getToken();
+
+      // Find the material to get its details
+      const material = materials.find(m => m.id === materialId);
+      if (!material) {
+        alert('학습자료를 찾을 수 없습니다.');
+        return;
+      }
+
+      // Start a mock exam session with this specific study set
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/mock-exam/start`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            mode: 'past_exam',
+            study_set_id: studySetId,
+            material_id: materialId,
+            title: material.title,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || '시험을 시작할 수 없습니다.');
+      }
+
+      const data = await response.json();
+      const examSession = data.data || data;
+
+      // Navigate to the test page with the exam session ID
+      if (examSession.exam_id) {
+        router.push(`/test/mock-exam/${examSession.exam_id}`);
+      } else {
+        // Fallback to regular test if exam_id is not available
+        router.push(`/test/${studySetId}`);
+      }
+    } catch (error: any) {
+      console.error('Failed to start test:', error);
+      alert(error.message || '시험 시작 중 오류가 발생했습니다.');
+    }
+  };
+
   if (loading) {
     return (
       <div className="max-w-5xl mx-auto px-6 py-8">
@@ -633,6 +683,16 @@ export default function StudySetDetailPage() {
                             </button>
                             {material.status === 'completed' && material.total_questions > 0 && (
                               <>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleStartTest(material.id);
+                                  }}
+                                  className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                                  title="문제 풀기"
+                                >
+                                  <BookOpen className="w-4 h-4" />
+                                </button>
                                 {(!material.graphrag_status || material.graphrag_status === 'not_started') && (
                                   <button
                                     onClick={() => handleStartGraphRAG(material.id)}

@@ -19,6 +19,7 @@ from app.api.v1.endpoints import (
     knowledge_graph_router,
     badges_router
 )
+from app.api.v1.endpoints.mock_exam import router as mock_exam_router
 
 api_router = APIRouter()
 
@@ -39,6 +40,7 @@ api_router.include_router(admin_router)
 api_router.include_router(dashboard_router)
 api_router.include_router(knowledge_graph_router)
 api_router.include_router(badges_router)
+api_router.include_router(mock_exam_router)
 
 
 # Health check for API v1

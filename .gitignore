@@ -43,3 +43,4 @@ backend.tar.gz
 dokploy-config.json
 dokploy-complete-setup.json
 .dokploy.env
+oh-my-opencode/

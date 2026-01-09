@@ -1,7 +1,7 @@
 'use client';
 
 import { NotionCard, NotionPageHeader, NotionStatCard } from '@/components/ui/NotionCard';
-import { FileText, Play, Clock, Trophy, AlertCircle, CheckCircle } from 'lucide-react';
+import { FileText, Play, Clock, Trophy, AlertCircle, CheckCircle, X, ChevronRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
@@ -20,8 +20,10 @@ interface TestSession {
 interface StudySet {
   id: string;
   name: string;
-  certification_name: string;
+  certification_id?: string;
+  total_materials: number;
   total_questions: number;
+  created_at: string;
 }
 
 export default function TestPage() {
@@ -30,6 +32,8 @@ export default function TestPage() {
   const [testHistory, setTestHistory] = useState<TestSession[]>([]);
   const [studySets, setStudySets] = useState<StudySet[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedMode, setSelectedMode] = useState<'all' | 'random' | 'timed'>('all');
   const [stats, setStats] = useState({
     totalTests: 0,
     avgScore: 0,
@@ -83,7 +87,9 @@ export default function TestPage() {
 
       if (studySetsResponse.ok) {
         const studySetsData = await studySetsResponse.json();
-        setStudySets(studySetsData.data || []);
+        // Filter only study sets with questions
+        const setsWithQuestions = (studySetsData.data || []).filter((s: StudySet) => s.total_questions > 0);
+        setStudySets(setsWithQuestions);
       }
     } catch (error) {
       console.error('데이터 가져오기 실패:', error);
@@ -110,7 +116,7 @@ export default function TestPage() {
 
       if (response.ok) {
         const data = await response.json();
-        router.push(`/test/${data.data.session_id}`);
+        router.push(`/dashboard/test/${data.data.session_id}`);
       } else {
         alert('테스트 시작에 실패했습니다.');
       }
@@ -118,6 +124,19 @@ export default function TestPage() {
       console.error('테스트 시작 실패:', error);
       alert('테스트 시작 중 오류가 발생했습니다.');
     }
+  };
+
+  const handleQuickStart = () => {
+    if (studySets.length === 0) {
+      alert('학습 세트가 없습니다. 먼저 PDF를 업로드해주세요.');
+      return;
+    }
+    setShowModal(true);
+  };
+
+  const handleStartExam = (studySetId: string) => {
+    setShowModal(false);
+    startTest(studySetId, selectedMode);
   };
 
   const formatDate = (dateString: string) => {
@@ -142,16 +161,20 @@ export default function TestPage() {
   return (
     <div className="space-y-6">
       <NotionPageHeader
-        title="모의고사"
+        title="실전 모의고사"
         icon="📝"
         breadcrumbs={[
           { label: '홈' },
           { label: '모의고사' }
         ]}
         actions={
-          <button className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+          <button
+            onClick={handleQuickStart}
+            disabled={studySets.length === 0}
+            className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             <Play className="w-4 h-4" />
-            <span>빠른 시험 시작</span>
+            <span>시험 시작</span>
           </button>
         }
       />
@@ -162,7 +185,7 @@ export default function TestPage() {
           title="응시한 모의고사"
           value={loading ? '-' : stats.totalTests}
           icon={<FileText className="w-5 h-5 text-blue-500" />}
-          description={`총 ${studySets.length}개 중`}
+          description={`총 ${studySets.length}개 세트 사용 가능`}
         />
         <NotionStatCard
           title="평균 점수"
@@ -184,36 +207,41 @@ export default function TestPage() {
       </div>
 
       {/* 추천 모의고사 */}
-      <NotionCard title="오늘의 추천 모의고사" icon={<AlertCircle className="w-5 h-5" />}>
-        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-          <div className="flex items-start justify-between">
-            <div>
-              <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">
-                취약 분야 집중 모의고사
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                최근 학습 데이터 기반으로 취약한 부분을 집중 테스트합니다
-              </p>
-              <div className="flex items-center gap-4 mt-3 text-sm">
-                <span className="flex items-center gap-1">
-                  <FileText className="w-4 h-4" />
-                  30문제
-                </span>
-                <span className="flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
-                  45분
-                </span>
-                <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 rounded">
-                  맞춤형
-                </span>
+      {studySets.length > 0 && (
+        <NotionCard title="오늘의 추천 모의고사" icon={<AlertCircle className="w-5 h-5" />}>
+          <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">
+                  {studySets[0].name}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  최신 학습 세트로 실전 감각을 익혀보세요
+                </p>
+                <div className="flex items-center gap-4 mt-3 text-sm">
+                  <span className="flex items-center gap-1">
+                    <FileText className="w-4 h-4" />
+                    {studySets[0].total_questions}문제
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    {Math.ceil(studySets[0].total_questions * 1.5)}분
+                  </span>
+                  <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded">
+                    실전 모의
+                  </span>
+                </div>
               </div>
+              <button
+                onClick={() => startTest(studySets[0].id, 'all')}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                시작하기
+              </button>
             </div>
-            <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-              시작하기
-            </button>
           </div>
-        </div>
-      </NotionCard>
+        </NotionCard>
+      )}
 
       {/* 모의고사 목록 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -231,24 +259,25 @@ export default function TestPage() {
               studySets.slice(0, 5).map((studySet) => (
                 <div
                   key={studySet.id}
-                  className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
+                  className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <h4 className="font-medium text-gray-900 dark:text-gray-100">
+                      <h4 className="font-medium text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                         {studySet.name}
                       </h4>
                       <div className="flex items-center gap-3 mt-2 text-sm text-gray-600 dark:text-gray-400">
                         <span>{studySet.total_questions}문제</span>
                         <span>•</span>
-                        <span>{studySet.certification_name}</span>
+                        <span>{studySet.total_materials}개 자료</span>
                       </div>
                     </div>
                     <button
                       onClick={() => startTest(studySet.id, 'all')}
-                      className="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                      className="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-1"
                     >
                       시작
+                      <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -257,7 +286,7 @@ export default function TestPage() {
           </div>
         </NotionCard>
 
-        <NotionCard title="시험 결과 히스토리" icon={<Trophy className="w-5 h-5" />}>
+        <NotionCard title="최근 시험 결과" icon={<Trophy className="w-5 h-5" />}>
           <div className="p-4">
             {loading ? (
               <div className="text-center py-8 text-gray-500">로딩 중...</div>
@@ -273,15 +302,15 @@ export default function TestPage() {
                   return (
                     <div
                       key={test.id}
-                      className={`flex items-center justify-between p-3 border-l-4 border-${color}-500 bg-${color}-50 dark:bg-${color}-900/20 cursor-pointer hover:opacity-80 transition-opacity`}
-                      onClick={() => router.push(`/test/result/${test.id}`)}
+                      className={`flex items-center justify-between p-3 border-l-4 border-${color}-500 bg-${color}-50 dark:bg-${color}-900/20 cursor-pointer hover:opacity-80 transition-opacity rounded-r-lg`}
+                      onClick={() => router.push(`/dashboard/test/result/${test.id}`)}
                     >
                       <div>
                         <p className="font-medium">
-                          테스트 ({test.mode === 'all' ? '전체' : test.mode === 'random' ? '랜덤' : '오답'})
+                          {test.mode === 'all' ? '실전 모의고사' : test.mode === 'random' ? '랜덤 테스트' : '오답 복습'}
                         </p>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {formatDate(test.completed_at || test.started_at)}
+                          {formatDate(test.completed_at || test.started_at)} • {test.total_questions}문제
                         </p>
                       </div>
                       <span className={`text-lg font-bold text-${color}-600 dark:text-${color}-400`}>
@@ -297,57 +326,138 @@ export default function TestPage() {
       </div>
 
       {/* 시험 유형별 카테고리 */}
-      <NotionCard title="시험 유형별 선택" icon={<FileText className="w-5 h-5" />}>
+      <NotionCard title="시험 유형 선택" icon={<FileText className="w-5 h-5" />}>
         <div className="p-4 grid grid-cols-2 md:grid-cols-4 gap-4">
           <button
             onClick={() => {
-              if (studySets.length > 0) {
-                startTest(studySets[0].id, 'random');
-              } else {
-                alert('학습 세트가 없습니다. 먼저 PDF를 업로드해주세요.');
-              }
+              setSelectedMode('random');
+              handleQuickStart();
             }}
             disabled={studySets.length === 0}
-            className="p-4 text-center border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-6 text-center border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-blue-500 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
           >
-            <div className="text-2xl mb-2">⚡</div>
-            <div className="font-medium">빠른 테스트</div>
-            <div className="text-sm text-gray-500">랜덤 20문제</div>
+            <div className="text-3xl mb-3">⚡</div>
+            <div className="font-semibold text-lg mb-1">빠른 테스트</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">랜덤 20문제</div>
           </button>
           <button
-            onClick={() => router.push('/shuffle')}
-            className="p-4 text-center border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+            onClick={() => router.push('/dashboard/study-sets')}
+            className="p-6 text-center border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-purple-500 dark:hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all group"
           >
-            <div className="text-2xl mb-2">📚</div>
-            <div className="font-medium">단원별</div>
-            <div className="text-sm text-gray-500">선택 학습</div>
+            <div className="text-3xl mb-3">📚</div>
+            <div className="font-semibold text-lg mb-1">학습 세트</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">세트별 학습</div>
           </button>
           <button
             onClick={() => {
-              if (studySets.length > 0) {
-                startTest(studySets[0].id, 'all');
-              } else {
-                alert('학습 세트가 없습니다. 먼저 PDF를 업로드해주세요.');
-              }
+              setSelectedMode('all');
+              handleQuickStart();
             }}
             disabled={studySets.length === 0}
-            className="p-4 text-center border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-6 text-center border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-green-500 dark:hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
           >
-            <div className="text-2xl mb-2">🎯</div>
-            <div className="font-medium">실전 모의</div>
-            <div className="text-sm text-gray-500">전체 문제</div>
+            <div className="text-3xl mb-3">🎯</div>
+            <div className="font-semibold text-lg mb-1">실전 모의</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">전체 문제</div>
           </button>
           <button
-            onClick={() => router.push('/test/retry')}
+            onClick={() => router.push('/dashboard/test/retry')}
             disabled={testHistory.filter(t => t.score && t.score < 100).length === 0}
-            className="p-4 text-center border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-6 text-center border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-orange-500 dark:hover:border-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
           >
-            <div className="text-2xl mb-2">🔥</div>
-            <div className="font-medium">오답 복습</div>
-            <div className="text-sm text-gray-500">틀린 문제만</div>
+            <div className="text-3xl mb-3">🔥</div>
+            <div className="font-semibold text-lg mb-1">오답 복습</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">틀린 문제만</div>
           </button>
         </div>
       </NotionCard>
+
+      {/* Study Set Selection Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                학습 세트 선택
+              </h2>
+              <button
+                onClick={() => setShowModal(false)}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+              </button>
+            </div>
+
+            {/* Exam Mode Selection */}
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">시험 모드</h3>
+              <div className="grid grid-cols-3 gap-3">
+                <button
+                  onClick={() => setSelectedMode('all')}
+                  className={`p-3 text-center border-2 rounded-lg transition-all ${selectedMode === 'all'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                    }`}
+                >
+                  <div className="font-medium">전체 문제</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">실전 모의</div>
+                </button>
+                <button
+                  onClick={() => setSelectedMode('random')}
+                  className={`p-3 text-center border-2 rounded-lg transition-all ${selectedMode === 'random'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                    }`}
+                >
+                  <div className="font-medium">랜덤 20문제</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">빠른 테스트</div>
+                </button>
+                <button
+                  onClick={() => setSelectedMode('timed')}
+                  className={`p-3 text-center border-2 rounded-lg transition-all ${selectedMode === 'timed'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                    }`}
+                >
+                  <div className="font-medium">시간 제한</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">실전 연습</div>
+                </button>
+              </div>
+            </div>
+
+            {/* Study Sets List */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">학습 세트 목록</h3>
+              <div className="space-y-2">
+                {studySets.map((studySet) => (
+                  <button
+                    key={studySet.id}
+                    onClick={() => handleStartExam(studySet.id)}
+                    className="w-full p-4 text-left border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <h4 className="font-medium text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                          {studySet.name}
+                        </h4>
+                        <div className="flex items-center gap-3 mt-1 text-sm text-gray-600 dark:text-gray-400">
+                          <span>{studySet.total_questions}문제</span>
+                          <span>•</span>
+                          <span>{studySet.total_materials}개 자료</span>
+                          <span>•</span>
+                          <span>{formatDate(studySet.created_at)}</span>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
