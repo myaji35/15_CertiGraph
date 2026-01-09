@@ -110,6 +110,14 @@ class MockQuestionRepository:
         self._save_data()
         return questions
 
+    async def delete_by_material(self, material_id: str) -> bool:
+        """Delete all questions for a material."""
+        if material_id in self._storage:
+            del self._storage[material_id]
+            self._save_data()
+            return True
+        return False
+
     async def get_by_material(
         self,
         material_id: str,
@@ -118,3 +126,4 @@ class MockQuestionRepository:
     ) -> list[dict[str, Any]]:
         """Get questions for a material (alias for get_by_study_set)."""
         return await self.get_by_study_set(material_id, limit, randomize)
+

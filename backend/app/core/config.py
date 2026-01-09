@@ -8,17 +8,29 @@ class Settings(BaseSettings):
     # Development mode (bypasses auth)
     dev_mode: bool = False
 
+    # Test mode (allows mock tokens for testing)
+    test_mode: bool = False
+
     # PostgreSQL (for direct database access)
     use_postgres: bool = False
     database_url: str = ""
+
+    # GCP Cloud SQL (replaces Supabase)
+    use_cloud_sql: bool = False
+    cloud_sql_host: str = "localhost"  # localhost when using Cloud SQL Proxy
+    cloud_sql_port: int = 5432
+    cloud_sql_database: str = "certigraph"
+    cloud_sql_user: str = ""
+    cloud_sql_password: str = ""
+    cloud_sql_connection_name: str = ""  # project:region:instance
 
     # Clerk (for JWT verification)
     clerk_jwks_url: str
     clerk_secret_key: str = ""
 
-    # Supabase (Database only)
-    supabase_url: str
-    supabase_service_key: str
+    # Supabase (Database only) - DEPRECATED: Use Cloud SQL instead
+    supabase_url: str = ""
+    supabase_service_key: str = ""
 
     # Anthropic Claude (optional for MVP)
     anthropic_api_key: str = ""
@@ -32,9 +44,16 @@ class Settings(BaseSettings):
     # Upstage (optional for MVP)
     upstage_api_key: str = ""
 
-    # Pinecone (optional for MVP)
+    # Pinecone (optional for MVP) - DEPRECATED: Use Vertex AI instead
     pinecone_api_key: str = ""
     pinecone_index_name: str = "certigraph-questions"
+
+    # GCP Vertex AI Vector Search (replaces Pinecone)
+    use_vertex_ai: bool = False
+    gcp_project_id: str = ""
+    gcp_region: str = "asia-northeast3"
+    vertex_ai_index_id: str = ""
+    vertex_ai_index_endpoint_id: str = ""
 
     # Neo4j (optional for MVP - not used)
     neo4j_uri: str = ""

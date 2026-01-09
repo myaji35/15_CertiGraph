@@ -76,32 +76,6 @@ class UserCertificationPreference(BaseModel):
 # 주요 자격증 데이터 (2025년 기준)
 POPULAR_CERTIFICATIONS = [
     {
-        "id": "social_worker_1",
-        "name": "사회복지사 1급",
-        "category": CertificationCategory.NATIONAL_PROFESSIONAL,
-        "level": CertificationLevel.LEVEL_1,
-        "organization": "한국사회복지사협회",
-        "description": "사회복지 전문 인력 양성을 위한 국가전문자격",
-        "exam_subjects": [
-            "사회복지기초",
-            "사회복지실천",
-            "사회복지정책과 제도"
-        ],
-        "passing_criteria": "각 과목 40점 이상, 전체 평균 60점 이상",
-        "exam_fee": {"written": 25000},
-        "schedules_2025": [
-            {
-                "exam_type": ExamType.WRITTEN,
-                "round": 23,
-                "application_start": date(2024, 12, 2),
-                "application_end": date(2024, 12, 6),
-                "exam_date": date(2025, 1, 25),
-                "result_date": date(2025, 3, 12)
-            }
-        ],
-        "website": "https://www.welfare.net"
-    },
-    {
         "id": "info_processing_engineer",
         "name": "정보처리기사",
         "category": CertificationCategory.NATIONAL,
@@ -530,5 +504,32 @@ POPULAR_CERTIFICATIONS = [
             }
         ],
         "website": "https://aws.amazon.com/certification"
+    },
+    {
+        "id": "social_worker_1",
+        "name": "사회복지사 1급",
+        "category": CertificationCategory.NATIONAL_PROFESSIONAL,
+        "level": CertificationLevel.LEVEL_1,
+        "organization": "한국산업인력공단",
+        "description": "사회복지 전문 인력 국가자격",
+        "exam_subjects": [
+            "사회복지기초",
+            "사회복지실천",
+            "사회복지정책과 제도"
+        ],
+        "passing_criteria": "전 과목 총점의 60% 이상, 각 과목 40% 이상",
+        "exam_fee": {"written": 15000},
+        "schedules_2025": [],
+        "schedules_2026": [
+            {
+                "exam_type": ExamType.WRITTEN,
+                "round": 19,
+                "application_start": date(2025, 12, 15),
+                "application_end": date(2025, 12, 19),
+                "exam_date": date(2026, 1, 17),
+                "result_date": date(2026, 2, 7)
+            }
+        ],
+        "website": "https://www.q-net.or.kr"
     }
 ]

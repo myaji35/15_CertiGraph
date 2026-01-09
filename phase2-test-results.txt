@@ -1,0 +1,1209 @@
+
+Running 95 tests using 4 workers
+
+⏭️  Skipping E2E-PAR-002: Server error (500): /sign-up
+✓ 홈페이지 접속 완료
+현재 URL: http://localhost:3030/
+  -   1 [chromium] › tests/e2e/parallel/01-user-registration.spec.ts:71:7 › P4: User Registration E2E Tests › E2E-PAR-002: Should show error for duplicate email registration
+⏭️  Skipping E2E-PAR-001: Server error (500): /sign-up
+  -   4 [chromium] › tests/e2e/parallel/01-user-registration.spec.ts:16:7 › P4: User Registration E2E Tests › E2E-PAR-001: Should successfully register a new user with valid credentials
+⏭️  Skipping E2E-PAR-003: Server error (500): /sign-up
+  -   5 [chromium] › tests/e2e/parallel/01-user-registration.spec.ts:107:7 › P4: User Registration E2E Tests › E2E-PAR-003: Should validate password requirements
+⏭️  Skipping E2E-PAR-004: Server error (500): /sign-up
+  -   6 [chromium] › tests/e2e/parallel/01-user-registration.spec.ts:154:7 › P4: User Registration E2E Tests › E2E-PAR-004: Should validate email format
+⏭️  Skipping E2E-PAR-005: Server error (500): /sign-in
+⏭️  Skipping E2E-PAR-006: Server error (500): /sign-in
+  -   7 [chromium] › tests/e2e/parallel/02-login-flows.spec.ts:16:7 › P4: Login Flows E2E Tests › E2E-PAR-005: Should successfully log in with valid credentials
+  -   8 [chromium] › tests/e2e/parallel/02-login-flows.spec.ts:61:7 › P4: Login Flows E2E Tests › E2E-PAR-006: Should show error for invalid credentials
+✅ 네비게이션 테스트 완료!
+⏭️  Skipping E2E-PAR-007: Server error (500): /sign-in
+  ✓   2 [chromium] › tests/demo/simple-test.spec.ts:55:7 › CertiGraph Demo Test › 데모: 페이지 네비게이션 (12.6s)
+⏭️  Skipping E2E-PAR-008: Server error (500): /sign-in
+  -   9 [chromium] › tests/e2e/parallel/02-login-flows.spec.ts:91:7 › P4: Login Flows E2E Tests › E2E-PAR-007: Should successfully log out
+  -  10 [chromium] › tests/e2e/parallel/02-login-flows.spec.ts:136:7 › P4: Login Flows E2E Tests › E2E-PAR-008: Should support "Remember Me" functionality
+⏭️  Skipping Dashboard beforeEach: Server error (500): /sign-in
+⏭️  Skipping Dashboard beforeEach: Server error (500): /sign-in
+⏭️  Skipping Dashboard beforeEach: Server error (500): /sign-in
+No recent activity section found - feature may not be implemented yet
+  -  11 [chromium] › tests/e2e/parallel/03-dashboard-view.spec.ts:48:7 › P4: Dashboard View E2E Tests › E2E-PAR-017: Dashboard displays user statistics
+  ✓  12 [chromium] › tests/e2e/parallel/03-dashboard-view.spec.ts:83:7 › P4: Dashboard View E2E Tests › E2E-PAR-018: Dashboard shows recent activity (3.8s)
+Study sets navigation link not found - feature may not be implemented yet
+  ✓  13 [chromium] › tests/e2e/parallel/03-dashboard-view.spec.ts:110:7 › P4: Dashboard View E2E Tests › E2E-PAR-019: Dashboard navigation works correctly (4.1s)
+⏭️  Skipping Dashboard beforeEach: Server error (500): /sign-in
+⏭️  Skipping PAY-001: Server error (500): /pricing
+  ✘   3 [chromium] › tests/demo/simple-test.spec.ts:12:7 › CertiGraph Demo Test › 데모: 홈페이지 접속 및 기본 요소 확인 (19.2s)
+  -  15 [chromium] › tests/e2e/payment/payment-flow.spec.ts:23:7 › S3: Payment Flow Tests (Sequential) › PAY-001: Pricing page displays season pass (10,000 KRW)
+Dashboard title not found after reload - page may not be fully implemented
+⏭️  Skipping E2E-SEQ-001: Server error (500): /sign-up
+  -  16 [chromium] › tests/e2e/sequential/critical-user-journey.spec.ts:22:7 › S2: Critical User Journey (Sequential) › E2E-SEQ-001: Complete user onboarding
+⏭️  Skipping PAY-002: Server error (500): /pricing
+  -  18 [chromium] › tests/e2e/sequential/critical-user-journey.spec.ts:78:7 › S2: Critical User Journey (Sequential) › E2E-SEQ-002: Purchase season pass and create study set
+  -  17 [chromium] › tests/e2e/payment/payment-flow.spec.ts:52:7 › S3: Payment Flow Tests (Sequential) › PAY-002: Select certification and initiate payment
+  -  19 [chromium] › tests/e2e/sequential/critical-user-journey.spec.ts:130:7 › S2: Critical User Journey (Sequential) › E2E-SEQ-003: Upload PDF and wait for processing
+  -  21 [chromium] › tests/e2e/sequential/critical-user-journey.spec.ts:202:7 › S2: Critical User Journey (Sequential) › E2E-SEQ-004: Take practice test
+⏭️  Skipping PAY-003: Server error (500): /checkout?certification=정보처리기사&price=10000
+  ✘  23 [chromium] › tests/integration/api-read/dashboard-stats.spec.ts:43:7 › P3: Dashboard Stats API Tests › API-READ-013: GET /api/dashboard/stats - Get user statistics (37ms)
+  -  22 [chromium] › tests/e2e/sequential/critical-user-journey.spec.ts:263:7 › S2: Critical User Journey (Sequential) › E2E-SEQ-005: Review incorrect answers with GraphRAG explanations
+  ✓  14 [chromium] › tests/e2e/parallel/03-dashboard-view.spec.ts:140:7 › P4: Dashboard View E2E Tests › E2E-PAR-020: Dashboard data refreshes correctly (7.9s)
+  -  20 [chromium] › tests/e2e/payment/payment-flow.spec.ts:99:7 › S3: Payment Flow Tests (Sequential) › PAY-003: Payment widget loads correctly
+  -  24 [chromium] › tests/e2e/sequential/critical-user-journey.spec.ts:299:7 › S2: Critical User Journey (Sequential) › E2E-SEQ-006: View knowledge graph visualization
+  ✘  25 [chromium] › tests/integration/api-read/dashboard-stats.spec.ts:77:7 › P3: Dashboard Stats API Tests › API-READ-015: GET /api/dashboard/weak-concepts - Get weak concepts (42ms)
+  -  27 [chromium] › tests/e2e/sequential/critical-user-journey.spec.ts:341:7 › S2: Critical User Journey (Sequential) › E2E-SEQ-007: Complete focused practice on weak concept
+⏭️  Skipping PAY-004: Server error (500): /checkout?certification=정보처리기사&price=10000
+  ✓  28 [chromium] › tests/integration/api-read/dashboard-stats.spec.ts:120:7 › P3: Dashboard Stats API Tests › API-READ-017: GET /api/knowledge-graph/:concept - Get concept details (20ms)
+  -  26 [chromium] › tests/e2e/payment/payment-flow.spec.ts:125:7 › S3: Payment Flow Tests (Sequential) › PAY-004: Display payment amount and order details
+  ✘  30 [chromium] › tests/integration/api-read/dashboard-stats.spec.ts:141:7 › P3: Dashboard Stats API Tests › API-READ-018: GET /api/dashboard/study-progress - Get study progress over time (62ms)
+  ✘  29 [chromium] › tests/integration/api-read/dashboard-stats.spec.ts:58:7 › P3: Dashboard Stats API Tests › API-READ-014: GET /api/dashboard/recent-activity - Get recent activity (34ms)
+  ✘  32 [chromium] › tests/integration/api-read/dashboard-stats.spec.ts:97:7 › P3: Dashboard Stats API Tests › API-READ-016: GET /api/knowledge-graph - Get knowledge graph data (10ms)
+⏭️  Skipping PAY-005: Server error (500): /checkout?certification=정보처리기사&price=10000
+  -  31 [chromium] › tests/e2e/payment/payment-flow.spec.ts:147:7 › S3: Payment Flow Tests (Sequential) › PAY-005: Fill in payment information
+  ✘  34 [chromium] › tests/integration/api-read/questions-get.spec.ts:43:7 › P3: Questions GET API Tests › API-READ-007: GET /api/questions - List all questions (7ms)
+  ✘  35 [chromium] › tests/integration/api-read/questions-get.spec.ts:77:7 › P3: Questions GET API Tests › API-READ-009: GET /api/questions - Filter by study set (6ms)
+⏭️  Skipping PAY-006: Server error (500): /checkout?certification=정보처리기사&price=10000
+  ✘  36 [chromium] › tests/integration/api-read/questions-get.spec.ts:128:7 › P3: Questions GET API Tests › API-READ-011: GET /api/questions - Filter by concept (16ms)
+  -  33 [chromium] › tests/e2e/payment/payment-flow.spec.ts:174:7 › S3: Payment Flow Tests (Sequential) › PAY-006: Submit payment with test card
+  ✓  37 [chromium] › tests/integration/api-read/questions-get.spec.ts:57:7 › P3: Questions GET API Tests › API-READ-008: GET /api/questions/:id - Get specific question (9ms)
+  ✘  40 [chromium] › tests/integration/api-read/study-sets-get.spec.ts:45:7 › P3: Study Sets GET API Tests › API-READ-001: GET /api/study-sets - List with default pagination (9ms)
+  ✓  39 [chromium] › tests/integration/api-read/questions-get.spec.ts:98:7 › P3: Questions GET API Tests › API-READ-010: GET /api/questions/:id - Answer options are randomized (5ms)
+  ✘  42 [chromium] › tests/integration/api-read/study-sets-get.spec.ts:79:7 › P3: Study Sets GET API Tests › API-READ-003: GET /api/study-sets/:id - Get specific study set (7ms)
+⏭️  Skipping PAY-007: Server error (500): /payment/success?orderId=ORDER_1767618280171&amount=10000&paymentKey=test_payment_key_1767618280171
+  ✘  41 [chromium] › tests/integration/api-read/questions-get.spec.ts:147:7 › P3: Questions GET API Tests › API-READ-012: GET /api/questions - Filter by difficulty (11ms)
+  -  38 [chromium] › tests/e2e/payment/payment-flow.spec.ts:213:7 › S3: Payment Flow Tests (Sequential) › PAY-007: Handle payment success callback
+  ✘  43 [chromium] › tests/integration/api-read/study-sets-get.spec.ts:60:7 › P3: Study Sets GET API Tests › API-READ-002: GET /api/study-sets - Filter by certification type (12ms)
+  ✘  45 [chromium] › tests/integration/api-read/study-sets-get.spec.ts:98:7 › P3: Study Sets GET API Tests › API-READ-004: GET /api/study-sets - Pagination works correctly (8ms)
+  ✘  46 [chromium] › tests/integration/api-read/study-sets-get.spec.ts:117:7 › P3: Study Sets GET API Tests › API-READ-005: GET /api/study-sets - Sort by created date (8ms)
+  ✘  47 [chromium] › tests/integration/api-write/01-study-sets-create.spec.ts:55:7 › S1: Study Sets Create API Tests (Sequential) › API-WRITE-001: Create study set with valid data (19ms)
+  -  49 [chromium] › tests/integration/api-write/01-study-sets-create.spec.ts:79:7 › S1: Study Sets Create API Tests (Sequential) › API-WRITE-002: Verify created study set exists
+  -  50 [chromium] › tests/integration/api-write/01-study-sets-create.spec.ts:93:7 › S1: Study Sets Create API Tests (Sequential) › API-WRITE-003: Create study set with missing required fields
+  -  51 [chromium] › tests/integration/api-write/01-study-sets-create.spec.ts:111:7 › S1: Study Sets Create API Tests (Sequential) › API-WRITE-004: Create study set with invalid data types
+  -  52 [chromium] › tests/integration/api-write/01-study-sets-create.spec.ts:129:7 › S1: Study Sets Create API Tests (Sequential) › API-WRITE-005: Create study set with duplicate name
+  -  53 [chromium] › tests/integration/api-write/01-study-sets-create.spec.ts:153:7 › S1: Study Sets Create API Tests (Sequential) › API-WRITE-006: Create study set with maximum length name
+  -  54 [chromium] › tests/integration/api-write/01-study-sets-create.spec.ts:180:7 › S1: Study Sets Create API Tests (Sequential) › API-WRITE-007: Create study set without authentication
+  -  55 [chromium] › tests/integration/api-write/01-study-sets-create.spec.ts:195:7 › S1: Study Sets Create API Tests (Sequential) › API-WRITE-008: Create study set with special characters in name
+✓ Season pass activated
+  ✓  44 [chromium] › tests/e2e/payment/payment-flow.spec.ts:241:7 › S3: Payment Flow Tests (Sequential) › PAY-008: Verify season pass activated (1.8s)
+  ✘  48 [chromium] › tests/integration/api-write/02-study-sets-update.spec.ts:75:7 › S1: Study Sets Update API Tests (Sequential) › API-WRITE-009: Update study set name (48ms)
+  -  58 [chromium] › tests/integration/api-write/02-study-sets-update.spec.ts:93:7 › S1: Study Sets Update API Tests (Sequential) › API-WRITE-010: Update study set description
+  -  59 [chromium] › tests/integration/api-write/02-study-sets-update.spec.ts:110:7 › S1: Study Sets Update API Tests (Sequential) › API-WRITE-011: Update non-existent study set
+  -  60 [chromium] › tests/integration/api-write/02-study-sets-update.spec.ts:124:7 › S1: Study Sets Update API Tests (Sequential) › API-WRITE-012: Update with invalid data
+  -  61 [chromium] › tests/integration/api-write/02-study-sets-update.spec.ts:141:7 › S1: Study Sets Update API Tests (Sequential) › API-WRITE-013: Update without authentication
+  -  62 [chromium] › tests/integration/api-write/02-study-sets-update.spec.ts:154:7 › S1: Study Sets Update API Tests (Sequential) › API-WRITE-014: Update with concurrent modification check
+  ✘  57 [chromium] › tests/integration/api-read/study-sets-get.spec.ts:139:7 › P3: Study Sets GET API Tests › API-READ-006: GET /api/study-sets - Search by name (11ms)
+⏭️  Skipping PAY-009: Server error (500): /payment/fail?code=USER_CANCEL&message=사용자가 결제를 취소하였습니다.&orderId=ORDER_FAIL_1767618283507
+  ✘  63 [chromium] › tests/integration/api-write/03-study-sets-delete.spec.ts:42:7 › S1: Study Sets Delete API Tests (Sequential) › API-WRITE-015: Delete study set successfully (21ms)
+  -  65 [chromium] › tests/integration/api-write/03-study-sets-delete.spec.ts:78:7 › S1: Study Sets Delete API Tests (Sequential) › API-WRITE-016: Delete non-existent study set
+  -  66 [chromium] › tests/integration/api-write/03-study-sets-delete.spec.ts:88:7 › S1: Study Sets Delete API Tests (Sequential) › API-WRITE-017: Delete without authentication
+  -  67 [chromium] › tests/integration/api-write/03-study-sets-delete.spec.ts:120:7 › S1: Study Sets Delete API Tests (Sequential) › API-WRITE-018: Delete cascades to related questions
+  -  68 [chromium] › tests/integration/api-write/03-study-sets-delete.spec.ts:163:7 › S1: Study Sets Delete API Tests (Sequential) › API-WRITE-019: Delete is idempotent
+  -  69 [chromium] › tests/integration/api-write/03-study-sets-delete.spec.ts:199:7 › S1: Study Sets Delete API Tests (Sequential) › API-WRITE-020: Soft delete vs hard delete
+  -  56 [chromium] › tests/e2e/payment/payment-flow.spec.ts:263:7 › S3: Payment Flow Tests (Sequential) › PAY-009: Handle payment failure
+⏭️  Skipping PAY-010: Server error (500): /pricing
+  -  70 [chromium] › tests/e2e/payment/payment-flow.spec.ts:282:7 › S3: Payment Flow Tests (Sequential) › PAY-010: Prevent duplicate payments
+✓ Webhook handling test (manual verification needed)
+  ✓  72 [chromium] › tests/e2e/payment/payment-flow.spec.ts:306:7 › S3: Payment Flow Tests (Sequential) › PAY-011: Test payment webhook handling (2.6s)
+  ✘  64 [chromium] › tests/unit/frontend/notion-card.spec.ts:43:7 › P1: NotionCard Component Tests › FE-UNIT-001: NotionCard renders with default props (7.3s)
+⏭️  Skipping PAY-012: Server error (500): /pricing
+  -  74 [chromium] › tests/e2e/payment/payment-flow.spec.ts:324:7 › S3: Payment Flow Tests (Sequential) › PAY-012: Respect rate limiting (wait between payments)
+  ✘  73 [chromium] › tests/unit/frontend/notion-card.spec.ts:102:7 › P1: NotionCard Component Tests › FE-UNIT-005: NotionCard renders with custom className (6.1s)
+  ✘  75 [chromium] › tests/unit/frontend/notion-card.spec.ts:53:7 › P1: NotionCard Component Tests › FE-UNIT-002: NotionCard displays title and description correctly (6.2s)
+  ✘  76 [chromium] › tests/unit/frontend/notion-card.spec.ts:122:7 › P1: NotionCard Component Tests › FE-UNIT-007: NotionCard handles long text overflow (6.3s)
+  ✘  77 [chromium] › tests/unit/frontend/notion-card.spec.ts:111:7 › P1: NotionCard Component Tests › FE-UNIT-006: NotionCard displays icon correctly (6.0s)
+  ✘  78 [chromium] › tests/unit/frontend/notion-stat-card.spec.ts:43:7 › P1: NotionStatCard Component Tests › FE-UNIT-009: NotionStatCard renders with default props (6.2s)
+  ✘  79 [chromium] › tests/unit/frontend/notion-card.spec.ts:134:7 › P1: NotionCard Component Tests › FE-UNIT-008: NotionCard is accessible (ARIA attributes) (6.2s)
+  ✘  80 [chromium] › tests/unit/frontend/notion-stat-card.spec.ts:62:7 › P1: NotionStatCard Component Tests › FE-UNIT-011: NotionStatCard shows trend indicator (up) (6.0s)
+  ✘  81 [chromium] › tests/unit/frontend/notion-stat-card.spec.ts:52:7 › P1: NotionStatCard Component Tests › FE-UNIT-010: NotionStatCard displays title and value correctly (6.2s)
+  ✘  83 [chromium] › tests/unit/frontend/notion-stat-card.spec.ts:74:7 › P1: NotionStatCard Component Tests › FE-UNIT-012: NotionStatCard shows trend indicator (down) (6.0s)
+  ✘  84 [chromium] › tests/unit/frontend/notion-stat-card.spec.ts:110:7 › P1: NotionStatCard Component Tests › FE-UNIT-015: NotionStatCard shows loading state (6.2s)
+  ✘  85 [chromium] › tests/unit/frontend/question-card.spec.ts:43:7 › P1: QuestionCard Component Tests › FE-UNIT-041: QuestionCard renders with question text (6.0s)
+  ✘  87 [chromium] › tests/unit/frontend/question-card.spec.ts:55:7 › P1: QuestionCard Component Tests › FE-UNIT-042: QuestionCard displays all answer options (1.1s)
+  ✘  71 [chromium] › tests/unit/frontend/notion-card.spec.ts:63:7 › P1: NotionCard Component Tests › FE-UNIT-003: NotionCard shows hover effects (1.0m)
+  ✘  82 [chromium] › tests/unit/frontend/notion-stat-card.spec.ts:86:7 › P1: NotionStatCard Component Tests › FE-UNIT-013: NotionStatCard formats large numbers correctly (1.0m)
+  ✘  90 [chromium] › tests/unit/frontend/notion-stat-card.spec.ts:99:7 › P1: NotionStatCard Component Tests › FE-UNIT-014: NotionStatCard displays percentage correctly (6.2s)
+  ✓  91 [chromium] › tests/unit/frontend/question-card.spec.ts:105:7 › P1: QuestionCard Component Tests › FE-UNIT-045: QuestionCard renders markdown in question text (1.2s)
+  ✘  86 [chromium] › tests/unit/frontend/notion-stat-card.spec.ts:122:7 › P1: NotionStatCard Component Tests › FE-UNIT-016: NotionStatCard handles click to navigate (1.0m)
+  ✘  92 [chromium] › tests/unit/frontend/question-card.spec.ts:120:7 › P1: QuestionCard Component Tests › FE-UNIT-046: QuestionCard displays question number (7.1s)
+  ✘  88 [chromium] › tests/unit/frontend/question-card.spec.ts:69:7 › P1: QuestionCard Component Tests › FE-UNIT-043: QuestionCard allows selecting an answer (1.1m)
+  ✘  89 [chromium] › tests/unit/frontend/notion-card.spec.ts:84:7 › P1: NotionCard Component Tests › FE-UNIT-004: NotionCard handles click events (1.0m)
+  ✘  93 [chromium] › tests/unit/frontend/question-card.spec.ts:131:7 › P1: QuestionCard Component Tests › FE-UNIT-047: QuestionCard shows explanation after answer (1.1m)
+  ✘  94 [chromium] › tests/unit/frontend/question-card.spec.ts:84:7 › P1: QuestionCard Component Tests › FE-UNIT-044: QuestionCard shows correct answer after submission (1.1m)
+  ✘  95 [chromium] › tests/unit/frontend/question-card.spec.ts:150:7 › P1: QuestionCard Component Tests › FE-UNIT-048: QuestionCard prevents changing answer after submission (1.1m)
+
+
+  1) [chromium] › tests/demo/simple-test.spec.ts:12:7 › CertiGraph Demo Test › 데모: 홈페이지 접속 및 기본 요소 확인 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveTitle[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Expected pattern: [32m/CertiGraph|자격증|Exam/i[39m
+    Received string:  [31m""[39m
+    Timeout: 10000ms
+
+    Call log:
+    [2m  - Expect "toHaveTitle" with timeout 10000ms[22m
+    [2m    13 × unexpected value ""[22m
+
+
+      23 |
+      24 |     // 2. 페이지 제목 확인
+    > 25 |     await expect(page).toHaveTitle(/CertiGraph|자격증|Exam/i, { timeout: 10000 });
+         |                        ^
+      26 |     console.log('✓ 페이지 제목 확인');
+      27 |
+      28 |     // 3. 주요 요소 확인 (있으면)
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/demo/simple-test.spec.ts:25:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/demo-simple-test-CertiGraph-Demo-Test-데모-홈페이지-접속-및-기본-요소-확인-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/demo-simple-test-CertiGraph-Demo-Test-데모-홈페이지-접속-및-기본-요소-확인-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../test-results/demo-simple-test-CertiGraph-Demo-Test-데모-홈페이지-접속-및-기본-요소-확인-chromium/error-context.md
+
+  2) [chromium] › tests/integration/api-read/dashboard-stats.spec.ts:43:7 › P3: Dashboard Stats API Tests › API-READ-013: GET /api/dashboard/stats - Get user statistics 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m200[39m
+    Received: [31m404[39m
+
+      48 |     });
+      49 |
+    > 50 |     expect(response.status()).toBe(200);
+         |                               ^
+      51 |
+      52 |     const body = await response.json();
+      53 |     expect(body).toHaveProperty('total_questions');
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/integration/api-read/dashboard-stats.spec.ts:50:31
+
+  3) [chromium] › tests/integration/api-read/dashboard-stats.spec.ts:58:7 › P3: Dashboard Stats API Tests › API-READ-014: GET /api/dashboard/recent-activity - Get recent activity 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m200[39m
+    Received: [31m404[39m
+
+      63 |     });
+      64 |
+    > 65 |     expect(response.status()).toBe(200);
+         |                               ^
+      66 |
+      67 |     const body = await response.json();
+      68 |     expect(Array.isArray(body.activities)).toBe(true);
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/integration/api-read/dashboard-stats.spec.ts:65:31
+
+  4) [chromium] › tests/integration/api-read/dashboard-stats.spec.ts:77:7 › P3: Dashboard Stats API Tests › API-READ-015: GET /api/dashboard/weak-concepts - Get weak concepts 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m200[39m
+    Received: [31m404[39m
+
+      82 |     });
+      83 |
+    > 84 |     expect(response.status()).toBe(200);
+         |                               ^
+      85 |
+      86 |     const body = await response.json();
+      87 |     expect(Array.isArray(body.weak_concepts)).toBe(true);
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/integration/api-read/dashboard-stats.spec.ts:84:31
+
+  5) [chromium] › tests/integration/api-read/dashboard-stats.spec.ts:97:7 › P3: Dashboard Stats API Tests › API-READ-016: GET /api/knowledge-graph - Get knowledge graph data 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m200[39m
+    Received: [31m404[39m
+
+      102 |     });
+      103 |
+    > 104 |     expect(response.status()).toBe(200);
+          |                               ^
+      105 |
+      106 |     const body = await response.json();
+      107 |     expect(body).toHaveProperty('nodes');
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/integration/api-read/dashboard-stats.spec.ts:104:31
+
+  6) [chromium] › tests/integration/api-read/dashboard-stats.spec.ts:141:7 › P3: Dashboard Stats API Tests › API-READ-018: GET /api/dashboard/study-progress - Get study progress over time 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m200[39m
+    Received: [31m404[39m
+
+      149 |     });
+      150 |
+    > 151 |     expect(response.status()).toBe(200);
+          |                               ^
+      152 |
+      153 |     const body = await response.json();
+      154 |     expect(Array.isArray(body.progress_data)).toBe(true);
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/integration/api-read/dashboard-stats.spec.ts:151:31
+
+  7) [chromium] › tests/integration/api-read/questions-get.spec.ts:43:7 › P3: Questions GET API Tests › API-READ-007: GET /api/questions - List all questions 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m200[39m
+    Received: [31m404[39m
+
+      48 |     });
+      49 |
+    > 50 |     expect(response.status()).toBe(200);
+         |                               ^
+      51 |
+      52 |     const body = await response.json();
+      53 |     expect(body).toHaveProperty('data');
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/integration/api-read/questions-get.spec.ts:50:31
+
+  8) [chromium] › tests/integration/api-read/questions-get.spec.ts:77:7 › P3: Questions GET API Tests › API-READ-009: GET /api/questions - Filter by study set 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m200[39m
+    Received: [31m404[39m
+
+      87 |     });
+      88 |
+    > 89 |     expect(response.status()).toBe(200);
+         |                               ^
+      90 |
+      91 |     const body = await response.json();
+      92 |     // All returned questions should belong to the specified study set
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/integration/api-read/questions-get.spec.ts:89:31
+
+  9) [chromium] › tests/integration/api-read/questions-get.spec.ts:128:7 › P3: Questions GET API Tests › API-READ-011: GET /api/questions - Filter by concept 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m200[39m
+    Received: [31m404[39m
+
+      136 |     });
+      137 |
+    > 138 |     expect(response.status()).toBe(200);
+          |                               ^
+      139 |
+      140 |     const body = await response.json();
+      141 |     // If results exist, they should be related to the concept
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/integration/api-read/questions-get.spec.ts:138:31
+
+  10) [chromium] › tests/integration/api-read/questions-get.spec.ts:147:7 › P3: Questions GET API Tests › API-READ-012: GET /api/questions - Filter by difficulty 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m200[39m
+    Received: [31m404[39m
+
+      155 |     });
+      156 |
+    > 157 |     expect(response.status()).toBe(200);
+          |                               ^
+      158 |
+      159 |     const body = await response.json();
+      160 |     // If results exist, they should match the difficulty filter
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/integration/api-read/questions-get.spec.ts:157:31
+
+  11) [chromium] › tests/integration/api-read/study-sets-get.spec.ts:45:7 › P3: Study Sets GET API Tests › API-READ-001: GET /api/study-sets - List with default pagination 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m200[39m
+    Received: [31m401[39m
+
+      50 |     });
+      51 |
+    > 52 |     expect(response.status()).toBe(200);
+         |                               ^
+      53 |
+      54 |     const body = await response.json();
+      55 |     expect(body).toHaveProperty('data');
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/integration/api-read/study-sets-get.spec.ts:52:31
+
+  12) [chromium] › tests/integration/api-read/study-sets-get.spec.ts:60:7 › P3: Study Sets GET API Tests › API-READ-002: GET /api/study-sets - Filter by certification type 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m200[39m
+    Received: [31m401[39m
+
+      68 |     });
+      69 |
+    > 70 |     expect(response.status()).toBe(200);
+         |                               ^
+      71 |
+      72 |     const body = await response.json();
+      73 |     // All returned items should match the filter
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/integration/api-read/study-sets-get.spec.ts:70:31
+
+  13) [chromium] › tests/integration/api-read/study-sets-get.spec.ts:79:7 › P3: Study Sets GET API Tests › API-READ-003: GET /api/study-sets/:id - Get specific study set 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoContain[2m([22m[32mexpected[39m[2m) // indexOf[22m
+
+    Expected value: [32m401[39m
+    Received array: [31m[200, 404][39m
+
+      87 |
+      88 |     // May return 200 or 404 depending on whether data exists
+    > 89 |     expect([200, 404]).toContain(response.status());
+         |                        ^
+      90 |
+      91 |     if (response.status() === 200) {
+      92 |       const body = await response.json();
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/integration/api-read/study-sets-get.spec.ts:89:24
+
+  14) [chromium] › tests/integration/api-read/study-sets-get.spec.ts:98:7 › P3: Study Sets GET API Tests › API-READ-004: GET /api/study-sets - Pagination works correctly 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m200[39m
+    Received: [31m401[39m
+
+      107 |     });
+      108 |
+    > 109 |     expect(response.status()).toBe(200);
+          |                               ^
+      110 |
+      111 |     const body = await response.json();
+      112 |     expect(body.pagination).toHaveProperty('page');
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/integration/api-read/study-sets-get.spec.ts:109:31
+
+  15) [chromium] › tests/integration/api-read/study-sets-get.spec.ts:117:7 › P3: Study Sets GET API Tests › API-READ-005: GET /api/study-sets - Sort by created date 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m200[39m
+    Received: [31m401[39m
+
+      126 |     });
+      127 |
+    > 128 |     expect(response.status()).toBe(200);
+          |                               ^
+      129 |
+      130 |     const body = await response.json();
+      131 |     // Verify sorting (if data exists)
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/integration/api-read/study-sets-get.spec.ts:128:31
+
+  16) [chromium] › tests/integration/api-read/study-sets-get.spec.ts:139:7 › P3: Study Sets GET API Tests › API-READ-006: GET /api/study-sets - Search by name 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m200[39m
+    Received: [31m401[39m
+
+      147 |     });
+      148 |
+    > 149 |     expect(response.status()).toBe(200);
+          |                               ^
+      150 |
+      151 |     const body = await response.json();
+      152 |     // If results exist, they should match the search term
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/integration/api-read/study-sets-get.spec.ts:149:31
+
+  17) [chromium] › tests/integration/api-write/01-study-sets-create.spec.ts:55:7 › S1: Study Sets Create API Tests (Sequential) › API-WRITE-001: Create study set with valid data 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m201[39m
+    Received: [31m401[39m
+
+      66 |     });
+      67 |
+    > 68 |     expect(response.status()).toBe(201);
+         |                               ^
+      69 |
+      70 |     const body = await response.json();
+      71 |     expect(body).toHaveProperty('id');
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/integration/api-write/01-study-sets-create.spec.ts:68:31
+
+  18) [chromium] › tests/integration/api-write/02-study-sets-update.spec.ts:75:7 › S1: Study Sets Update API Tests (Sequential) › API-WRITE-009: Update study set name 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m200[39m
+    Received: [31m401[39m
+
+      84 |     });
+      85 |
+    > 86 |     expect(response.status()).toBe(200);
+         |                               ^
+      87 |
+      88 |     const body = await response.json();
+      89 |     expect(body.id).toBe(studySetId);
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/integration/api-write/02-study-sets-update.spec.ts:86:31
+
+  19) [chromium] › tests/integration/api-write/03-study-sets-delete.spec.ts:42:7 › S1: Study Sets Delete API Tests (Sequential) › API-WRITE-015: Delete study set successfully 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m204[39m
+    Received: [31m401[39m
+
+      64 |     });
+      65 |
+    > 66 |     expect(deleteResponse.status()).toBe(204);
+         |                                     ^
+      67 |
+      68 |     // Verify it's deleted
+      69 |     const getResponse = await apiContext.get(`/api/v1/study-sets/${studySetId}`, {
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/integration/api-write/03-study-sets-delete.spec.ts:66:37
+
+  20) [chromium] › tests/unit/frontend/notion-card.spec.ts:43:7 › P1: NotionCard Component Tests › FE-UNIT-001: NotionCard renders with default props 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('[data-testid="notion-card-default"]')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('[data-testid="notion-card-default"]')[22m
+
+
+      45 |
+      46 |     const card = page.locator('[data-testid="notion-card-default"]');
+    > 47 |     await expect(card).toBeVisible();
+         |                        ^
+      48 |     await expect(card).toHaveClass(/bg-white/);
+      49 |
+      50 |     await page.screenshot({ path: 'test-results/fe-unit-001.png' });
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/unit/frontend/notion-card.spec.ts:47:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-card--a1c25--renders-with-default-props-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-card--a1c25--renders-with-default-props-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../test-results/unit-frontend-notion-card--a1c25--renders-with-default-props-chromium/error-context.md
+
+  21) [chromium] › tests/unit/frontend/notion-card.spec.ts:53:7 › P1: NotionCard Component Tests › FE-UNIT-002: NotionCard displays title and description correctly 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: locator('[data-testid="notion-card-with-content"]').locator('h3')
+    Expected substring: [32m"Sample Title"[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('[data-testid="notion-card-with-content"]').locator('h3')[22m
+
+
+      55 |
+      56 |     const card = page.locator('[data-testid="notion-card-with-content"]');
+    > 57 |     await expect(card.locator('h3')).toContainText('Sample Title');
+         |                                      ^
+      58 |     await expect(card.locator('p')).toContainText('Sample Description');
+      59 |
+      60 |     await page.screenshot({ path: 'test-results/fe-unit-002.png' });
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/unit/frontend/notion-card.spec.ts:57:38
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-card--91e25-e-and-description-correctly-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-card--91e25-e-and-description-correctly-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../test-results/unit-frontend-notion-card--91e25-e-and-description-correctly-chromium/error-context.md
+
+  22) [chromium] › tests/unit/frontend/notion-card.spec.ts:63:7 › P1: NotionCard Component Tests › FE-UNIT-003: NotionCard shows hover effects 
+
+    [31mTest timeout of 60000ms exceeded.[39m
+
+    Error: locator.evaluate: Test timeout of 60000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="notion-card-default"]').first()[22m
+
+
+      67 |
+      68 |     // Check initial state
+    > 69 |     const initialBoxShadow = await card.evaluate(el => window.getComputedStyle(el).boxShadow);
+         |                                         ^
+      70 |
+      71 |     // Hover over the card
+      72 |     await card.hover();
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/unit/frontend/notion-card.spec.ts:69:41
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-card--95c33-ionCard-shows-hover-effects-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-card--95c33-ionCard-shows-hover-effects-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../test-results/unit-frontend-notion-card--95c33-ionCard-shows-hover-effects-chromium/error-context.md
+
+  23) [chromium] › tests/unit/frontend/notion-card.spec.ts:84:7 › P1: NotionCard Component Tests › FE-UNIT-004: NotionCard handles click events 
+
+    [31mTest timeout of 60000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 60000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="notion-card-clickable"]')[22m
+
+
+      88 |
+      89 |     // Click the card and verify navigation or callback
+    > 90 |     await card.click();
+         |                ^
+      91 |
+      92 |     // Check if URL changed or a modal appeared
+      93 |     await page.waitForTimeout(500);
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/unit/frontend/notion-card.spec.ts:90:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-card--7216b-onCard-handles-click-events-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-card--7216b-onCard-handles-click-events-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../test-results/unit-frontend-notion-card--7216b-onCard-handles-click-events-chromium/error-context.md
+
+  24) [chromium] › tests/unit/frontend/notion-card.spec.ts:102:7 › P1: NotionCard Component Tests › FE-UNIT-005: NotionCard renders with custom className 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveClass[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: locator('[data-testid="notion-card-custom-class"]')
+    Expected pattern: [32m/custom-card-class/[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toHaveClass" with timeout 5000ms[22m
+    [2m  - waiting for locator('[data-testid="notion-card-custom-class"]')[22m
+
+
+      104 |
+      105 |     const card = page.locator('[data-testid="notion-card-custom-class"]');
+    > 106 |     await expect(card).toHaveClass(/custom-card-class/);
+          |                        ^
+      107 |
+      108 |     await page.screenshot({ path: 'test-results/fe-unit-005.png' });
+      109 |   });
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/unit/frontend/notion-card.spec.ts:106:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-card--6b6d3-nders-with-custom-className-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-card--6b6d3-nders-with-custom-className-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../test-results/unit-frontend-notion-card--6b6d3-nders-with-custom-className-chromium/error-context.md
+
+  25) [chromium] › tests/unit/frontend/notion-card.spec.ts:111:7 › P1: NotionCard Component Tests › FE-UNIT-006: NotionCard displays icon correctly 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('[data-testid="notion-card-with-icon"]').locator('svg, img').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('[data-testid="notion-card-with-icon"]').locator('svg, img').first()[22m
+
+
+      115 |     const icon = card.locator('svg, img').first();
+      116 |
+    > 117 |     await expect(icon).toBeVisible();
+          |                        ^
+      118 |
+      119 |     await page.screenshot({ path: 'test-results/fe-unit-006.png' });
+      120 |   });
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/unit/frontend/notion-card.spec.ts:117:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-card--7eb2c-ard-displays-icon-correctly-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-card--7eb2c-ard-displays-icon-correctly-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../test-results/unit-frontend-notion-card--7eb2c-ard-displays-icon-correctly-chromium/error-context.md
+
+  26) [chromium] › tests/unit/frontend/notion-card.spec.ts:122:7 › P1: NotionCard Component Tests › FE-UNIT-007: NotionCard handles long text overflow 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveClass[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: locator('[data-testid="notion-card-long-text"]').locator('p')
+    Expected pattern: [32m/truncate|line-clamp/[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toHaveClass" with timeout 5000ms[22m
+    [2m  - waiting for locator('[data-testid="notion-card-long-text"]').locator('p')[22m
+
+
+      127 |
+      128 |     // Check for text truncation classes
+    > 129 |     await expect(description).toHaveClass(/truncate|line-clamp/);
+          |                               ^
+      130 |
+      131 |     await page.screenshot({ path: 'test-results/fe-unit-007.png' });
+      132 |   });
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/unit/frontend/notion-card.spec.ts:129:31
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-card--65f00--handles-long-text-overflow-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-card--65f00--handles-long-text-overflow-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../test-results/unit-frontend-notion-card--65f00--handles-long-text-overflow-chromium/error-context.md
+
+  27) [chromium] › tests/unit/frontend/notion-card.spec.ts:134:7 › P1: NotionCard Component Tests › FE-UNIT-008: NotionCard is accessible (ARIA attributes) 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveAttribute[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: locator('[data-testid="notion-card-accessible"]')
+    Expected: [32m"article"[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toHaveAttribute" with timeout 5000ms[22m
+    [2m  - waiting for locator('[data-testid="notion-card-accessible"]')[22m
+
+
+      138 |
+      139 |     // Check for ARIA attributes
+    > 140 |     await expect(card).toHaveAttribute('role', 'article');
+          |                        ^
+      141 |     await expect(card.locator('h3')).toHaveAttribute('id');
+      142 |
+      143 |     await page.screenshot({ path: 'test-results/fe-unit-008.png' });
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/unit/frontend/notion-card.spec.ts:140:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-card--b3db3-accessible-ARIA-attributes--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-card--b3db3-accessible-ARIA-attributes--chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../test-results/unit-frontend-notion-card--b3db3-accessible-ARIA-attributes--chromium/error-context.md
+
+  28) [chromium] › tests/unit/frontend/notion-stat-card.spec.ts:43:7 › P1: NotionStatCard Component Tests › FE-UNIT-009: NotionStatCard renders with default props 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('[data-testid="notion-stat-card-default"]')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('[data-testid="notion-stat-card-default"]')[22m
+
+
+      45 |
+      46 |     const card = page.locator('[data-testid="notion-stat-card-default"]');
+    > 47 |     await expect(card).toBeVisible();
+         |                        ^
+      48 |
+      49 |     await page.screenshot({ path: 'test-results/fe-unit-009.png' });
+      50 |   });
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/unit/frontend/notion-stat-card.spec.ts:47:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-stat--334f8--renders-with-default-props-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-stat--334f8--renders-with-default-props-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../test-results/unit-frontend-notion-stat--334f8--renders-with-default-props-chromium/error-context.md
+
+  29) [chromium] › tests/unit/frontend/notion-stat-card.spec.ts:52:7 › P1: NotionStatCard Component Tests › FE-UNIT-010: NotionStatCard displays title and value correctly 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: locator('[data-testid="notion-stat-card-with-data"]').locator('[data-testid="stat-title"]')
+    Expected substring: [32m"Total Questions"[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('[data-testid="notion-stat-card-with-data"]').locator('[data-testid="stat-title"]')[22m
+
+
+      54 |
+      55 |     const card = page.locator('[data-testid="notion-stat-card-with-data"]');
+    > 56 |     await expect(card.locator('[data-testid="stat-title"]')).toContainText('Total Questions');
+         |                                                              ^
+      57 |     await expect(card.locator('[data-testid="stat-value"]')).toContainText('1,234');
+      58 |
+      59 |     await page.screenshot({ path: 'test-results/fe-unit-010.png' });
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/unit/frontend/notion-stat-card.spec.ts:56:62
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-stat--2ae35-s-title-and-value-correctly-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-stat--2ae35-s-title-and-value-correctly-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../test-results/unit-frontend-notion-stat--2ae35-s-title-and-value-correctly-chromium/error-context.md
+
+  30) [chromium] › tests/unit/frontend/notion-stat-card.spec.ts:62:7 › P1: NotionStatCard Component Tests › FE-UNIT-011: NotionStatCard shows trend indicator (up) 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('[data-testid="notion-stat-card-trend-up"]').locator('[data-testid="trend-icon"]')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('[data-testid="notion-stat-card-trend-up"]').locator('[data-testid="trend-icon"]')[22m
+
+
+      66 |     const trendIcon = card.locator('[data-testid="trend-icon"]');
+      67 |
+    > 68 |     await expect(trendIcon).toBeVisible();
+         |                             ^
+      69 |     await expect(trendIcon).toHaveClass(/text-green/);
+      70 |
+      71 |     await page.screenshot({ path: 'test-results/fe-unit-011.png' });
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/unit/frontend/notion-stat-card.spec.ts:68:29
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-stat--72a38-d-shows-trend-indicator-up--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-stat--72a38-d-shows-trend-indicator-up--chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../test-results/unit-frontend-notion-stat--72a38-d-shows-trend-indicator-up--chromium/error-context.md
+
+  31) [chromium] › tests/unit/frontend/notion-stat-card.spec.ts:74:7 › P1: NotionStatCard Component Tests › FE-UNIT-012: NotionStatCard shows trend indicator (down) 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('[data-testid="notion-stat-card-trend-down"]').locator('[data-testid="trend-icon"]')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('[data-testid="notion-stat-card-trend-down"]').locator('[data-testid="trend-icon"]')[22m
+
+
+      78 |     const trendIcon = card.locator('[data-testid="trend-icon"]');
+      79 |
+    > 80 |     await expect(trendIcon).toBeVisible();
+         |                             ^
+      81 |     await expect(trendIcon).toHaveClass(/text-red/);
+      82 |
+      83 |     await page.screenshot({ path: 'test-results/fe-unit-012.png' });
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/unit/frontend/notion-stat-card.spec.ts:80:29
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-stat--4b643-shows-trend-indicator-down--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-stat--4b643-shows-trend-indicator-down--chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../test-results/unit-frontend-notion-stat--4b643-shows-trend-indicator-down--chromium/error-context.md
+
+  32) [chromium] › tests/unit/frontend/notion-stat-card.spec.ts:86:7 › P1: NotionStatCard Component Tests › FE-UNIT-013: NotionStatCard formats large numbers correctly 
+
+    [31mTest timeout of 60000ms exceeded.[39m
+
+    Error: locator.textContent: Test timeout of 60000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="notion-stat-card-large-number"]').locator('[data-testid="stat-value"]')[22m
+
+
+      91 |
+      92 |     // Should format 1000000 as "1M" or "1,000,000"
+    > 93 |     const text = await value.textContent();
+         |                              ^
+      94 |     expect(text).toMatch(/1[,.]?[0M]/);
+      95 |
+      96 |     await page.screenshot({ path: 'test-results/fe-unit-013.png' });
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/unit/frontend/notion-stat-card.spec.ts:93:30
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-stat--9d2d2-ats-large-numbers-correctly-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-stat--9d2d2-ats-large-numbers-correctly-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../test-results/unit-frontend-notion-stat--9d2d2-ats-large-numbers-correctly-chromium/error-context.md
+
+  33) [chromium] › tests/unit/frontend/notion-stat-card.spec.ts:99:7 › P1: NotionStatCard Component Tests › FE-UNIT-014: NotionStatCard displays percentage correctly 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: locator('[data-testid="notion-stat-card-percentage"]').locator('[data-testid="stat-percentage"]')
+    Expected substring: [32m"%"[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('[data-testid="notion-stat-card-percentage"]').locator('[data-testid="stat-percentage"]')[22m
+
+
+      103 |     const percentage = card.locator('[data-testid="stat-percentage"]');
+      104 |
+    > 105 |     await expect(percentage).toContainText('%');
+          |                              ^
+      106 |
+      107 |     await page.screenshot({ path: 'test-results/fe-unit-014.png' });
+      108 |   });
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/unit/frontend/notion-stat-card.spec.ts:105:30
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-stat--194fd-splays-percentage-correctly-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-stat--194fd-splays-percentage-correctly-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../test-results/unit-frontend-notion-stat--194fd-splays-percentage-correctly-chromium/error-context.md
+
+  34) [chromium] › tests/unit/frontend/notion-stat-card.spec.ts:110:7 › P1: NotionStatCard Component Tests › FE-UNIT-015: NotionStatCard shows loading state 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('[data-testid="notion-stat-card-loading"]').locator('[data-testid="skeleton"]')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('[data-testid="notion-stat-card-loading"]').locator('[data-testid="skeleton"]')[22m
+
+
+      114 |     const skeleton = card.locator('[data-testid="skeleton"]');
+      115 |
+    > 116 |     await expect(skeleton).toBeVisible();
+          |                            ^
+      117 |     await expect(skeleton).toHaveClass(/animate-pulse/);
+      118 |
+      119 |     await page.screenshot({ path: 'test-results/fe-unit-015.png' });
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/unit/frontend/notion-stat-card.spec.ts:116:28
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-stat--63f3b-tatCard-shows-loading-state-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-stat--63f3b-tatCard-shows-loading-state-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../test-results/unit-frontend-notion-stat--63f3b-tatCard-shows-loading-state-chromium/error-context.md
+
+  35) [chromium] › tests/unit/frontend/notion-stat-card.spec.ts:122:7 › P1: NotionStatCard Component Tests › FE-UNIT-016: NotionStatCard handles click to navigate 
+
+    [31mTest timeout of 60000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 60000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="notion-stat-card-clickable"]')[22m
+
+
+      125 |     const card = page.locator('[data-testid="notion-stat-card-clickable"]');
+      126 |
+    > 127 |     await card.click();
+          |                ^
+      128 |     await page.waitForTimeout(500);
+      129 |
+      130 |     // Verify navigation or modal
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/unit/frontend/notion-stat-card.spec.ts:127:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-stat--70270-d-handles-click-to-navigate-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-notion-stat--70270-d-handles-click-to-navigate-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../test-results/unit-frontend-notion-stat--70270-d-handles-click-to-navigate-chromium/error-context.md
+
+  36) [chromium] › tests/unit/frontend/question-card.spec.ts:43:7 › P1: QuestionCard Component Tests › FE-UNIT-041: QuestionCard renders with question text 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('[data-testid="question-card-default"]')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('[data-testid="question-card-default"]')[22m
+
+
+      45 |
+      46 |     const card = page.locator('[data-testid="question-card-default"]');
+    > 47 |     await expect(card).toBeVisible();
+         |                        ^
+      48 |
+      49 |     const questionText = card.locator('[data-testid="question-text"]');
+      50 |     await expect(questionText).toContainText('다음 중');
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/unit/frontend/question-card.spec.ts:47:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-question-car-7e4b0--renders-with-question-text-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-question-car-7e4b0--renders-with-question-text-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../test-results/unit-frontend-question-car-7e4b0--renders-with-question-text-chromium/error-context.md
+
+  37) [chromium] › tests/unit/frontend/question-card.spec.ts:55:7 › P1: QuestionCard Component Tests › FE-UNIT-042: QuestionCard displays all answer options 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: >= [32m4[39m
+    Received:    [31m0[39m
+
+      61 |     // Should have 4 or 5 options
+      62 |     const count = await options.count();
+    > 63 |     expect(count).toBeGreaterThanOrEqual(4);
+         |                   ^
+      64 |     expect(count).toBeLessThanOrEqual(5);
+      65 |
+      66 |     await page.screenshot({ path: 'test-results/fe-unit-042.png' });
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/unit/frontend/question-card.spec.ts:63:19
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-question-car-a3125-displays-all-answer-options-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-question-car-a3125-displays-all-answer-options-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../test-results/unit-frontend-question-car-a3125-displays-all-answer-options-chromium/error-context.md
+
+  38) [chromium] › tests/unit/frontend/question-card.spec.ts:69:7 › P1: QuestionCard Component Tests › FE-UNIT-043: QuestionCard allows selecting an answer 
+
+    [31mTest timeout of 60000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 60000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="question-card-interactive"]').locator('[data-testid="option-0"]')[22m
+
+
+      74 |
+      75 |     // Click the first option
+    > 76 |     await firstOption.click();
+         |                       ^
+      77 |
+      78 |     // Verify it's selected
+      79 |     await expect(firstOption).toHaveClass(/selected|bg-blue/);
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/unit/frontend/question-card.spec.ts:76:23
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-question-car-279ae--allows-selecting-an-answer-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-question-car-279ae--allows-selecting-an-answer-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../test-results/unit-frontend-question-car-279ae--allows-selecting-an-answer-chromium/error-context.md
+
+  39) [chromium] › tests/unit/frontend/question-card.spec.ts:84:7 › P1: QuestionCard Component Tests › FE-UNIT-044: QuestionCard shows correct answer after submission 
+
+    [31mTest timeout of 60000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 60000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="question-card-with-answer"]').locator('[data-testid="option-0"]')[22m
+
+
+      90 |     // Select an option
+      91 |     const firstOption = card.locator('[data-testid="option-0"]');
+    > 92 |     await firstOption.click();
+         |                       ^
+      93 |
+      94 |     // Submit
+      95 |     await submitButton.click();
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/unit/frontend/question-card.spec.ts:92:23
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-question-car-a9268-ect-answer-after-submission-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-question-car-a9268-ect-answer-after-submission-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../test-results/unit-frontend-question-car-a9268-ect-answer-after-submission-chromium/error-context.md
+
+  40) [chromium] › tests/unit/frontend/question-card.spec.ts:120:7 › P1: QuestionCard Component Tests › FE-UNIT-046: QuestionCard displays question number 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: locator('[data-testid="question-card-numbered"]').locator('[data-testid="question-number"]')
+    Expected pattern: [32m/문제|Question|Q/[39m
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 5000ms[22m
+    [2m  - waiting for locator('[data-testid="question-card-numbered"]').locator('[data-testid="question-number"]')[22m
+
+
+      124 |     const questionNumber = card.locator('[data-testid="question-number"]');
+      125 |
+    > 126 |     await expect(questionNumber).toContainText(/문제|Question|Q/);
+          |                                  ^
+      127 |
+      128 |     await page.screenshot({ path: 'test-results/fe-unit-046.png' });
+      129 |   });
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/unit/frontend/question-card.spec.ts:126:34
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-question-car-eb404-rd-displays-question-number-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-question-car-eb404-rd-displays-question-number-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../test-results/unit-frontend-question-car-eb404-rd-displays-question-number-chromium/error-context.md
+
+  41) [chromium] › tests/unit/frontend/question-card.spec.ts:131:7 › P1: QuestionCard Component Tests › FE-UNIT-047: QuestionCard shows explanation after answer 
+
+    [31mTest timeout of 60000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 60000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="question-card-with-explanation"]').locator('[data-testid="option-0"]')[22m
+
+
+      137 |     // Select and submit
+      138 |     const firstOption = card.locator('[data-testid="option-0"]');
+    > 139 |     await firstOption.click();
+          |                       ^
+      140 |     await submitButton.click();
+      141 |     await page.waitForTimeout(500);
+      142 |
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/unit/frontend/question-card.spec.ts:139:23
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-question-car-3ac16-ws-explanation-after-answer-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-question-car-3ac16-ws-explanation-after-answer-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../test-results/unit-frontend-question-car-3ac16-ws-explanation-after-answer-chromium/error-context.md
+
+  42) [chromium] › tests/unit/frontend/question-card.spec.ts:150:7 › P1: QuestionCard Component Tests › FE-UNIT-048: QuestionCard prevents changing answer after submission 
+
+    [31mTest timeout of 60000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 60000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="question-card-locked"]').locator('[data-testid="option-0"]')[22m
+
+
+      156 |     // Select and submit
+      157 |     const firstOption = card.locator('[data-testid="option-0"]');
+    > 158 |     await firstOption.click();
+          |                       ^
+      159 |     await submitButton.click();
+      160 |     await page.waitForTimeout(500);
+      161 |
+        at /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/tests/unit/frontend/question-card.spec.ts:158:23
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-question-car-99f08-ing-answer-after-submission-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../../test-results/unit-frontend-question-car-99f08-ing-answer-after-submission-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../test-results/unit-frontend-question-car-99f08-ing-answer-after-submission-chromium/error-context.md
+
+  42 failed
+    [chromium] › tests/demo/simple-test.spec.ts:12:7 › CertiGraph Demo Test › 데모: 홈페이지 접속 및 기본 요소 확인 
+    [chromium] › tests/integration/api-read/dashboard-stats.spec.ts:43:7 › P3: Dashboard Stats API Tests › API-READ-013: GET /api/dashboard/stats - Get user statistics 
+    [chromium] › tests/integration/api-read/dashboard-stats.spec.ts:58:7 › P3: Dashboard Stats API Tests › API-READ-014: GET /api/dashboard/recent-activity - Get recent activity 
+    [chromium] › tests/integration/api-read/dashboard-stats.spec.ts:77:7 › P3: Dashboard Stats API Tests › API-READ-015: GET /api/dashboard/weak-concepts - Get weak concepts 
+    [chromium] › tests/integration/api-read/dashboard-stats.spec.ts:97:7 › P3: Dashboard Stats API Tests › API-READ-016: GET /api/knowledge-graph - Get knowledge graph data 
+    [chromium] › tests/integration/api-read/dashboard-stats.spec.ts:141:7 › P3: Dashboard Stats API Tests › API-READ-018: GET /api/dashboard/study-progress - Get study progress over time 
+    [chromium] › tests/integration/api-read/questions-get.spec.ts:43:7 › P3: Questions GET API Tests › API-READ-007: GET /api/questions - List all questions 
+    [chromium] › tests/integration/api-read/questions-get.spec.ts:77:7 › P3: Questions GET API Tests › API-READ-009: GET /api/questions - Filter by study set 
+    [chromium] › tests/integration/api-read/questions-get.spec.ts:128:7 › P3: Questions GET API Tests › API-READ-011: GET /api/questions - Filter by concept 
+    [chromium] › tests/integration/api-read/questions-get.spec.ts:147:7 › P3: Questions GET API Tests › API-READ-012: GET /api/questions - Filter by difficulty 
+    [chromium] › tests/integration/api-read/study-sets-get.spec.ts:45:7 › P3: Study Sets GET API Tests › API-READ-001: GET /api/study-sets - List with default pagination 
+    [chromium] › tests/integration/api-read/study-sets-get.spec.ts:60:7 › P3: Study Sets GET API Tests › API-READ-002: GET /api/study-sets - Filter by certification type 
+    [chromium] › tests/integration/api-read/study-sets-get.spec.ts:79:7 › P3: Study Sets GET API Tests › API-READ-003: GET /api/study-sets/:id - Get specific study set 
+    [chromium] › tests/integration/api-read/study-sets-get.spec.ts:98:7 › P3: Study Sets GET API Tests › API-READ-004: GET /api/study-sets - Pagination works correctly 
+    [chromium] › tests/integration/api-read/study-sets-get.spec.ts:117:7 › P3: Study Sets GET API Tests › API-READ-005: GET /api/study-sets - Sort by created date 
+    [chromium] › tests/integration/api-read/study-sets-get.spec.ts:139:7 › P3: Study Sets GET API Tests › API-READ-006: GET /api/study-sets - Search by name 
+    [chromium] › tests/integration/api-write/01-study-sets-create.spec.ts:55:7 › S1: Study Sets Create API Tests (Sequential) › API-WRITE-001: Create study set with valid data 
+    [chromium] › tests/integration/api-write/02-study-sets-update.spec.ts:75:7 › S1: Study Sets Update API Tests (Sequential) › API-WRITE-009: Update study set name 
+    [chromium] › tests/integration/api-write/03-study-sets-delete.spec.ts:42:7 › S1: Study Sets Delete API Tests (Sequential) › API-WRITE-015: Delete study set successfully 
+    [chromium] › tests/unit/frontend/notion-card.spec.ts:43:7 › P1: NotionCard Component Tests › FE-UNIT-001: NotionCard renders with default props 
+    [chromium] › tests/unit/frontend/notion-card.spec.ts:53:7 › P1: NotionCard Component Tests › FE-UNIT-002: NotionCard displays title and description correctly 
+    [chromium] › tests/unit/frontend/notion-card.spec.ts:63:7 › P1: NotionCard Component Tests › FE-UNIT-003: NotionCard shows hover effects 
+    [chromium] › tests/unit/frontend/notion-card.spec.ts:84:7 › P1: NotionCard Component Tests › FE-UNIT-004: NotionCard handles click events 
+    [chromium] › tests/unit/frontend/notion-card.spec.ts:102:7 › P1: NotionCard Component Tests › FE-UNIT-005: NotionCard renders with custom className 
+    [chromium] › tests/unit/frontend/notion-card.spec.ts:111:7 › P1: NotionCard Component Tests › FE-UNIT-006: NotionCard displays icon correctly 
+    [chromium] › tests/unit/frontend/notion-card.spec.ts:122:7 › P1: NotionCard Component Tests › FE-UNIT-007: NotionCard handles long text overflow 
+    [chromium] › tests/unit/frontend/notion-card.spec.ts:134:7 › P1: NotionCard Component Tests › FE-UNIT-008: NotionCard is accessible (ARIA attributes) 
+    [chromium] › tests/unit/frontend/notion-stat-card.spec.ts:43:7 › P1: NotionStatCard Component Tests › FE-UNIT-009: NotionStatCard renders with default props 
+    [chromium] › tests/unit/frontend/notion-stat-card.spec.ts:52:7 › P1: NotionStatCard Component Tests › FE-UNIT-010: NotionStatCard displays title and value correctly 
+    [chromium] › tests/unit/frontend/notion-stat-card.spec.ts:62:7 › P1: NotionStatCard Component Tests › FE-UNIT-011: NotionStatCard shows trend indicator (up) 
+    [chromium] › tests/unit/frontend/notion-stat-card.spec.ts:74:7 › P1: NotionStatCard Component Tests › FE-UNIT-012: NotionStatCard shows trend indicator (down) 
+    [chromium] › tests/unit/frontend/notion-stat-card.spec.ts:86:7 › P1: NotionStatCard Component Tests › FE-UNIT-013: NotionStatCard formats large numbers correctly 
+    [chromium] › tests/unit/frontend/notion-stat-card.spec.ts:99:7 › P1: NotionStatCard Component Tests › FE-UNIT-014: NotionStatCard displays percentage correctly 
+    [chromium] › tests/unit/frontend/notion-stat-card.spec.ts:110:7 › P1: NotionStatCard Component Tests › FE-UNIT-015: NotionStatCard shows loading state 
+    [chromium] › tests/unit/frontend/notion-stat-card.spec.ts:122:7 › P1: NotionStatCard Component Tests › FE-UNIT-016: NotionStatCard handles click to navigate 
+    [chromium] › tests/unit/frontend/question-card.spec.ts:43:7 › P1: QuestionCard Component Tests › FE-UNIT-041: QuestionCard renders with question text 
+    [chromium] › tests/unit/frontend/question-card.spec.ts:55:7 › P1: QuestionCard Component Tests › FE-UNIT-042: QuestionCard displays all answer options 
+    [chromium] › tests/unit/frontend/question-card.spec.ts:69:7 › P1: QuestionCard Component Tests › FE-UNIT-043: QuestionCard allows selecting an answer 
+    [chromium] › tests/unit/frontend/question-card.spec.ts:84:7 › P1: QuestionCard Component Tests › FE-UNIT-044: QuestionCard shows correct answer after submission 
+    [chromium] › tests/unit/frontend/question-card.spec.ts:120:7 › P1: QuestionCard Component Tests › FE-UNIT-046: QuestionCard displays question number 
+    [chromium] › tests/unit/frontend/question-card.spec.ts:131:7 › P1: QuestionCard Component Tests › FE-UNIT-047: QuestionCard shows explanation after answer 
+    [chromium] › tests/unit/frontend/question-card.spec.ts:150:7 › P1: QuestionCard Component Tests › FE-UNIT-048: QuestionCard prevents changing answer after submission 
+  26 skipped
+  17 did not run
+  10 passed (4.6m)

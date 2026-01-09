@@ -118,7 +118,7 @@ const getFallbackExamDates = (): ExamDate[] => {
     { year: 2023, round: 21, date: new Date(2023, 1, 11), registration: new Date(2022, 11, 12) },
     { year: 2024, round: 22, date: new Date(2024, 1, 3), registration: new Date(2023, 11, 4) },
     { year: 2025, round: 23, date: new Date(2025, 1, 8), registration: new Date(2024, 11, 9) },
-    { year: 2026, round: 24, date: new Date(2026, 1, 7), registration: new Date(2025, 11, 8) },
+    { year: 2026, round: 19, date: new Date(2026, 0, 17), registration: new Date(2025, 11, 15) },  // 1월 17일 (month=0 is January)
   ];
 
   // 정보처리기사 데이터 추가
@@ -214,13 +214,22 @@ const getFallbackExamDates = (): ExamDate[] => {
     });
   });
 
-  return exams.filter(exam => {
+  const filtered = exams.filter(exam => {
     const oneYearAgo = new Date(today);
     oneYearAgo.setFullYear(today.getFullYear() - 1);
     const twoYearsLater = new Date(today);
     twoYearsLater.setFullYear(today.getFullYear() + 2);
     return exam.date >= oneYearAgo && exam.date <= twoYearsLater;
   });
+
+  console.log('[DEBUG] Total exams generated:', exams.length);
+  console.log('[DEBUG] Filtered exams:', filtered.length);
+  console.log('[DEBUG] Social Worker exams:', filtered.filter(e => e.title.includes('사회복지사')));
+  console.log('[DEBUG] Jan 2026 exams:', filtered.filter(e =>
+    e.date.getFullYear() === 2026 && e.date.getMonth() === 0
+  ));
+
+  return filtered;
 };
 
 function getExamStatus(examDate: Date, registrationDeadline: Date): 'upcoming' | 'registration-open' | 'registration-closed' | 'completed' {

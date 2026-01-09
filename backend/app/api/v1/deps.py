@@ -44,6 +44,24 @@ async def get_current_user(
             "email": "dev@example.com"
         })
 
+    # Test mode bypass (for automated tests)
+    if settings.test_mode and authorization:
+        parts = authorization.split()
+        if len(parts) == 2 and parts[0].lower() == "bearer":
+            token = parts[1]
+            # Accept any token that starts with "test_" or "mock_"
+            if token.startswith("test_") or token.startswith("mock_"):
+                # Special handling for VIP user testing
+                if token == "test-vip-user":
+                    return ClerkUser({
+                        "sub": "test_vip_user_123",
+                        "email": "myaji35@gmail.com"
+                    })
+                return ClerkUser({
+                    "sub": f"test_user_{token[:8]}",
+                    "email": f"test_{token[:8]}@example.com"
+                })
+
     if not authorization:
         raise AuthMissingTokenError()
 
@@ -140,7 +158,37 @@ StorageServiceDep = Annotated[
 ]
 
 
-# Supabase dependency
+# Database dependency - returns Cloud SQL or Supabase based on configuration
+def get_db_client(settings: Settings = Depends(get_settings)):
+    """
+    Get database client - Cloud SQL (preferred) or Supabase (legacy).
+
+    Returns SQLAlchemy Session for Cloud SQL, or Supabase Client for legacy mode.
+    """
+    if settings.use_cloud_sql:
+        # Use Cloud SQL with SQLAlchemy
+        from app.db.session import SessionLocal
+        db = SessionLocal()
+        try:
+            yield db
+        finally:
+            db.close()
+    else:
+        # Fallback to Supabase (legacy mode)
+        if not settings.supabase_url or not settings.supabase_service_key:
+            raise ValueError("Supabase credentials not configured. Set USE_CLOUD_SQL=true to use Cloud SQL.")
+        yield create_client(settings.supabase_url, settings.supabase_service_key)
+
+
+# Legacy Supabase dependency (deprecated)
 def get_supabase(settings: Settings = Depends(get_settings)) -> Client:
-    """Get Supabase client."""
+    """
+    Get Supabase client.
+
+    DEPRECATED: Use get_db_client() instead for Cloud SQL support.
+    This is kept for backwards compatibility during migration.
+    """
+    if not settings.supabase_url or not settings.supabase_service_key:
+        # Return None in GCP-only mode to allow endpoints to handle gracefully
+        return None
     return create_client(settings.supabase_url, settings.supabase_service_key)

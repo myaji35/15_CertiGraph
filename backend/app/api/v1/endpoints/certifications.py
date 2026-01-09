@@ -37,10 +37,88 @@ async def get_certifications(
     - year: 특정 연도 필터 (기본값: 2025)
     """
     year = year or 2025
-    data_loader = get_data_loader()
 
-    # 모든 자격증 데이터 가져오기
-    all_certifications = data_loader.get_all_certifications()
+    # DEV_MODE에서는 Mock 데이터 사용
+    from app.core.config import get_settings
+    settings = get_settings()
+
+    if settings.dev_mode:
+        # Mock 자격증 데이터
+        all_certifications = [
+            {
+                "id": "cert-001",
+                "name": "사회복지사 1급",
+                "category": "national",
+                "organization": "한국산업인력공단",
+                "description": "사회복지 전문가 자격증",
+                "level": "level_1",
+                "exam_subjects": ["사회복지 실천론", "사회복지 정책론", "사회복지 법제론"],
+                "passing_criteria": "각 과목 40점 이상, 전 과목 평균 60점 이상",
+                "exam_fee": {"written": 25000},
+                "website": "https://www.q-net.or.kr",
+                "schedules_2025": [
+                    {
+                        "exam_type": "written",
+                        "round": 25,
+                        "application_start": date(2024, 12, 9),
+                        "application_end": date(2024, 12, 13),
+                        "exam_date": date(2025, 2, 8),
+                        "result_date": date(2025, 3, 19),
+                        "description": "제25회 사회복지사 1급 필기시험"
+                    }
+                ]
+            },
+            {
+                "id": "cert-002",
+                "name": "정보처리기사",
+                "category": "national_professional",
+                "organization": "한국산업인력공단",
+                "description": "정보처리 전문가 자격증",
+                "level": "engineer",
+                "exam_subjects": ["소프트웨어 설계", "소프트웨어 개발", "데이터베이스 구축", "프로그래밍 언어 활용", "정보시스템 구축관리"],
+                "passing_criteria": "과목당 40점 이상, 평균 60점 이상",
+                "exam_fee": {"written": 19400, "practical": 22600},
+                "website": "https://www.q-net.or.kr",
+                "schedules_2025": [
+                    {
+                        "exam_type": "written",
+                        "round": 1,
+                        "application_start": date(2025, 1, 13),
+                        "application_end": date(2025, 1, 16),
+                        "exam_date": date(2025, 3, 15),
+                        "result_date": date(2025, 3, 26),
+                        "description": "제1회 정보처리기사 필기시험"
+                    }
+                ]
+            },
+            {
+                "id": "cert-003",
+                "name": "토익",
+                "category": "private",
+                "organization": "ETS",
+                "description": "영어 능력 시험",
+                "level": None,
+                "exam_subjects": ["Listening", "Reading"],
+                "passing_criteria": "990점 만점",
+                "exam_fee": {"regular": 48000},
+                "website": "https://www.toeic.co.kr",
+                "schedules_2025": [
+                    {
+                        "exam_type": "written",
+                        "round": 1,
+                        "application_start": date(2025, 1, 6),
+                        "application_end": date(2025, 1, 10),
+                        "exam_date": date(2025, 1, 26),
+                        "result_date": date(2025, 2, 5),
+                        "description": "2025년 1월 토익 정기시험"
+                    }
+                ]
+            }
+        ]
+    else:
+        data_loader = get_data_loader()
+        # 모든 자격증 데이터 가져오기
+        all_certifications = data_loader.get_all_certifications()
 
     # 데이터를 dict에서 Certification 객체로 변환
     certifications = []
@@ -258,7 +336,11 @@ async def get_monthly_calendar(
     calendar_data = {}
 
     for cert_data in all_certifications:
-        for sched in cert_data.get("schedules_2025", []):
+        # 연도에 맞는 일정 키 선택
+        schedule_key = f"schedules_{year}"
+        schedules = cert_data.get(schedule_key, [])
+
+        for sched in schedules:
             exam_date = sched["exam_date"]
 
             # 해당 연월의 시험인지 확인

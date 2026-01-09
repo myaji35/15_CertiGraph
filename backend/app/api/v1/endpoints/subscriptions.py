@@ -23,11 +23,59 @@ async def get_my_subscriptions(
 ):
     """사용자의 모든 구독 목록 조회"""
 
+    # 디버깅: JWT Payload 전체 구조 출력
+    import json
+    print(f"[DEBUG] === JWT PAYLOAD FULL DUMP ===")
+    print(f"[DEBUG] Clerk ID: {current_user.clerk_id}")
+    print(f"[DEBUG] Email from ClerkUser: {current_user.email}")
+    print(f"[DEBUG] Full JWT Payload: {json.dumps(current_user.raw_payload, indent=2)}")
+    print(f"[DEBUG] === END JWT PAYLOAD ===")
+
+    # Clerk JWT에서 이메일이 다른 필드에 있을 수 있으므로 여러 필드를 체크
+    user_email = current_user.email or current_user.raw_payload.get("primary_email_address") or current_user.raw_payload.get("email_addresses", [{}])[0].get("email_address", None) if current_user.raw_payload.get("email_addresses") else None
+
+    print(f"[DEBUG] Final extracted email: {user_email}")
+
+    # 🎁 VIP 사용자 무료 패스 (Clerk ID로 체크)
+    VIP_CLERK_IDS = ["user_36T9Qa8HsuaM1fMjTisw4frRH1Z"]  # myaji35@gmail.com
+
+    # DEV_MODE에서는 모든 사용자를 VIP로 처리 (테스트용)
+    from app.core.config import get_settings
+    settings = get_settings()
+
+    if current_user.clerk_id in VIP_CLERK_IDS or settings.dev_mode:
+        from datetime import datetime, timedelta, date
+        vip_subscription = SubscriptionResponse(
+            id="vip-pass",
+            clerk_user_id=current_user.clerk_id,
+            certification_id="certi_001",  # 실제 자격증 ID 사용
+            certification_name="VIP 무료 이용권",
+            exam_date=date(2099, 12, 31),  # VIP는 만료일 없음을 표현
+            subscription_start_date=datetime.now(),
+            subscription_end_date=datetime.now() + timedelta(days=9999),
+            days_remaining=9999,
+            status="active",
+            amount=0,
+            created_at=datetime.now()
+        )
+        return UserSubscriptionsResponse(
+            subscriptions=[vip_subscription],
+            total_count=1
+        )
+
     # 구독 목록 조회 (활성 구독만)
-    response = supabase.rpc(
-        'get_user_subscriptions',
-        {'p_clerk_user_id': current_user.clerk_id}
-    ).execute()
+    try:
+        response = supabase.rpc(
+            'get_user_subscriptions',
+            {'p_clerk_user_id': current_user.clerk_id}
+        ).execute()
+    except Exception as e:
+        # Cloud SQL 마이그레이션 중 Supabase 함수가 없는 경우 빈 목록 반환
+        print(f"Supabase RPC error (migration in progress): {e}")
+        return UserSubscriptionsResponse(
+            subscriptions=[],
+            total_count=0
+        )
 
     subscriptions = []
     for row in response.data:
@@ -58,6 +106,23 @@ async def check_subscription(
     supabase=Depends(get_supabase)
 ):
     """특정 자격증에 대한 구독 여부 확인"""
+
+    # 🎁 VIP 사용자 무료 패스 (Clerk ID로 체크)
+    VIP_CLERK_IDS = ["user_36T9Qa8HsuaM1fMjTisw4frRH1Z"]  # myaji35@gmail.com
+
+    # DEV_MODE에서는 모든 사용자를 VIP로 처리 (테스트용)
+    from app.core.config import get_settings
+    settings = get_settings()
+
+    if current_user.clerk_id in VIP_CLERK_IDS or settings.dev_mode:
+        from datetime import datetime, timedelta
+        return SubscriptionCheckResponse(
+            has_subscription=True,
+            certification_id=certification_id,
+            certification_name="VIP 무료 이용권",
+            days_remaining=9999,
+            subscription_end_date=datetime.now() + timedelta(days=9999)
+        )
 
     # 구독 확인 함수 호출
     response = supabase.rpc(

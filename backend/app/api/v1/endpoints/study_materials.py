@@ -36,9 +36,16 @@ async def upload_study_material(
             detail="Only PDF files are allowed"
         )
 
-    # Verify study set exists and belongs to user
-    study_set_repo = MockStudySetRepository()
-    study_set = await study_set_repo.find_by_id(study_set_id)
+    # Import the MOCK_STUDY_SETS from study_sets module
+    from app.api.v1.endpoints.study_sets import MOCK_STUDY_SETS
+
+    # First check in memory storage
+    if study_set_id in MOCK_STUDY_SETS:
+        study_set = MOCK_STUDY_SETS[study_set_id]
+    else:
+        # Verify study set exists and belongs to user
+        study_set_repo = MockStudySetRepository()
+        study_set = await study_set_repo.find_by_id(study_set_id)
 
     if not study_set:
         raise HTTPException(
@@ -247,6 +254,150 @@ async def delete_study_material(
     return {
         "success": True,
         "message": "학습자료가 삭제되었습니다."
+    }
+
+
+@router.post("/{material_id}/retry")
+async def retry_study_material(
+    material_id: str,
+    current_user: CurrentUser = None,
+):
+    """
+    Retry processing a failed study material.
+    
+    This endpoint allows users to reprocess materials that failed during initial processing.
+    """
+    from app.repositories.mock_study_material import MockStudyMaterialRepository
+    from app.repositories.mock_study_set import MockStudySetRepository
+    from app.repositories.mock_question import MockQuestionRepository
+    from app.services.pdf_processor import SimplePDFProcessor
+    import asyncio
+    import logging
+    import os
+
+    logger = logging.getLogger(__name__)
+    material_repo = MockStudyMaterialRepository()
+
+    # Verify material exists and belongs to user
+    material = await material_repo.find_by_id(material_id)
+
+    if not material:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Material not found"
+        )
+
+    if material["clerk_id"] != current_user.clerk_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You don't have permission to retry this material"
+        )
+
+    # Check if material is in a failed state
+    if material["status"] not in ["failed", "completed"]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only failed or completed materials can be retried"
+        )
+
+    # Reset material status
+    await material_repo.update_status(
+        material_id,
+        status="processing",
+        processing_progress=0,
+        processing_error=None
+    )
+
+    # Start reprocessing in background
+    async def reprocess_pdf_background():
+        """Background task to reprocess PDF."""
+        processor = SimplePDFProcessor()
+        question_repo = MockQuestionRepository()
+        study_set_repo = MockStudySetRepository()
+
+        async def update_progress(status, progress, message):
+            """Update material processing status."""
+            await material_repo.update_status(
+                material_id,
+                status=status,
+                processing_progress=progress,
+                log_message=message
+            )
+            logger.info(f"📊 Retry progress update: {progress}% - {message}")
+
+        try:
+            # Read PDF file from disk
+            backend_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))
+            file_path = os.path.join(backend_dir, material["pdf_url"].lstrip("/"))
+            
+            if not os.path.exists(file_path):
+                raise Exception(f"PDF file not found: {file_path}")
+            
+            with open(file_path, "rb") as f:
+                file_content = f.read()
+
+            # Process the PDF
+            result = await processor.process_pdf(
+                material_id,
+                file_content,
+                material["title"],
+                update_progress
+            )
+
+            if result["success"]:
+                # Delete old questions if any
+                await question_repo.delete_by_material(material_id)
+                
+                # Save new questions to repository
+                questions = result["questions"]
+                study_set_id = material["study_set_id"]
+
+                # Store questions grouped by material_id
+                await question_repo.bulk_create(material_id, questions)
+
+                # Update material with question count
+                await material_repo.update_status(
+                    material_id,
+                    status="completed",
+                    total_questions=len(questions),
+                    processing_progress=100
+                )
+
+                # Update study set counts
+                material_count = await material_repo.count_by_study_set(study_set_id)
+                total_questions = await material_repo.get_total_questions(study_set_id)
+                await study_set_repo.update_material_counts(
+                    study_set_id,
+                    material_count,
+                    total_questions
+                )
+
+                logger.info(f"✅ Retry processing completed: {len(questions)} questions")
+            else:
+                await material_repo.update_status(
+                    material_id,
+                    status="failed",
+                    processing_progress=0,
+                    processing_error=result.get("error")
+                )
+                logger.error(f"❌ Retry processing failed: {result.get('error')}")
+
+        except Exception as e:
+            logger.error(f"❌ Retry processing exception: {str(e)}")
+            await material_repo.update_status(
+                material_id,
+                status="failed",
+                processing_progress=0,
+                processing_error=str(e)
+            )
+
+    # Start background reprocessing
+    asyncio.create_task(reprocess_pdf_background())
+
+    return {
+        "success": True,
+        "message": "학습자료 재처리가 시작되었습니다.",
+        "material_id": material_id
     }
 
 

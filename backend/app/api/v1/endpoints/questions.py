@@ -1,10 +1,90 @@
 """Questions API endpoints - View extracted questions from study materials."""
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from typing import List, Optional
-from app.api.v1.deps import CurrentUser
+from app.api.v1.deps import CurrentUser, get_supabase, SettingsDep
 
 router = APIRouter(prefix="/questions", tags=["Questions"])
+
+
+@router.get("")
+async def get_questions(
+    material_id: Optional[str] = Query(None, description="Filter by material ID"),
+    concept: Optional[str] = Query(None, description="Filter by concept"),
+    difficulty: Optional[str] = Query(None, description="Filter by difficulty level"),
+    limit: Optional[int] = Query(50, description="Maximum number of questions to return"),
+    offset: Optional[int] = Query(0, description="Number of questions to skip"),
+    current_user: CurrentUser = None,
+    settings: SettingsDep = None,
+    supabase=Depends(get_supabase)
+):
+    """
+    Get questions with optional filtering.
+
+    Supports filtering by:
+    - material_id: Get questions from a specific material
+    - concept: Filter by concept/topic
+    - difficulty: Filter by difficulty level (easy/medium/hard)
+    """
+    # In dev/test mode, return mock data
+    if settings and (settings.dev_mode or settings.test_mode):
+        from app.repositories.mock_question import MockQuestionRepository
+        question_repo = MockQuestionRepository()
+
+        # Get mock questions (assuming study_set_id for mock)
+        questions = await question_repo.get_by_study_set("mock_study_set_1")
+
+        # Apply filters
+        if material_id:
+            questions = [q for q in questions if q.get("material_id") == material_id]
+        if concept:
+            questions = [q for q in questions if concept in (q.get("concepts") or [])]
+        if difficulty:
+            questions = [q for q in questions if q.get("difficulty") == difficulty]
+
+        # Apply pagination
+        total_count = len(questions)
+        questions = questions[offset:offset + limit]
+
+        return {
+            "success": True,
+            "questions": questions,
+            "total_count": total_count,
+            "returned_count": len(questions),
+            "offset": offset,
+            "limit": limit
+        }
+
+    # Real implementation with Supabase
+    try:
+        query = supabase.table("questions").select("*")
+
+        # Apply filters
+        if material_id:
+            query = query.eq("material_id", material_id)
+        if concept:
+            query = query.contains("concepts", [concept])
+        if difficulty:
+            query = query.eq("difficulty", difficulty)
+
+        # Apply pagination
+        query = query.range(offset, offset + limit - 1)
+
+        response = query.execute()
+
+        return {
+            "success": True,
+            "questions": response.data or [],
+            "total_count": len(response.data) if response.data else 0,
+            "returned_count": len(response.data) if response.data else 0,
+            "offset": offset,
+            "limit": limit
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to fetch questions: {str(e)}"
+        )
 
 
 @router.get("/material/{material_id}")

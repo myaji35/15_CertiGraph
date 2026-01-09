@@ -13,5 +13,8 @@ from .trial import router as trial_router
 from .subscriptions import router as subscriptions_router
 from .mlflow_tracking import router as mlflow_tracking_router
 from .admin import router as admin_router
+from .dashboard import router as dashboard_router
+from .knowledge_graph import router as knowledge_graph_router
+from .badges import router as badges_router
 
-__all__ = ["study_sets_router", "study_materials_router", "questions_router", "tests_router", "analysis_router", "certifications_router", "external_certifications_router", "plane_router", "payment_router", "trial_router", "subscriptions_router", "mlflow_tracking_router", "admin_router"]
+__all__ = ["study_sets_router", "study_materials_router", "questions_router", "tests_router", "analysis_router", "certifications_router", "external_certifications_router", "plane_router", "payment_router", "trial_router", "subscriptions_router", "mlflow_tracking_router", "admin_router", "dashboard_router", "knowledge_graph_router", "badges_router"]

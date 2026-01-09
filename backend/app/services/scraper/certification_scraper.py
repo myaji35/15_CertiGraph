@@ -248,6 +248,16 @@ class CertificationScraper:
                     "result_date": "2025-12-17"
                 }
             ],
+            "사회복지사 1급": [
+                {
+                    "round": "제19회",
+                    "exam_type": "필기",
+                    "application_start": "2025-12-15",
+                    "application_end": "2025-12-19",
+                    "exam_date": "2026-01-17",
+                    "result_date": "2026-02-07"
+                }
+            ],
             "SQL개발자(SQLD)": [
                 {
                     "round": "53회",
@@ -330,6 +340,22 @@ class CertificationScraper:
                     "application_end": "2025-11-14",
                     "exam_date": "2025-12-13",
                     "result_date": "2025-12-26"
+                },
+                {
+                    "round": "24-4회",
+                    "exam_type": "필기",
+                    "application_start": "2025-11-17",
+                    "application_end": "2025-11-28",
+                    "exam_date": "2025-12-20",
+                    "result_date": "2026-01-09"
+                },
+                {
+                    "round": "24-4회",
+                    "exam_type": "실기",
+                    "application_start": "2026-01-12",
+                    "application_end": "2026-01-23",
+                    "exam_date": "2026-02-28",
+                    "result_date": "2026-03-20"
                 }
             ],
             "리눅스마스터 2급": [
@@ -384,6 +410,288 @@ class CertificationScraper:
             ]
         }
 
+        # 2026년 시험 일정
+        schedules_2026 = {
+            "사회복지사 1급": [
+                {
+                    "round": "제19회",
+                    "exam_type": "필기",
+                    "application_start": "2025-12-15",
+                    "application_end": "2025-12-19",
+                    "exam_date": "2026-01-17",
+                    "result_date": "2026-02-07"
+                }
+            ],
+            "정보처리기사": [
+                {
+                    "round": "1회",
+                    "exam_type": "필기",
+                    "application_start": "2026-01-12",
+                    "application_end": "2026-01-15",
+                    "exam_date": "2026-03-11",
+                    "result_date": "2026-03-11"
+                },
+                {
+                    "round": "1회",
+                    "exam_type": "실기",
+                    "application_start": "2026-03-23",
+                    "application_end": "2026-03-26",
+                    "exam_date": "2026-05-06",
+                    "result_date": "2026-06-12"
+                },
+                {
+                    "round": "2회",
+                    "exam_type": "필기",
+                    "application_start": "2026-04-20",
+                    "application_end": "2026-04-23",
+                    "exam_date": "2026-06-10",
+                    "result_date": "2026-06-10"
+                },
+                {
+                    "round": "2회",
+                    "exam_type": "실기",
+                    "application_start": "2026-06-22",
+                    "application_end": "2026-06-25",
+                    "exam_date": "2026-08-05",
+                    "result_date": "2026-09-11"
+                },
+                {
+                    "round": "3회",
+                    "exam_type": "필기",
+                    "application_start": "2026-07-20",
+                    "application_end": "2026-07-23",
+                    "exam_date": "2026-09-09",
+                    "result_date": "2026-09-09"
+                },
+                {
+                    "round": "3회",
+                    "exam_type": "실기",
+                    "application_start": "2026-09-21",
+                    "application_end": "2026-09-28",
+                    "exam_date": "2026-11-13",
+                    "result_date": "2026-12-18"
+                }
+            ],
+            "정보처리산업기사": [
+                {
+                    "round": "1회",
+                    "exam_type": "필기",
+                    "application_start": "2026-01-12",
+                    "application_end": "2026-01-15",
+                    "exam_date": "2026-03-11",
+                    "result_date": "2026-03-11"
+                },
+                {
+                    "round": "1회",
+                    "exam_type": "실기",
+                    "application_start": "2026-03-23",
+                    "application_end": "2026-03-26",
+                    "exam_date": "2026-05-06",
+                    "result_date": "2026-06-12"
+                },
+                {
+                    "round": "2회",
+                    "exam_type": "필기",
+                    "application_start": "2026-04-20",
+                    "application_end": "2026-04-23",
+                    "exam_date": "2026-06-10",
+                    "result_date": "2026-06-10"
+                },
+                {
+                    "round": "2회",
+                    "exam_type": "실기",
+                    "application_start": "2026-06-22",
+                    "application_end": "2026-06-25",
+                    "exam_date": "2026-08-05",
+                    "result_date": "2026-09-11"
+                },
+                {
+                    "round": "3회",
+                    "exam_type": "필기",
+                    "application_start": "2026-07-20",
+                    "application_end": "2026-07-23",
+                    "exam_date": "2026-09-09",
+                    "result_date": "2026-09-09"
+                },
+                {
+                    "round": "3회",
+                    "exam_type": "실기",
+                    "application_start": "2026-09-21",
+                    "application_end": "2026-09-28",
+                    "exam_date": "2026-11-13",
+                    "result_date": "2026-12-18"
+                }
+            ],
+            "빅데이터분석기사": [
+                {
+                    "round": "1회",
+                    "exam_type": "필기",
+                    "application_start": "2026-02-02",
+                    "application_end": "2026-02-06",
+                    "exam_date": "2026-04-11",
+                    "result_date": "2026-05-08"
+                },
+                {
+                    "round": "1회",
+                    "exam_type": "실기",
+                    "application_start": "2026-05-11",
+                    "application_end": "2026-05-15",
+                    "exam_date": "2026-06-13",
+                    "result_date": "2026-07-15"
+                },
+                {
+                    "round": "2회",
+                    "exam_type": "필기",
+                    "application_start": "2026-07-20",
+                    "application_end": "2026-07-24",
+                    "exam_date": "2026-09-12",
+                    "result_date": "2026-10-01"
+                },
+                {
+                    "round": "2회",
+                    "exam_type": "실기",
+                    "application_start": "2026-10-05",
+                    "application_end": "2026-10-09",
+                    "exam_date": "2026-11-14",
+                    "result_date": "2026-12-16"
+                }
+            ],
+            "SQL개발자(SQLD)": [
+                {
+                    "round": "57회",
+                    "exam_type": "필기",
+                    "application_start": "2026-01-26",
+                    "application_end": "2026-02-06",
+                    "exam_date": "2026-02-28",
+                    "result_date": "2026-03-27"
+                },
+                {
+                    "round": "58회",
+                    "exam_type": "필기",
+                    "application_start": "2026-04-06",
+                    "application_end": "2026-04-17",
+                    "exam_date": "2026-05-16",
+                    "result_date": "2026-06-12"
+                },
+                {
+                    "round": "59회",
+                    "exam_type": "필기",
+                    "application_start": "2026-07-06",
+                    "application_end": "2026-07-17",
+                    "exam_date": "2026-08-29",
+                    "result_date": "2026-09-25"
+                },
+                {
+                    "round": "60회",
+                    "exam_type": "필기",
+                    "application_start": "2026-10-05",
+                    "application_end": "2026-10-16",
+                    "exam_date": "2026-11-14",
+                    "result_date": "2026-12-11"
+                }
+            ],
+            "네트워크관리사 2급": [
+                {
+                    "round": "25-1회",
+                    "exam_type": "필기",
+                    "application_start": "2026-02-09",
+                    "application_end": "2026-02-20",
+                    "exam_date": "2026-03-21",
+                    "result_date": "2026-04-03"
+                },
+                {
+                    "round": "25-1회",
+                    "exam_type": "실기",
+                    "application_start": "2026-04-06",
+                    "application_end": "2026-04-17",
+                    "exam_date": "2026-05-23",
+                    "result_date": "2026-06-12"
+                },
+                {
+                    "round": "25-2회",
+                    "exam_type": "필기",
+                    "application_start": "2026-05-11",
+                    "application_end": "2026-05-22",
+                    "exam_date": "2026-06-20",
+                    "result_date": "2026-07-03"
+                },
+                {
+                    "round": "25-2회",
+                    "exam_type": "실기",
+                    "application_start": "2026-07-13",
+                    "application_end": "2026-07-24",
+                    "exam_date": "2026-08-29",
+                    "result_date": "2026-09-18"
+                },
+                {
+                    "round": "25-3회",
+                    "exam_type": "필기",
+                    "application_start": "2026-08-31",
+                    "application_end": "2026-09-11",
+                    "exam_date": "2026-10-17",
+                    "result_date": "2026-10-30"
+                },
+                {
+                    "round": "25-3회",
+                    "exam_type": "실기",
+                    "application_start": "2026-11-02",
+                    "application_end": "2026-11-13",
+                    "exam_date": "2026-12-12",
+                    "result_date": "2026-12-25"
+                },
+                {
+                    "round": "25-4회",
+                    "exam_type": "필기",
+                    "application_start": "2026-11-16",
+                    "application_end": "2026-11-27",
+                    "exam_date": "2026-12-19",
+                    "result_date": "2027-01-08"
+                },
+                {
+                    "round": "25-4회",
+                    "exam_type": "실기",
+                    "application_start": "2027-01-11",
+                    "application_end": "2027-01-22",
+                    "exam_date": "2027-02-27",
+                    "result_date": "2027-03-19"
+                }
+            ],
+            "리눅스마스터 2급": [
+                {
+                    "round": "2601회",
+                    "exam_type": "1차",
+                    "application_start": "2026-01-05",
+                    "application_end": "2026-01-20",
+                    "exam_date": "2026-01-27",
+                    "result_date": "2026-02-10"
+                },
+                {
+                    "round": "2601회",
+                    "exam_type": "2차",
+                    "application_start": "2026-03-16",
+                    "application_end": "2026-03-31",
+                    "exam_date": "2026-04-06",
+                    "result_date": "2026-05-08"
+                },
+                {
+                    "round": "2602회",
+                    "exam_type": "1차",
+                    "application_start": "2026-07-06",
+                    "application_end": "2026-07-21",
+                    "exam_date": "2026-07-27",
+                    "result_date": "2026-08-10"
+                },
+                {
+                    "round": "2602회",
+                    "exam_type": "2차",
+                    "application_start": "2026-09-14",
+                    "application_end": "2026-09-29",
+                    "exam_date": "2026-10-05",
+                    "result_date": "2026-11-06"
+                }
+            ]
+        }
+
         # 각 자격증에 일정 정보 추가
         for cert in qnet_certs:
             cert_name = cert["name"]
@@ -391,6 +699,17 @@ class CertificationScraper:
                 cert["schedules_2025"] = []
                 for schedule in schedules_2025[cert_name]:
                     cert["schedules_2025"].append({
+                        "round": schedule["round"],
+                        "exam_type": schedule["exam_type"],
+                        "application_start": datetime.strptime(schedule["application_start"], "%Y-%m-%d").date(),
+                        "application_end": datetime.strptime(schedule["application_end"], "%Y-%m-%d").date(),
+                        "exam_date": datetime.strptime(schedule["exam_date"], "%Y-%m-%d").date(),
+                        "result_date": datetime.strptime(schedule["result_date"], "%Y-%m-%d").date()
+                    })
+            if cert_name in schedules_2026:
+                cert["schedules_2026"] = []
+                for schedule in schedules_2026[cert_name]:
+                    cert["schedules_2026"].append({
                         "round": schedule["round"],
                         "exam_type": schedule["exam_type"],
                         "application_start": datetime.strptime(schedule["application_start"], "%Y-%m-%d").date(),
@@ -435,6 +754,26 @@ class CertificationScraper:
                         "result_date": date(2025, 1, 1),
                         "note": "필기 합격 후 2년 내 응시 가능"
                     }
+                ],
+                "schedules_2026": [
+                    {
+                        "round": "상시",
+                        "exam_type": "필기",
+                        "application_start": date(2026, 1, 1),
+                        "application_end": date(2026, 12, 31),
+                        "exam_date": date(2026, 1, 1),
+                        "result_date": date(2026, 1, 1),
+                        "note": "매주 토요일 시행 (상시시험)"
+                    },
+                    {
+                        "round": "상시",
+                        "exam_type": "실기",
+                        "application_start": date(2026, 1, 1),
+                        "application_end": date(2026, 12, 31),
+                        "exam_date": date(2026, 1, 1),
+                        "result_date": date(2026, 1, 1),
+                        "note": "필기 합격 후 2년 내 응시 가능"
+                    }
                 ]
             },
             {
@@ -467,6 +806,26 @@ class CertificationScraper:
                         "result_date": date(2025, 1, 1),
                         "note": "필기 합격 후 2년 내 응시 가능"
                     }
+                ],
+                "schedules_2026": [
+                    {
+                        "round": "상시",
+                        "exam_type": "필기",
+                        "application_start": date(2026, 1, 1),
+                        "application_end": date(2026, 12, 31),
+                        "exam_date": date(2026, 1, 1),
+                        "result_date": date(2026, 1, 1),
+                        "note": "매주 토요일 시행 (상시시험)"
+                    },
+                    {
+                        "round": "상시",
+                        "exam_type": "실기",
+                        "application_start": date(2026, 1, 1),
+                        "application_end": date(2026, 12, 31),
+                        "exam_date": date(2026, 1, 1),
+                        "result_date": date(2026, 1, 1),
+                        "note": "필기 합격 후 2년 내 응시 가능"
+                    }
                 ]
             },
             {
@@ -497,6 +856,26 @@ class CertificationScraper:
                         "application_end": date(2025, 12, 31),
                         "exam_date": date(2025, 1, 1),
                         "result_date": date(2025, 1, 1),
+                        "note": "필기 합격 후 2년 내 응시 가능"
+                    }
+                ],
+                "schedules_2026": [
+                    {
+                        "round": "상시",
+                        "exam_type": "필기",
+                        "application_start": date(2026, 1, 1),
+                        "application_end": date(2026, 12, 31),
+                        "exam_date": date(2026, 1, 1),
+                        "result_date": date(2026, 1, 1),
+                        "note": "매주 토요일 시행 (상시시험)"
+                    },
+                    {
+                        "round": "상시",
+                        "exam_type": "실기",
+                        "application_start": date(2026, 1, 1),
+                        "application_end": date(2026, 12, 31),
+                        "exam_date": date(2026, 1, 1),
+                        "result_date": date(2026, 1, 1),
                         "note": "필기 합격 후 2년 내 응시 가능"
                     }
                 ]

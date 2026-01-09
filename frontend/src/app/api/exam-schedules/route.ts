@@ -252,7 +252,7 @@ async function fetchSocialWorkerData(year: string) {
   const examSchedules = [
     { year: 2024, round: 22, date: '2024-02-03', reg: ['2023-12-04', '2023-12-08'] },
     { year: 2025, round: 23, date: '2025-02-08', reg: ['2024-12-09', '2024-12-13'] },
-    { year: 2026, round: 24, date: '2026-01-17', reg: ['2025-12-01', '2025-12-05'] }
+    { year: 2026, round: 19, date: '2026-01-17', reg: ['2025-12-15', '2025-12-19'] }  // Round 19, 1월 17일
   ];
 
   return examSchedules
@@ -413,7 +413,7 @@ function getExamStatus(
 
 // 샘플 데이터 (API 실패시 백업용)
 function getSampleData(year: string) {
-  return [
+  const samples = [
     {
       id: `sample-1-${year}`,
       examName: '정보처리기사 1회 필기',
@@ -431,4 +431,26 @@ function getSampleData(year: string) {
       applicationUrl: 'https://www.q-net.or.kr'
     }
   ];
+
+  // Add Social Worker exam for 2026
+  if (year === '2026') {
+    samples.push({
+      id: 'kasw-2026-19',
+      examName: '사회복지사 1급 19회',
+      examType: 'written',
+      category: '사회복지',
+      organization: '한국사회복지사협회',
+      examDate: '2026-01-17',
+      registrationStartDate: '2025-12-15',
+      registrationEndDate: '2025-12-19',
+      resultDate: '2026-03-03',
+      location: '전국 동시 시행',
+      fee: 65000,
+      status: 'upcoming',
+      detailUrl: 'https://www.welfare.net',
+      applicationUrl: 'https://lic.welfare.net'
+    });
+  }
+
+  return samples;
 }

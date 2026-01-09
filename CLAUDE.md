@@ -79,3 +79,19 @@ This project uses the BMad Method for structured development. Access workflows v
 ## Sprint Artifacts
 
 Development artifacts are stored in `docs/sprint-artifacts/`.
+
+## 코드 수정 프로토콜 (엄격 모드)
+
+**모든 코드 수정 후 아래 절차를 반드시 수행:**
+
+1. `cat [수정한 파일]` 로 변경사항 저장 확인
+2. 관련 캐시 디렉토리 전체 삭제
+3. 실행 중인 관련 프로세스 모두 종료 (`pkill -f` 또는 `lsof -i:[포트]`)
+4. 클린 빌드 실행
+5. 서버 새로 시작
+6. 테스트 실행
+
+**절대 하지 말 것:**
+- 파일 수정 후 바로 "수정 완료"라고 보고하지 말 것
+- 캐시 클리어 없이 테스트하지 말 것
+- 이전 프로세스가 실행 중인 상태에서 테스트하지 말 것

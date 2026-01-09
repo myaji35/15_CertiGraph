@@ -13,17 +13,20 @@ export default function NewStudySetPage() {
   const [certificationId, setCertificationId] = useState('');
   const [examDateId, setExamDateId] = useState('');
   const [userSubscription, setUserSubscription] = useState<any>(null);
+  const [certifications, setCertifications] = useState<any[]>([]);
+  const [selectedCertification, setSelectedCertification] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
     fetchUserSubscription();
+    fetchCertifications();
   }, []);
 
   const fetchUserSubscription = async () => {
     try {
       const token = await getToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/subscriptions/me`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/subscriptions/my-subscriptions`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -31,14 +34,32 @@ export default function NewStudySetPage() {
 
       if (response.ok) {
         const data = await response.json();
-        if (data.subscription && data.subscription.certification_id) {
-          setCertificationId(data.subscription.certification_id);
-          setExamDateId(data.subscription.exam_date_id || '');
-          setUserSubscription(data.subscription);
+        // Get the first active subscription
+        if (data.subscriptions && data.subscriptions.length > 0) {
+          const subscription = data.subscriptions[0];
+          setUserSubscription(subscription);
+
+          // For non-VIP users, set certification from subscription
+          if (subscription.id !== 'vip-pass') {
+            setCertificationId(subscription.certification_id);
+            setExamDateId(subscription.exam_date || '');
+          }
         }
       }
     } catch (err) {
       console.error('Error fetching user subscription:', err);
+    }
+  };
+
+  const fetchCertifications = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/certifications`);
+      if (response.ok) {
+        const data = await response.json();
+        setCertifications(data.certifications || []);
+      }
+    } catch (err) {
+      console.error('Error fetching certifications:', err);
     }
   };
 
@@ -50,8 +71,17 @@ export default function NewStudySetPage() {
       return;
     }
 
-    if (!certificationId) {
-      setError('이용권이 필요합니다. 먼저 이용권을 구매해주세요.');
+    // For VIP users, use selected certification, otherwise use subscription certification
+    const finalCertificationId = userSubscription?.id === 'vip-pass'
+      ? selectedCertification
+      : certificationId;
+
+    if (!finalCertificationId) {
+      if (userSubscription?.id === 'vip-pass') {
+        setError('자격증을 선택해주세요.');
+      } else {
+        setError('이용권이 필요합니다. 먼저 이용권을 구매해주세요.');
+      }
       return;
     }
 
@@ -60,19 +90,18 @@ export default function NewStudySetPage() {
       setError('');
 
       const token = await getToken();
-      const formData = new FormData();
-      formData.append('name', name);
-      if (description) {
-        formData.append('description', description);
-      }
-      formData.append('certification_id', certificationId);
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/study-sets/create`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/study-sets`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        body: formData,
+        body: JSON.stringify({
+          name: name,
+          description: description || '',
+          certification_id: finalCertificationId,
+        }),
       });
 
       if (!response.ok) {
@@ -84,7 +113,7 @@ export default function NewStudySetPage() {
       console.log('Study set created:', data);
 
       // Redirect to study set detail page to add materials
-      router.push(`/study-sets/${data.study_set.id}`);
+      router.push(`/dashboard/study-sets/${data.study_set.id}`);
     } catch (err: any) {
       console.error('Create study set error:', err);
       setError(err.message || '문제집 생성 중 오류가 발생했습니다.');
@@ -148,18 +177,55 @@ export default function NewStudySetPage() {
 
         {/* Subscription Info */}
         {userSubscription ? (
-          <div className="bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-700 rounded-lg p-6">
-            <h3 className="font-medium text-green-900 dark:text-green-100 mb-2">
-              ✓ 이용권 정보
-            </h3>
-            <div className="space-y-1 text-sm text-green-700 dark:text-green-300">
-              <p>자격증: {userSubscription.certification_name || '로딩 중...'}</p>
-              <p>시험일: {userSubscription.exam_date || '로딩 중...'}</p>
+          userSubscription.id === 'vip-pass' ? (
+            // VIP Pass Display
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-2 border-purple-300 dark:border-purple-700 rounded-lg p-6">
+              <h3 className="font-medium text-purple-900 dark:text-purple-100 mb-2">
+                👑 VIP 무료 이용권
+              </h3>
+              <div className="space-y-1 text-sm text-purple-700 dark:text-purple-300">
+                <p>모든 자격증을 무제한으로 이용할 수 있습니다</p>
+                <p>상태: 활성화됨</p>
+              </div>
+              <p className="mt-3 text-sm text-purple-600 dark:text-purple-400">
+                VIP 회원님은 모든 기능을 자유롭게 이용하실 수 있습니다
+              </p>
+
+              {/* Certification Selection for VIP */}
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-purple-900 dark:text-purple-100 mb-2">
+                  자격증 선택
+                </label>
+                <select
+                  value={selectedCertification}
+                  onChange={(e) => setSelectedCertification(e.target.value)}
+                  className="w-full px-3 py-2 border border-purple-300 dark:border-purple-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  required
+                >
+                  <option value="">자격증을 선택하세요</option>
+                  {certifications.map((cert) => (
+                    <option key={cert.id} value={cert.id}>
+                      {cert.name} - {cert.organization}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
-            <p className="mt-3 text-sm text-green-600 dark:text-green-400">
-              이 정보로 문제집이 자동 생성됩니다
-            </p>
-          </div>
+          ) : (
+            // Regular Subscription Display
+            <div className="bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-700 rounded-lg p-6">
+              <h3 className="font-medium text-green-900 dark:text-green-100 mb-2">
+                ✓ 이용권 정보
+              </h3>
+              <div className="space-y-1 text-sm text-green-700 dark:text-green-300">
+                <p>자격증: {userSubscription.certification_name || '로딩 중...'}</p>
+                <p>시험일: {userSubscription.exam_date || '로딩 중...'}</p>
+              </div>
+              <p className="mt-3 text-sm text-green-600 dark:text-green-400">
+                이 정보로 문제집이 자동 생성됩니다
+              </p>
+            </div>
+          )
         ) : (
           <div className="bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-300 dark:border-yellow-700 rounded-lg p-6">
             <h3 className="font-medium text-yellow-900 dark:text-yellow-100 mb-2">
@@ -195,7 +261,9 @@ export default function NewStudySetPage() {
               <Book className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
               <div>
                 <p className="font-medium text-blue-900 dark:text-blue-100">
-                  {name}:{userSubscription.certification_name}_{userSubscription.exam_date?.split('T')[0]}
+                  {userSubscription.id === 'vip-pass'
+                    ? `${name}:${certifications.find(c => c.id === selectedCertification)?.name || '선택된 자격증'}`
+                    : `${name}:${userSubscription.certification_name}_{userSubscription.exam_date?.split('T')[0]}`}
                 </p>
                 <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
                   학습자료 0개 · 문제 0개
@@ -216,7 +284,7 @@ export default function NewStudySetPage() {
           </button>
           <button
             type="submit"
-            disabled={loading || !name || !userSubscription}
+            disabled={loading || !name || !userSubscription || (userSubscription?.id === 'vip-pass' && !selectedCertification)}
             className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
           >
             {loading ? (

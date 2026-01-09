@@ -32,6 +32,9 @@ export function CalendarView() {
     setLoading(true);
     try {
       const data = await getMonthlyCalendar(currentYear, currentMonth);
+      console.log(`[Calendar Debug] Loaded data for ${currentYear}/${currentMonth}:`, data);
+      console.log('[Calendar Debug] Calendar object:', data.calendar);
+      console.log('[Calendar Debug] Day 17 data:', data.calendar?.['17']);
       setCalendarData(data);
     } catch (error) {
       console.error('Failed to load calendar:', error);
@@ -80,7 +83,15 @@ export function CalendarView() {
 
     // Days of the month
     for (let day = 1; day <= daysInMonth; day++) {
-      const exams = calendarData?.calendar[day] || [];
+      const exams = calendarData?.calendar[day.toString()] || [];
+      if (day === 17 && currentYear === 2026 && currentMonth === 1) {
+        console.log(`[Calendar Debug] Rendering day ${day}:`, {
+          examsCount: exams.length,
+          exams: exams,
+          calendarDataExists: !!calendarData,
+          calendarObjectKeys: calendarData?.calendar ? Object.keys(calendarData.calendar) : 'null'
+        });
+      }
       const isToday =
         currentYear === today.getFullYear() &&
         currentMonth === today.getMonth() + 1 &&

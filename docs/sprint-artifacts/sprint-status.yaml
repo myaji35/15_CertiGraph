@@ -1,0 +1,84 @@
+# generated: 2025-01-05
+# project: 15_CertiGraph
+# project_key: ExamsGram
+# tracking_system: file-system
+# story_location: {project-root}/docs/sprint-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic exists in epic file but not contexted
+#   - contexted or in-progress
+#   - done: Epic completed
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - drafted: Story file created in stories folder by *create-story
+#   - ready-for-dev: Draft approved and story context created by *story-ready
+#   - in-progress: Developer actively working on implementation by *dev-story
+#   - review: Implementation complete, ready for review by *code-review
+#   - done: Story completed by *story-done
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - completed: Retrospective has been done by *retrospective
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epics should be marked `in-progress` before stories can be marked beyond `backlog`
+# - SM typically drafts next story ONLY after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', dev reviews, then Dev moves to 'done'
+
+generated: 2025-01-05
+project: 15_CertiGraph
+project_key: ExamsGram
+tracking_system: file-system
+story_location: docs/sprint-artifacts
+
+development_status:
+  # Epic 1: Foundation & Authentication (6 stories)
+  epic-1: backlog
+  1-1-project-initialization-monorepo-setup: backlog
+  1-2-clerk-supabase-database-setup: backlog
+  1-3-frontend-authentication-ui-clerk: backlog
+  1-4-clerk-auth-integration-user-sync: backlog
+  1-5-backend-auth-middleware-clerk-jwt: backlog
+  1-6-protected-dashboard-layout: backlog
+  epic-1-retrospective: optional
+
+  # Epic 2: Study Set & Material Management (10 stories)
+  epic-2: backlog
+  2-1-study-set-creation-form: backlog
+  2-1a-study-set-list-edit-ui: backlog
+  2-2-study-set-crud-api: backlog
+  2-3-study-set-detail-page-view-materials: backlog
+  2-3a-study-material-upload-modal: backlog
+  2-4-study-material-upload-api: backlog
+  2-5-upstage-document-parse-integration: backlog
+  2-6-question-extraction-intelligent-chunking: backlog
+  2-7-vector-embedding-pinecone-storage: backlog
+  2-8-knowledge-graph-construction: backlog
+  epic-2-retrospective: optional
+
+  # Epic 3: CBT Test Engine (5 stories)
+  epic-3: backlog
+  3-1-test-configuration-modal: backlog
+  3-1a-test-session-creation-api: backlog
+  3-2-cbt-test-interface: backlog
+  3-3-answer-submission-scoring: backlog
+  3-4-test-result-review-page: backlog
+  3-5-wrong-answer-retest-mode: backlog
+  epic-3-retrospective: optional
+
+  # Epic 4: Analysis & Dashboard (4 stories)
+  epic-4: backlog
+  4-1-weak-concept-analysis-api: backlog
+  4-2-weak-concept-analysis-ui: backlog
+  4-3-learning-dashboard: backlog
+  4-4-user-progress-tracking-neo4j: backlog
+  epic-4-retrospective: optional
+
+  # Epic 5: Payment & Subscription (1 story)
+  epic-5: backlog
+  5-1-payment-gateway-integration-toss-payments: backlog
+  epic-5-retrospective: optional

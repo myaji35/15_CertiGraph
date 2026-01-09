@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter, useParams } from 'next/navigation';
-import { ArrowLeft, Upload, FileText, Trash2, Calendar, BookOpen, ChevronUpIcon, ChevronDownIcon, Network, X } from 'lucide-react';
+import { ArrowLeft, Upload, FileText, Trash2, Calendar, BookOpen, ChevronUpIcon, ChevronDownIcon, Network, X, RefreshCw, ChevronRight } from 'lucide-react';
 
 interface StudyMaterial {
   id: string;
@@ -13,6 +13,13 @@ interface StudyMaterial {
   status: string;
   total_questions: number;
   processing_progress: number;
+  processing_error?: string;
+  processing_logs?: Array<{
+    timestamp: string;
+    progress: number;
+    message: string;
+    status: string;
+  }>;
   created_at: string;
   graphrag_status?: string; // 'not_started' | 'processing' | 'completed' | 'failed'
   graphrag_progress?: number;
@@ -43,6 +50,8 @@ export default function StudySetDetailPage() {
   const [questionModalOpen, setQuestionModalOpen] = useState(false);
   const [currentMaterial, setCurrentMaterial] = useState<StudyMaterial | null>(null);
   const [currentQuestions, setCurrentQuestions] = useState<any[]>([]);
+  const [expandedLogs, setExpandedLogs] = useState<Set<string>>(new Set());
+  const [retryingMaterials, setRetryingMaterials] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetchStudySetAndMaterials();
@@ -76,6 +85,8 @@ export default function StudySetDetailPage() {
 
       if (materialsResponse.ok) {
         const materialsData = await materialsResponse.json();
+        console.log('📊 Materials data:', materialsData);
+        console.log('📊 Materials status:', materialsData.materials?.map((m: any) => ({ id: m.id, title: m.title, status: m.status })));
         setMaterials(materialsData.materials || []);
       }
     } catch (error) {
@@ -292,6 +303,69 @@ export default function StudySetDetailPage() {
     }
   };
 
+  const handleRetryMaterial = async (materialId: string) => {
+    if (!confirm('이 학습자료를 재처리하시겠습니까?')) {
+      return;
+    }
+
+    try {
+      setRetryingMaterials(prev => new Set(prev).add(materialId));
+      const token = await getToken();
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/study-materials/${materialId}/retry`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || '재처리를 시작할 수 없습니다.');
+      }
+
+      // Update local state to show processing
+      setMaterials(prev => prev.map(m =>
+        m.id === materialId
+          ? { ...m, status: 'processing', processing_progress: 0, processing_error: undefined }
+          : m
+      ));
+
+      // Refresh data after a short delay to get updated status
+      setTimeout(() => {
+        fetchStudySetAndMaterials();
+        setRetryingMaterials(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(materialId);
+          return newSet;
+        });
+      }, 2000);
+
+      alert('학습자료 재처리가 시작되었습니다.');
+    } catch (error: any) {
+      console.error('Retry error:', error);
+      alert(error.message || '재처리 중 오류가 발생했습니다.');
+      setRetryingMaterials(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(materialId);
+        return newSet;
+      });
+    }
+  };
+
+  const toggleLogExpansion = (materialId: string) => {
+    const newExpanded = new Set(expandedLogs);
+    if (newExpanded.has(materialId)) {
+      newExpanded.delete(materialId);
+    } else {
+      newExpanded.add(materialId);
+    }
+    setExpandedLogs(newExpanded);
+  };
+
   if (loading) {
     return (
       <div className="max-w-5xl mx-auto px-6 py-8">
@@ -437,17 +511,18 @@ export default function StudySetDetailPage() {
                   const isSelected = selectedMaterials.has(material.id);
 
                   return (
-                    <tr
-                      key={material.id}
-                      className={`${isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-900/50'} transition-colors cursor-pointer`}
-                      onClick={(e) => {
-                        // 체크박스나 버튼 클릭시에는 모달 열지 않음
-                        if ((e.target as HTMLElement).closest('input, button')) return;
-                        if (material.status === 'completed' && material.total_questions > 0) {
-                          handleViewQuestions(material);
-                        }
-                      }}
-                    >
+                    <>
+                      <tr
+                        key={material.id}
+                        className={`${isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-900/50'} transition-colors cursor-pointer`}
+                        onClick={(e) => {
+                          // 체크박스나 버튼 클릭시에는 모달 열지 않음
+                          if ((e.target as HTMLElement).closest('input, button')) return;
+                          if (material.status === 'completed' && material.total_questions > 0) {
+                            handleViewQuestions(material);
+                          }
+                        }}
+                      >
                         <td className="px-4 py-3">
                           <input
                             type="checkbox"
@@ -503,28 +578,59 @@ export default function StudySetDetailPage() {
                           </span>
                         </td>
                         <td className="px-4 py-3">
-                          {material.status === 'processing' ? (
-                            <div className="flex items-center gap-2">
-                              <div className="w-20 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div
-                                  className="bg-blue-600 h-2 rounded-full transition-all"
-                                  style={{ width: `${material.processing_progress}%` }}
-                                ></div>
+                          <div className="flex flex-col gap-1">
+                            {material.status === 'processing' ? (
+                              <div className="flex items-center gap-2">
+                                <div className="w-20 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                  <div
+                                    className="bg-blue-600 h-2 rounded-full transition-all"
+                                    style={{ width: `${material.processing_progress}%` }}
+                                  ></div>
+                                </div>
+                                <span className="text-xs text-gray-500">{material.processing_progress}%</span>
                               </div>
-                              <span className="text-xs text-gray-500">{material.processing_progress}%</span>
-                            </div>
-                          ) : material.status === 'completed' ? (
-                            <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-green-700 bg-green-100 rounded-full dark:bg-green-900/20 dark:text-green-400">
-                              완료
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-yellow-700 bg-yellow-100 rounded-full dark:bg-yellow-900/20 dark:text-yellow-400">
-                              {material.status}
-                            </span>
-                          )}
+                            ) : material.status === 'completed' ? (
+                              <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-green-700 bg-green-100 rounded-full dark:bg-green-900/20 dark:text-green-400">
+                                완료
+                              </span>
+                            ) : material.status === 'failed' ? (
+                              <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-red-700 bg-red-100 rounded-full dark:bg-red-900/20 dark:text-red-400">
+                                실패
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-yellow-700 bg-yellow-100 rounded-full dark:bg-yellow-900/20 dark:text-yellow-400">
+                                {material.status}
+                              </span>
+                            )}
+                            {(material.processing_logs && material.processing_logs.length > 0) && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleLogExpansion(material.id);
+                                }}
+                                className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                              >
+                                <ChevronRight className={`w-3 h-3 transition-transform ${expandedLogs.has(material.id) ? 'rotate-90' : ''}`} />
+                                처리 로그
+                              </button>
+                            )}
+                          </div>
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center justify-center gap-1">
+                            {/* DEBUG: Always show retry button */}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                console.log('🔄 Retry clicked for material:', material.id, 'Status:', material.status);
+                                handleRetryMaterial(material.id);
+                              }}
+                              disabled={retryingMaterials.has(material.id)}
+                              className="p-1.5 text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              title={`재처리 (상태: ${material.status})`}
+                            >
+                              <RefreshCw className={`w-4 h-4 ${retryingMaterials.has(material.id) ? 'animate-spin' : ''}`} />
+                            </button>
                             {material.status === 'completed' && material.total_questions > 0 && (
                               <>
                                 {(!material.graphrag_status || material.graphrag_status === 'not_started') && (
@@ -548,7 +654,10 @@ export default function StudySetDetailPage() {
                               </>
                             )}
                             <button
-                              onClick={() => handleDeleteMaterial(material.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteMaterial(material.id);
+                              }}
                               className="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                               title="삭제"
                             >
@@ -557,6 +666,51 @@ export default function StudySetDetailPage() {
                           </div>
                         </td>
                       </tr>
+                      {/* Processing Logs Row */}
+                      {expandedLogs.has(material.id) && material.processing_logs && material.processing_logs.length > 0 && (
+                        <tr className="bg-gray-50 dark:bg-gray-900/50">
+                          <td colSpan={8} className="px-4 py-3">
+                            <div className="ml-8">
+                              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">처리 로그</h4>
+                              <div className="space-y-2">
+                                {material.processing_logs.map((log, logIdx) => (
+                                  <div key={logIdx} className="flex items-start gap-3 text-xs">
+                                    <span className="text-gray-500 dark:text-gray-400 font-mono">
+                                      {new Date(log.timestamp).toLocaleTimeString('ko-KR')}
+                                    </span>
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-2">
+                                        <div className="w-16 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                                          <div
+                                            className={`h-1.5 rounded-full transition-all ${log.status === 'failed' ? 'bg-red-600' :
+                                              log.status === 'completed' ? 'bg-green-600' :
+                                                'bg-blue-600'
+                                              }`}
+                                            style={{ width: `${log.progress}%` }}
+                                          ></div>
+                                        </div>
+                                        <span className="text-gray-500 dark:text-gray-400">{log.progress}%</span>
+                                      </div>
+                                      <p className={`mt-1 ${log.status === 'failed' ? 'text-red-600 dark:text-red-400' :
+                                        'text-gray-700 dark:text-gray-300'
+                                        }`}>
+                                        {log.message}
+                                      </p>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                              {material.processing_error && (
+                                <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                                  <p className="text-xs font-semibold text-red-700 dark:text-red-300 mb-1">❌ 오류</p>
+                                  <p className="text-xs text-red-600 dark:text-red-400">{material.processing_error}</p>
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </>
                   );
                 })}
               </tbody>
@@ -629,11 +783,10 @@ export default function StudySetDetailPage() {
                         {q.options && q.options.map((opt: any) => (
                           <div
                             key={opt.number}
-                            className={`p-3 rounded-lg ${
-                              opt.number === q.correct_answer
-                                ? 'bg-green-50 dark:bg-green-900/20 border-2 border-green-400 dark:border-green-600'
-                                : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700'
-                            }`}
+                            className={`p-3 rounded-lg ${opt.number === q.correct_answer
+                              ? 'bg-green-50 dark:bg-green-900/20 border-2 border-green-400 dark:border-green-600'
+                              : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700'
+                              }`}
                           >
                             <p className="text-sm text-gray-800 dark:text-gray-200 flex items-center justify-between">
                               <span>{opt.text}</span>

@@ -55,7 +55,7 @@ export default function KnowledgeGraphPage() {
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
   const graphRef = useRef<any>(null);
 
-  // Generate sample data
+  // Fetch knowledge graph data from backend API
   useEffect(() => {
     const generateSampleData = (): GraphData => {
       const chapters = [
@@ -153,8 +153,54 @@ export default function KnowledgeGraphPage() {
       return { nodes, links };
     };
 
-    const data = generateSampleData();
-    setGraphData(data);
+    const fetchKnowledgeGraph = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/v1/knowledge-graph', {
+          method: 'GET',
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          console.warn('Failed to fetch knowledge graph from API, using sample data');
+          const data = generateSampleData();
+          setGraphData(data);
+          return;
+        }
+
+        const result = await response.json();
+
+        // Transform backend data to GraphNode/GraphLink format
+        const transformedNodes: GraphNode[] = result.nodes.map((node: any) => ({
+          id: node.id,
+          name: node.label,
+          val: node.status === 'mastered' ? 30 : node.status === 'weak' ? 20 : 10,
+          color: getMasteryColor(node.accuracy || 0),
+          category: node.id.startsWith('concept_') ? 'concept' : 'topic',
+          mastery: node.accuracy || 0,
+          questions: node.questions_count || 0,
+          correct: Math.floor((node.accuracy || 0) * (node.questions_count || 0) / 100)
+        }));
+
+        const transformedLinks: GraphLink[] = result.edges.map((edge: any) => ({
+          source: edge.source,
+          target: edge.target,
+          value: edge.strength || 1
+        }));
+
+        setGraphData({
+          nodes: transformedNodes,
+          links: transformedLinks
+        });
+
+      } catch (error) {
+        console.error('Error fetching knowledge graph:', error);
+        // Fallback to sample data on error
+        const data = generateSampleData();
+        setGraphData(data);
+      }
+    };
+
+    fetchKnowledgeGraph();
 
     // Set dimensions
     if (typeof window !== 'undefined') {

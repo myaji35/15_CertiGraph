@@ -1,0 +1,255 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - heading "Question Card Component Test" [level=1] [ref=e3]
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e7]:
+          - generic [ref=e8]: Q1.
+          - paragraph [ref=e10]: 다음 중 사회복지실천의 원칙으로 올바르지 않은 것은?
+        - generic [ref=e11]:
+          - button "① 개별화의 원칙" [ref=e12] [cursor=pointer]:
+            - generic [ref=e14]:
+              - generic [ref=e15]: ①
+              - generic [ref=e16]: 개별화의 원칙
+          - button "② 의도적 감정표현의 원칙" [ref=e17] [cursor=pointer]:
+            - generic [ref=e19]:
+              - generic [ref=e20]: ②
+              - generic [ref=e21]: 의도적 감정표현의 원칙
+          - button "③ 통제된 정서적 관여의 원칙" [ref=e22] [cursor=pointer]:
+            - generic [ref=e24]:
+              - generic [ref=e25]: ③
+              - generic [ref=e26]: 통제된 정서적 관여의 원칙
+          - button "④ 판단적 태도의 원칙" [ref=e27] [cursor=pointer]:
+            - generic [ref=e29]:
+              - generic [ref=e30]: ④
+              - generic [ref=e31]: 판단적 태도의 원칙
+          - button "⑤ 비밀보장의 원칙" [ref=e32] [cursor=pointer]:
+            - generic [ref=e34]:
+              - generic [ref=e35]: ⑤
+              - generic [ref=e36]: 비밀보장의 원칙
+        - button "답을 선택하세요" [disabled] [ref=e37]
+      - generic [ref=e38]:
+        - generic [ref=e40]:
+          - generic [ref=e41]: Q2.
+          - paragraph [ref=e43]: 다음 중 정답을 선택하세요
+        - generic [ref=e44]:
+          - button "① 답 1" [ref=e45] [cursor=pointer]:
+            - generic [ref=e47]:
+              - generic [ref=e48]: ①
+              - generic [ref=e49]: 답 1
+          - button "② 답 2" [ref=e50] [cursor=pointer]:
+            - generic [ref=e52]:
+              - generic [ref=e53]: ②
+              - generic [ref=e54]: 답 2
+          - button "③ 답 3" [ref=e55] [cursor=pointer]:
+            - generic [ref=e57]:
+              - generic [ref=e58]: ③
+              - generic [ref=e59]: 답 3
+          - button "④ 답 4" [ref=e60] [cursor=pointer]:
+            - generic [ref=e62]:
+              - generic [ref=e63]: ④
+              - generic [ref=e64]: 답 4
+          - button "⑤ 답 5" [ref=e65] [cursor=pointer]:
+            - generic [ref=e67]:
+              - generic [ref=e68]: ⑤
+              - generic [ref=e69]: 답 5
+        - button "답을 선택하세요" [disabled] [ref=e70]
+      - generic [ref=e71]:
+        - generic [ref=e73]:
+          - generic [ref=e74]: Q3.
+          - paragraph [ref=e76]: Interactive question for selection test
+        - generic [ref=e77]:
+          - button "① Option A" [ref=e78] [cursor=pointer]:
+            - generic [ref=e80]:
+              - generic [ref=e81]: ①
+              - generic [ref=e82]: Option A
+          - button "② Option B" [ref=e83] [cursor=pointer]:
+            - generic [ref=e85]:
+              - generic [ref=e86]: ②
+              - generic [ref=e87]: Option B
+          - button "③ Option C" [ref=e88] [cursor=pointer]:
+            - generic [ref=e90]:
+              - generic [ref=e91]: ③
+              - generic [ref=e92]: Option C
+          - button "④ Option D" [ref=e93] [cursor=pointer]:
+            - generic [ref=e95]:
+              - generic [ref=e96]: ④
+              - generic [ref=e97]: Option D
+        - button "답을 선택하세요" [disabled] [ref=e98]
+      - generic [ref=e99]:
+        - generic [ref=e101]:
+          - generic [ref=e102]: Q4.
+          - paragraph [ref=e104]: Submit this question to see feedback
+        - generic [ref=e105]:
+          - button "① Wrong" [ref=e106] [cursor=pointer]:
+            - generic [ref=e108]:
+              - generic [ref=e109]: ①
+              - generic [ref=e110]: Wrong
+          - button "② Wrong" [ref=e111] [cursor=pointer]:
+            - generic [ref=e113]:
+              - generic [ref=e114]: ②
+              - generic [ref=e115]: Wrong
+          - button "③ Correct" [ref=e116] [cursor=pointer]:
+            - generic [ref=e118]:
+              - generic [ref=e119]: ③
+              - generic [ref=e120]: Correct
+          - button "④ Wrong" [ref=e121] [cursor=pointer]:
+            - generic [ref=e123]:
+              - generic [ref=e124]: ④
+              - generic [ref=e125]: Wrong
+        - button "답을 선택하세요" [disabled] [ref=e126]
+      - generic [ref=e127]:
+        - generic [ref=e129]:
+          - generic [ref=e130]: Q2.
+          - paragraph [ref=e132]:
+            - strong [ref=e133]: Markdown Test
+            - text: ": This question uses"
+            - emphasis [ref=e134]: italic
+            - text: and
+            - strong [ref=e135]: bold
+            - text: formatting with
+            - code [ref=e136]: code
+            - text: elements.
+        - generic [ref=e137]:
+          - button "① Option 1" [ref=e138] [cursor=pointer]:
+            - generic [ref=e140]:
+              - generic [ref=e141]: ①
+              - generic [ref=e142]: Option 1
+          - button "② Option 2" [ref=e143] [cursor=pointer]:
+            - generic [ref=e145]:
+              - generic [ref=e146]: ②
+              - generic [ref=e147]: Option 2
+          - button "③ Option 3" [ref=e148] [cursor=pointer]:
+            - generic [ref=e150]:
+              - generic [ref=e151]: ③
+              - generic [ref=e152]: Option 3
+          - button "④ Option 4" [ref=e153] [cursor=pointer]:
+            - generic [ref=e155]:
+              - generic [ref=e156]: ④
+              - generic [ref=e157]: Option 4
+          - button "⑤ Option 5" [ref=e158] [cursor=pointer]:
+            - generic [ref=e160]:
+              - generic [ref=e161]: ⑤
+              - generic [ref=e162]: Option 5
+        - button "답을 선택하세요" [disabled] [ref=e163]
+      - generic [ref=e164]:
+        - generic [ref=e166]:
+          - generic [ref=e167]: Q999.
+          - paragraph [ref=e169]: Check the question number display
+        - generic [ref=e170]:
+          - button "① A" [ref=e171] [cursor=pointer]:
+            - generic [ref=e173]:
+              - generic [ref=e174]: ①
+              - generic [ref=e175]: A
+          - button "② B" [ref=e176] [cursor=pointer]:
+            - generic [ref=e178]:
+              - generic [ref=e179]: ②
+              - generic [ref=e180]: B
+          - button "③ C" [ref=e181] [cursor=pointer]:
+            - generic [ref=e183]:
+              - generic [ref=e184]: ③
+              - generic [ref=e185]: C
+          - button "④ D" [ref=e186] [cursor=pointer]:
+            - generic [ref=e188]:
+              - generic [ref=e189]: ④
+              - generic [ref=e190]: D
+        - button "답을 선택하세요" [disabled] [ref=e191]
+      - generic [ref=e192]:
+        - generic [ref=e194]:
+          - generic [ref=e195]: Q7.
+          - paragraph [ref=e197]: Submit to see the explanation
+        - generic [ref=e198]:
+          - button "① 답 1" [ref=e199] [cursor=pointer]:
+            - generic [ref=e201]:
+              - generic [ref=e202]: ①
+              - generic [ref=e203]: 답 1
+          - button "② 답 2" [ref=e204] [cursor=pointer]:
+            - generic [ref=e206]:
+              - generic [ref=e207]: ②
+              - generic [ref=e208]: 답 2
+          - button "③ 답 3" [ref=e209] [cursor=pointer]:
+            - generic [ref=e211]:
+              - generic [ref=e212]: ③
+              - generic [ref=e213]: 답 3
+          - button "④ 답 4" [ref=e214] [cursor=pointer]:
+            - generic [ref=e216]:
+              - generic [ref=e217]: ④
+              - generic [ref=e218]: 답 4
+        - button "답을 선택하세요" [disabled] [ref=e219]
+      - generic [ref=e220]:
+        - generic [ref=e222]:
+          - generic [ref=e223]: Q8.
+          - paragraph [ref=e225]: Try to change answer after submission
+        - generic [ref=e226]:
+          - button "① First ✗" [disabled] [ref=e227]:
+            - generic [ref=e228]:
+              - generic [ref=e229]:
+                - generic [ref=e230]: ①
+                - generic [ref=e231]: First
+              - generic [ref=e232]: ✗
+          - button "② Second ✓" [disabled] [ref=e233]:
+            - generic [ref=e234]:
+              - generic [ref=e235]:
+                - generic [ref=e236]: ②
+                - generic [ref=e237]: Second
+              - generic [ref=e238]: ✓
+          - button "③ Third" [disabled] [ref=e239]:
+            - generic [ref=e241]:
+              - generic [ref=e242]: ③
+              - generic [ref=e243]: Third
+          - button "④ Fourth" [disabled] [ref=e244]:
+            - generic [ref=e246]:
+              - generic [ref=e247]: ④
+              - generic [ref=e248]: Fourth
+        - generic [ref=e249]:
+          - heading "해설" [level=4] [ref=e250]
+          - paragraph [ref=e251]: Answer should be locked after submission
+        - generic [ref=e252]:
+          - generic [ref=e253]:
+            - generic [ref=e254]: ❌
+            - generic [ref=e255]: 틀렸습니다.
+          - paragraph [ref=e256]: "정답: ② Second"
+      - generic [ref=e257]:
+        - heading "Additional Test Cases" [level=2] [ref=e258]
+        - generic [ref=e259]:
+          - generic [ref=e261]:
+            - generic [ref=e262]: Q9.
+            - paragraph [ref=e264]: This question is already submitted (for testing submit state)
+          - generic [ref=e265]:
+            - button "① Option 1" [disabled] [ref=e266]:
+              - generic [ref=e268]:
+                - generic [ref=e269]: ①
+                - generic [ref=e270]: Option 1
+            - button "② Option 2" [disabled] [ref=e271]:
+              - generic [ref=e273]:
+                - generic [ref=e274]: ②
+                - generic [ref=e275]: Option 2
+            - button "③ Option 3 ✓" [disabled] [ref=e276]:
+              - generic [ref=e277]:
+                - generic [ref=e278]:
+                  - generic [ref=e279]: ③
+                  - generic [ref=e280]: Option 3
+                - generic [ref=e281]: ✓
+            - button "④ Option 4" [disabled] [ref=e282]:
+              - generic [ref=e284]:
+                - generic [ref=e285]: ④
+                - generic [ref=e286]: Option 4
+            - button "⑤ Option 5" [disabled] [ref=e287]:
+              - generic [ref=e289]:
+                - generic [ref=e290]: ⑤
+                - generic [ref=e291]: Option 5
+          - generic [ref=e292]:
+            - heading "해설" [level=4] [ref=e293]
+            - paragraph [ref=e294]: This explanation is visible immediately because the question is submitted.
+          - generic [ref=e295]:
+            - generic [ref=e296]:
+              - generic [ref=e297]: ❌
+              - generic [ref=e298]: 틀렸습니다.
+            - paragraph [ref=e299]: "정답: ③ Option 3"
+  - button "Open Next.js Dev Tools" [ref=e305] [cursor=pointer]:
+    - img [ref=e306]
+  - alert [ref=e309]
+```

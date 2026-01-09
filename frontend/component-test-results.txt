@@ -1,0 +1,26 @@
+ReferenceError: describe is not defined
+
+   at src/components/layout/NotionLayout.test.tsx:6
+
+  4 | import NotionLayout from './NotionLayout';
+  5 |
+> 6 | describe('NotionLayout 컴포넌트 테스트', () => {
+    | ^
+  7 |   // FE-UNIT-030: NotionLayout 기본 렌더링
+  8 |   test('컴포넌트가 정상적으로 렌더링되는지 확인', () => {
+  9 |     render(
+    at Object.<anonymous> (/Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/frontend/src/components/layout/NotionLayout.test.tsx:6:1)
+ReferenceError: describe is not defined
+
+   at src/components/ui/NotionCard.test.tsx:5
+
+  3 | import { NotionCard, NotionStatCard, NotionPageHeader, NotionEmptyState } from './NotionCard';
+  4 |
+> 5 | describe('NotionCard 컴포넌트 테스트', () => {
+    | ^
+  6 |   // FE-UNIT-001: NotionCard 렌더링 - children만 전달
+  7 |   test('children만 전달했을 때 렌더링', () => {
+  8 |     render(
+    at Object.<anonymous> (/Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/frontend/src/components/ui/NotionCard.test.tsx:5:1)
+Error: No tests found
+

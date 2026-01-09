@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter, useParams } from 'next/navigation';
-import { ArrowLeft, Upload, FileText, Trash2, Calendar, BookOpen, ChevronUpIcon, ChevronDownIcon, X } from 'lucide-react';
+import { ArrowLeft, Upload, FileText, Trash2, Calendar, BookOpen, ChevronUpIcon, ChevronDownIcon, X, AlertCircle, RefreshCw } from 'lucide-react';
 
 interface ProcessingLog {
   timestamp: string;
@@ -152,7 +152,7 @@ export default function StudySetDetailPage() {
     try {
       const token = await getToken();
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/study-materials/${materialId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/v1/study-materials/${materialId}`,
         {
           method: 'DELETE',
           headers: {
@@ -187,7 +187,7 @@ export default function StudySetDetailPage() {
     try {
       const token = await getToken();
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/questions/material/${material.id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/v1/questions/material/${material.id}`,
         {
           headers: { 'Authorization': `Bearer ${token}` },
         }
@@ -265,6 +265,37 @@ export default function StudySetDetailPage() {
       newExpanded.add(materialId);
     }
     setExpandedLogs(newExpanded);
+  };
+
+  const handleRetryProcessing = async (materialId: string) => {
+    try {
+      const token = await getToken();
+
+      // 재처리 API 호출 (파일을 다시 파싱)
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/study-materials/${materialId}/retry`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        alert('재처리를 시작합니다. 잠시 후 새로고침해주세요.');
+        // 3초 후 자동 새로고침
+        setTimeout(() => {
+          fetchStudySetAndMaterials();
+        }, 3000);
+      } else {
+        const errorData = await response.json();
+        alert(`재처리 실패: ${errorData.detail || '알 수 없는 오류'}`);
+      }
+    } catch (error) {
+      console.error('Retry error:', error);
+      alert('재처리 중 오류가 발생했습니다.');
+    }
   };
 
   if (loading) {
@@ -413,15 +444,15 @@ export default function StudySetDetailPage() {
 
                   return (
                     <React.Fragment key={material.id}>
-                    <tr
-                      className={`${isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-900/50'} transition-colors cursor-pointer`}
-                      onClick={(e) => {
-                        if ((e.target as HTMLElement).closest('input, button')) return;
-                        if (material.status === 'completed' && material.total_questions > 0) {
-                          handleViewQuestions(material);
-                        }
-                      }}
-                    >
+                      <tr
+                        className={`${isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-900/50'} transition-colors cursor-pointer`}
+                        onClick={(e) => {
+                          if ((e.target as HTMLElement).closest('input, button')) return;
+                          if (material.status === 'completed' && material.total_questions > 0) {
+                            handleViewQuestions(material);
+                          }
+                        }}
+                      >
                         <td className="px-4 py-3">
                           <input
                             type="checkbox"
@@ -517,6 +548,19 @@ export default function StudySetDetailPage() {
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center justify-center gap-1">
+                            {/* Retry button for failed materials */}
+                            {material.status === 'failed' && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRetryProcessing(material.id);
+                                }}
+                                className="p-1.5 text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-lg transition-colors"
+                                title="재처리"
+                              >
+                                <RefreshCw className="w-4 h-4" />
+                              </button>
+                            )}
                             <button
                               onClick={() => handleDeleteMaterial(material.id)}
                               className="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
@@ -547,21 +591,19 @@ export default function StudySetDetailPage() {
                                     <div className="flex items-center gap-2">
                                       <div className="w-16 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
                                         <div
-                                          className={`h-1.5 rounded-full ${
-                                            log.status === 'completed' ? 'bg-green-500' :
+                                          className={`h-1.5 rounded-full ${log.status === 'completed' ? 'bg-green-500' :
                                             log.status === 'failed' ? 'bg-red-500' :
-                                            'bg-blue-500'
-                                          }`}
+                                              'bg-blue-500'
+                                            }`}
                                           style={{ width: `${log.progress}%` }}
                                         ></div>
                                       </div>
                                       <span className="text-gray-500 dark:text-gray-400 w-10">{log.progress}%</span>
                                     </div>
-                                    <span className={`flex-1 ${
-                                      log.status === 'completed' ? 'text-green-700 dark:text-green-400' :
+                                    <span className={`flex-1 ${log.status === 'completed' ? 'text-green-700 dark:text-green-400' :
                                       log.status === 'failed' ? 'text-red-700 dark:text-red-400' :
-                                      'text-gray-700 dark:text-gray-300'
-                                    }`}>
+                                        'text-gray-700 dark:text-gray-300'
+                                      }`}>
                                       {log.message}
                                     </span>
                                   </div>
@@ -646,11 +688,10 @@ export default function StudySetDetailPage() {
                           {q.options && q.options.map((opt: any) => (
                             <div
                               key={opt.number}
-                              className={`p-3 rounded-lg ${
-                                opt.number === q.correct_answer
-                                  ? 'bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-700'
-                                  : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700'
-                              }`}
+                              className={`p-3 rounded-lg ${opt.number === q.correct_answer
+                                ? 'bg-green-50 dark:bg-green-900/20 border-2 border-green-300 dark:border-green-700'
+                                : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700'
+                                }`}
                             >
                               <p className="text-sm text-gray-800 dark:text-gray-200">
                                 {opt.text}

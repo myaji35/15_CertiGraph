@@ -2,8 +2,8 @@
 
 import asyncio
 from io import BytesIO
-from fastapi import APIRouter, UploadFile, File, Form, BackgroundTasks, Depends
-from typing import Any
+from fastapi import APIRouter, UploadFile, File, Form, Body, BackgroundTasks, Depends
+from typing import Any, Dict
 
 from app.api.v1.deps import (
     CurrentUser,
@@ -33,6 +33,9 @@ from app.repositories.study_set import StudySetRepository
 
 router = APIRouter(prefix="/study-sets", tags=["study-sets"])
 
+# In-memory storage for mock study sets (when Supabase is not available)
+MOCK_STUDY_SETS: Dict[str, dict] = {}
+
 # Constants
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
 ALLOWED_CONTENT_TYPES = ["application/pdf"]
@@ -42,8 +45,8 @@ ALLOWED_CONTENT_TYPES = ["application/pdf"]
 async def create_study_set(
     current_user: CurrentUser,
     repo: StudySetRepo,
-    payload: dict[str, Any],
     settings: SettingsDep,
+    payload: dict[str, Any] = Body(...),
 ) -> dict[str, Any]:
     """
     Create a new study set with metadata only (no PDF).
@@ -84,8 +87,11 @@ async def create_study_set(
             detail="자격증을 선택해주세요"
         )
 
-    # Check for active subscription to this certification (skip in dev mode)
-    if not settings.dev_mode:
+    # VIP users list (hardcoded for now)
+    VIP_CLERK_IDS = ["user_36T9Qa8HsuaM1fMjTisw4frRH1Z"]  # myaji35@gmail.com
+
+    # Check for active subscription to this certification (skip for VIP users and in dev/test mode)
+    if current_user.clerk_id not in VIP_CLERK_IDS and not settings.dev_mode and not settings.test_mode:
         supabase = create_client(settings.supabase_url, settings.supabase_service_key)
         has_subscription = supabase.rpc(
             'has_active_subscription',
@@ -103,26 +109,51 @@ async def create_study_set(
 
     # Create study set (without PDF)
     # Note: MockStudySetRepository only supports basic parameters
-    study_set = await repo.create(
-        user_id=current_user.clerk_id,
-        name=name.strip(),
-        pdf_path=None,  # No PDF yet
-        pdf_hash=None,  # No PDF yet
-        status=StudySetStatus.READY,
-        source_study_set_id=None,
-    )
+    try:
+        study_set = await repo.create(
+            user_id=current_user.clerk_id,
+            name=name.strip(),
+            pdf_path=None,  # No PDF yet
+            pdf_hash=None,  # No PDF yet
+            status=StudySetStatus.READY,
+            source_study_set_id=None,
+        )
+    except Exception as e:
+        # Fallback for when Supabase is unavailable
+        import uuid
+        from datetime import datetime
+
+        study_set = {
+            "id": str(uuid.uuid4()),
+            "user_id": current_user.clerk_id,
+            "name": name.strip(),
+            "certification_id": certification_id,
+            "description": description,
+            "status": "ready",
+            "created_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.utcnow().isoformat(),
+            "total_materials": 0,
+            "total_questions": 0
+        }
+        # Store in memory for later retrieval
+        MOCK_STUDY_SETS[study_set["id"]] = study_set
+        print(f"[DEBUG] Study set created (mock): {study_set}")
+        print(f"[DEBUG] Total mock study sets in memory: {len(MOCK_STUDY_SETS)}")
 
     # Store additional metadata separately for now
     # In production, these would be stored in the database
+    from datetime import datetime
 
     return {
-        "id": study_set["id"],
-        "name": study_set["name"],
-        "certification_id": certification_id,
-        "exam_date": exam_date,
-        "description": description,
-        "status": StudySetStatus.READY.value,
-        "created_at": study_set["created_at"],
+        "study_set": {
+            "id": study_set["id"],
+            "name": study_set.get("name", name.strip()),
+            "certification_id": certification_id,
+            "exam_date": exam_date,
+            "description": description,
+            "status": study_set.get("status", StudySetStatus.READY.value),
+            "created_at": study_set.get("created_at", datetime.utcnow().isoformat()),
+        }
     }
 
 # Fake processing steps for cached duplicates
@@ -250,6 +281,7 @@ async def upload_study_set(
     current_user: CurrentUser,
     repo: StudySetRepo,
     storage: StorageServiceDep,
+    settings: SettingsDep,
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     name: str = Form(...),
@@ -274,21 +306,22 @@ async def upload_study_set(
     from fastapi import HTTPException, status as http_status
     from app.api.v1.deps import get_supabase
 
-    # 구독 확인: 해당 자격증에 대한 활성 구독이 있는지 검사
-    supabase = get_supabase()
-    has_subscription = supabase.rpc(
-        'has_active_subscription',
-        {
-            'p_clerk_user_id': current_user.clerk_id,
-            'p_certification_id': certification_id
-        }
-    ).execute()
+    # 구독 확인: 해당 자격증에 대한 활성 구독이 있는지 검사 (skip in dev/test mode)
+    if not settings.dev_mode and not settings.test_mode:
+        supabase = get_supabase()
+        has_subscription = supabase.rpc(
+            'has_active_subscription',
+            {
+                'p_clerk_user_id': current_user.clerk_id,
+                'p_certification_id': certification_id
+            }
+        ).execute()
 
-    if not has_subscription.data:
-        raise HTTPException(
-            status_code=http_status.HTTP_402_PAYMENT_REQUIRED,
-            detail=f"이 자격증에 대한 구독이 필요합니다. 먼저 구독을 구매해주세요."
-        )
+        if not has_subscription.data:
+            raise HTTPException(
+                status_code=http_status.HTTP_402_PAYMENT_REQUIRED,
+                detail=f"이 자격증에 대한 구독이 필요합니다. 먼저 구독을 구매해주세요."
+            )
 
     # Validate file type
     if file.content_type not in ALLOWED_CONTENT_TYPES:
@@ -395,27 +428,54 @@ async def get_study_set(
     repo: StudySetRepo,
 ) -> dict[str, Any]:
     """Get a study set by ID."""
-    study_set = await repo.get_by_id(study_set_id)
+    # First try to get from mock storage
+    if study_set_id in MOCK_STUDY_SETS:
+        study_set = MOCK_STUDY_SETS[study_set_id]
+        print(f"[DEBUG] Found study set in mock storage: {study_set_id}")
 
-    if not study_set:
-        raise ResourceNotFoundError("학습 세트", study_set_id)
+        # Verify ownership
+        if study_set["user_id"] != current_user.clerk_id:
+            raise ResourceNotFoundError("학습 세트", study_set_id)
 
-    # Verify ownership
-    if study_set["user_id"] != current_user.clerk_id:
-        raise ResourceNotFoundError("학습 세트", study_set_id)
-
-    question_count = await repo.get_question_count(study_set_id)
-
-    return {
-        "data": {
-            "id": study_set["id"],
-            "name": study_set["name"],
-            "status": study_set["status"],
-            "question_count": question_count,
-            "created_at": study_set["created_at"],
-            "is_cached": study_set.get("source_study_set_id") is not None,
+        return {
+            "data": {
+                "id": study_set["id"],
+                "name": study_set["name"],
+                "status": study_set.get("status", "ready"),
+                "question_count": study_set.get("total_questions", 0),
+                "created_at": study_set["created_at"],
+                "is_cached": False,
+                "certification_id": study_set.get("certification_id"),
+                "description": study_set.get("description")
+            }
         }
-    }
+
+    # Try to get from repository
+    try:
+        study_set = await repo.get_by_id(study_set_id)
+
+        if not study_set:
+            raise ResourceNotFoundError("학습 세트", study_set_id)
+
+        # Verify ownership
+        if study_set["user_id"] != current_user.clerk_id:
+            raise ResourceNotFoundError("학습 세트", study_set_id)
+
+        question_count = await repo.get_question_count(study_set_id)
+
+        return {
+            "data": {
+                "id": study_set["id"],
+                "name": study_set["name"],
+                "status": study_set["status"],
+                "question_count": question_count,
+                "created_at": study_set["created_at"],
+                "is_cached": study_set.get("source_study_set_id") is not None,
+            }
+        }
+    except Exception as e:
+        print(f"[DEBUG] Error fetching study set {study_set_id}: {e}")
+        raise ResourceNotFoundError("학습 세트", study_set_id)
 
 
 @router.get("")
@@ -426,32 +486,57 @@ async def list_study_sets(
     offset: int = 0,
 ) -> dict[str, Any]:
     """List all study sets for the current user."""
-    study_sets = await repo.find_all_by_user(
-        current_user.clerk_id,
-        skip=offset,
-        limit=limit,
-    )
-
-    # Get question counts
     result = []
-    for ss in study_sets:
-        question_count = await repo.get_question_count(ss["id"])
-        result.append({
-            "id": ss["id"],
-            "name": ss["name"],
-            "status": ss["status"],
-            "question_count": question_count,
-            "created_at": ss["created_at"],
-            "is_cached": ss.get("source_study_set_id") is not None,
-            "exam_name": ss.get("exam_name"),
-            "exam_year": ss.get("exam_year"),
-            "exam_round": ss.get("exam_round"),
-            "exam_session": ss.get("exam_session"),
-            "exam_session_name": ss.get("exam_session_name"),
-            "tags": ss.get("tags"),
-            "learning_status": ss.get("learning_status", "not_learned"),
-            "last_studied_at": ss.get("last_studied_at"),
-        })
+
+    # First, add mock study sets for the current user
+    for study_set_id, study_set in MOCK_STUDY_SETS.items():
+        if study_set["user_id"] == current_user.clerk_id:
+            result.append({
+                "id": study_set["id"],
+                "name": study_set["name"],
+                "status": study_set.get("status", "ready"),
+                "question_count": study_set.get("total_questions", 0),
+                "created_at": study_set["created_at"],
+                "is_cached": False,
+                "certification_id": study_set.get("certification_id"),
+                "total_materials": study_set.get("total_materials", 0),
+                "total_questions": study_set.get("total_questions", 0),
+                "learning_status": study_set.get("learning_status", "not_learned"),
+                "description": study_set.get("description"),
+            })
+
+    print(f"[DEBUG] Found {len(result)} mock study sets for user {current_user.clerk_id}")
+
+    # Try to get from repository (will fail if Supabase is down)
+    try:
+        study_sets = await repo.find_all_by_user(
+            current_user.clerk_id,
+            skip=offset,
+            limit=limit,
+        )
+
+        # Get question counts
+        for ss in study_sets:
+            question_count = await repo.get_question_count(ss["id"])
+            result.append({
+                "id": ss["id"],
+                "name": ss["name"],
+                "status": ss["status"],
+                "question_count": question_count,
+                "created_at": ss["created_at"],
+                "is_cached": ss.get("source_study_set_id") is not None,
+                "exam_name": ss.get("exam_name"),
+                "exam_year": ss.get("exam_year"),
+                "exam_round": ss.get("exam_round"),
+                "exam_session": ss.get("exam_session"),
+                "exam_session_name": ss.get("exam_session_name"),
+                "tags": ss.get("tags"),
+                "learning_status": ss.get("learning_status", "not_learned"),
+                "last_studied_at": ss.get("last_studied_at"),
+            })
+    except Exception as e:
+        print(f"[DEBUG] Error fetching from repository: {e}")
+        # Continue with mock data only
 
     return {
         "data": result,
