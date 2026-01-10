@@ -1,0 +1,25 @@
+{
+  "name": "certigraph-tests",
+  "version": "1.0.0",
+  "description": "CertiGraph Playwright 병렬 테스트",
+  "scripts": {
+    "test": "playwright test",
+    "test:parallel": "playwright test --project=auth-parallel --project=read-only-parallel --project=independent-e2e",
+    "test:sequential": "playwright test --project=payment-sequential --project=integration-sequential",
+    "test:all": "playwright test",
+    "test:auth": "playwright test --project=auth-parallel --project=auth-comprehensive",
+    "test:payment": "playwright test --project=payment-sequential",
+    "test:integration": "playwright test --project=integration-sequential",
+    "test:study-exam": "playwright test --project=study-exam-partial",
+    "test:report": "playwright show-report test-results/html-report",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:headed": "playwright test --headed",
+    "test:ci": "CI=true playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0"
+  }
+}
