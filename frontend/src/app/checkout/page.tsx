@@ -16,11 +16,19 @@ export default function CheckoutPage() {
         <h1 className="text-2xl font-bold mb-6">결제하기</h1>
 
         {/* Order Summary */}
-        <div className="mb-6 p-4 bg-gray-100 rounded">
-          <h2 className="font-semibold mb-2">주문 내역</h2>
-          <div className="flex justify-between">
-            <span>{certification || '시즌패스'}</span>
-            <span>₩{price ? parseInt(price).toLocaleString() : '10,000'}</span>
+        <div className="order-summary mb-6 p-4 bg-gray-100 rounded">
+          <h2 className="font-semibold mb-3">주문 내역</h2>
+
+          {/* 자격증 정보 */}
+          <div className="flex justify-between mb-2 pb-2 border-b border-gray-300">
+            <span className="text-gray-700">자격증</span>
+            <span className="font-medium">{certification || '정보처리기사'}</span>
+          </div>
+
+          {/* 총 결제 금액 */}
+          <div className="flex justify-between items-center mt-3">
+            <span className="text-lg font-semibold">총 결제 금액</span>
+            <span className="text-2xl font-bold text-blue-600">₩10,000</span>
           </div>
         </div>
 
