@@ -311,7 +311,7 @@ export default function TestResultPage({ params }: { params: Promise<{ sessionId
             )}
 
             {/* Actions */}
-            <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="lg">
+            <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="lg">
                 <Button
                     variant="light"
                     size="lg"
@@ -319,6 +319,18 @@ export default function TestResultPage({ params }: { params: Promise<{ sessionId
                     onClick={() => setShowReview(true)}
                 >
                     전체 문제 복습
+                </Button>
+
+                <Button
+                    variant="light"
+                    color="orange"
+                    size="lg"
+                    leftSection={<IconBook size={20} />}
+                    component={Link}
+                    href={`/dashboard/test/review/${resolvedParams.sessionId}`}
+                    disabled={result.wrong_count === 0}
+                >
+                    오답노트 생성
                 </Button>
 
                 <Button

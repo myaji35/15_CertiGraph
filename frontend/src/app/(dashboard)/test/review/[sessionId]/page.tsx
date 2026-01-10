@@ -19,6 +19,10 @@ import {
     Divider,
     ThemeIcon,
     Progress,
+    Textarea,
+    TextInput,
+    Modal,
+    Checkbox,
 } from "@mantine/core";
 import {
     IconX,
@@ -28,6 +32,9 @@ import {
     IconChevronRight,
     IconAlertCircle,
     IconHome,
+    IconTag,
+    IconNote,
+    IconRefresh,
 } from "@tabler/icons-react";
 import Link from "next/link";
 
@@ -39,6 +46,9 @@ interface WrongQuestion {
     correct_answer: number;
     explanation?: string;
     passage?: string;
+    tags?: string[];
+    memo?: string;
+    completed?: boolean;
 }
 
 interface ReviewData {
@@ -56,6 +66,12 @@ export default function TestReviewPage({ params }: { params: Promise<{ sessionId
     const [loading, setLoading] = useState(true);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [understood, setUnderstood] = useState<Set<string>>(new Set());
+
+    // 태그 및 메모 관련 상태
+    const [tagModalOpen, setTagModalOpen] = useState(false);
+    const [memoModalOpen, setMemoModalOpen] = useState(false);
+    const [currentTags, setCurrentTags] = useState<string>("");
+    const [currentMemo, setCurrentMemo] = useState<string>("");
 
     useEffect(() => {
         fetchReviewData();
@@ -81,7 +97,12 @@ export default function TestReviewPage({ params }: { params: Promise<{ sessionId
             const data = await response.json();
             const result = data.data;
 
-            const wrongQuestions = result.questions.filter((q: any) => !q.is_correct);
+            const wrongQuestions = result.questions.filter((q: any) => !q.is_correct).map((q: any) => ({
+                ...q,
+                tags: [],
+                memo: "",
+                completed: false,
+            }));
 
             setReviewData({
                 session_id: resolvedParams.sessionId,
@@ -98,6 +119,50 @@ export default function TestReviewPage({ params }: { params: Promise<{ sessionId
 
     const handleUnderstood = (questionId: string) => {
         setUnderstood(new Set(understood.add(questionId)));
+    };
+
+    const handleRetake = () => {
+        // 다시 풀기 기능 - 새로운 테스트 세션 시작
+        router.push(`/dashboard/test/start?mode=wrong&sessionId=${resolvedParams.sessionId}`);
+    };
+
+    const handleAddTags = () => {
+        if (!reviewData) return;
+        const currentQuestion = reviewData.wrong_questions[currentIndex];
+        setCurrentTags(currentQuestion.tags?.join(", ") || "");
+        setTagModalOpen(true);
+    };
+
+    const handleSaveTags = () => {
+        if (!reviewData) return;
+        const tags = currentTags.split(",").map(t => t.trim()).filter(t => t);
+        const updatedQuestions = [...reviewData.wrong_questions];
+        updatedQuestions[currentIndex].tags = tags;
+        setReviewData({ ...reviewData, wrong_questions: updatedQuestions });
+        setTagModalOpen(false);
+    };
+
+    const handleAddMemo = () => {
+        if (!reviewData) return;
+        const currentQuestion = reviewData.wrong_questions[currentIndex];
+        setCurrentMemo(currentQuestion.memo || "");
+        setMemoModalOpen(true);
+    };
+
+    const handleSaveMemo = () => {
+        if (!reviewData) return;
+        const updatedQuestions = [...reviewData.wrong_questions];
+        updatedQuestions[currentIndex].memo = currentMemo;
+        setReviewData({ ...reviewData, wrong_questions: updatedQuestions });
+        setMemoModalOpen(false);
+    };
+
+    const handleToggleComplete = (questionId: string) => {
+        if (!reviewData) return;
+        const updatedQuestions = reviewData.wrong_questions.map(q =>
+            q.question_id === questionId ? { ...q, completed: !q.completed } : q
+        );
+        setReviewData({ ...reviewData, wrong_questions: updatedQuestions });
     };
 
     if (loading || !reviewData) {
@@ -136,6 +201,7 @@ export default function TestReviewPage({ params }: { params: Promise<{ sessionId
     const currentQuestion = reviewData.wrong_questions[currentIndex];
     const progress = ((currentIndex + 1) / reviewData.total_wrong) * 100;
     const understoodCount = understood.size;
+    const completedCount = reviewData.wrong_questions.filter(q => q.completed).length;
 
     return (
         <Stack gap="md" maw={1000} mx="auto">
@@ -162,10 +228,21 @@ export default function TestReviewPage({ params }: { params: Promise<{ sessionId
                 </Group>
 
                 <Progress value={progress} size="sm" mt="md" color="red" />
+
+                {/* 다시 풀기 버튼 */}
+                <Group mt="md">
+                    <Button
+                        variant="light"
+                        leftSection={<IconRefresh size={18} />}
+                        onClick={handleRetake}
+                    >
+                        다시 풀기
+                    </Button>
+                </Group>
             </Paper>
 
             {/* Question Card */}
-            <Card shadow="md" padding="xl" radius="lg">
+            <Card shadow="md" padding="xl" radius="lg" className={`review-question ${currentQuestion.completed ? 'completed' : ''}`}>
                 <Stack gap="xl">
                     {/* Alert */}
                     <Alert icon={<IconAlertCircle size={16} />} color="red" variant="light">
@@ -188,9 +265,18 @@ export default function TestReviewPage({ params }: { params: Promise<{ sessionId
 
                     {/* Question */}
                     <div>
-                        <Text size="xl" fw={600} mb="lg">
-                            Q{currentIndex + 1}. {currentQuestion.question_text}
-                        </Text>
+                        <Group justify="space-between" mb="md">
+                            <Text size="xl" fw={600}>
+                                Q{currentIndex + 1}. {currentQuestion.question_text}
+                            </Text>
+
+                            {/* 완료 체크박스 */}
+                            <Checkbox
+                                label="완료"
+                                checked={currentQuestion.completed || false}
+                                onChange={() => handleToggleComplete(currentQuestion.question_id)}
+                            />
+                        </Group>
 
                         {/* Options */}
                         <Radio.Group value={currentQuestion.correct_answer.toString()}>
@@ -275,17 +361,60 @@ export default function TestReviewPage({ params }: { params: Promise<{ sessionId
                         </Alert>
                     )}
 
-                    {/* Understood Button */}
-                    {!understood.has(currentQuestion.question_id) && (
+                    {/* Tags */}
+                    {currentQuestion.tags && currentQuestion.tags.length > 0 && (
+                        <Group gap="xs">
+                            {currentQuestion.tags.map((tag, idx) => (
+                                <Badge key={idx} className="tag" variant="light" color="blue">
+                                    {tag}
+                                </Badge>
+                            ))}
+                        </Group>
+                    )}
+
+                    {/* Memo Indicator */}
+                    {currentQuestion.memo && (
+                        <Alert icon={<IconNote size={16} />} color="yellow" variant="light" className="memo-indicator">
+                            <Text size="sm" fw={600} mb="xs">
+                                📝 내 메모
+                            </Text>
+                            <Text size="sm" style={{ whiteSpace: "pre-wrap" }}>
+                                {currentQuestion.memo}
+                            </Text>
+                        </Alert>
+                    )}
+
+                    {/* Action Buttons */}
+                    <Group>
+                        {!understood.has(currentQuestion.question_id) && (
+                            <Button
+                                variant="light"
+                                color="green"
+                                leftSection={<IconCheck size={18} />}
+                                onClick={() => handleUnderstood(currentQuestion.question_id)}
+                            >
+                                이해했어요!
+                            </Button>
+                        )}
+
                         <Button
                             variant="light"
-                            color="green"
-                            leftSection={<IconCheck size={18} />}
-                            onClick={() => handleUnderstood(currentQuestion.question_id)}
+                            color="blue"
+                            leftSection={<IconTag size={18} />}
+                            onClick={handleAddTags}
                         >
-                            이해했어요!
+                            태그 추가
                         </Button>
-                    )}
+
+                        <Button
+                            variant="light"
+                            color="yellow"
+                            leftSection={<IconNote size={18} />}
+                            onClick={handleAddMemo}
+                        >
+                            메모
+                        </Button>
+                    </Group>
                 </Stack>
             </Card>
 
@@ -322,8 +451,8 @@ export default function TestReviewPage({ params }: { params: Promise<{ sessionId
             {/* Progress Summary */}
             <Paper p="md" radius="md" withBorder>
                 <Group justify="space-between">
-                    <Text size="sm" c="dimmed">
-                        복습 진행률
+                    <Text size="sm" c="dimmed" className="review-progress">
+                        복습 진행률: {completedCount} 완료
                     </Text>
                     <Text size="sm" fw={600}>
                         {Math.round(progress)}%
@@ -341,8 +470,11 @@ export default function TestReviewPage({ params }: { params: Promise<{ sessionId
                         <Badge variant="light" color="green">
                             이해 {understoodCount}개
                         </Badge>
+                        <Badge variant="light" color="blue">
+                            완료 {completedCount}개
+                        </Badge>
                         <Badge variant="light" color="gray">
-                            남음 {reviewData.total_wrong - understoodCount}개
+                            남음 {reviewData.total_wrong - completedCount}개
                         </Badge>
                     </Group>
 
@@ -357,6 +489,43 @@ export default function TestReviewPage({ params }: { params: Promise<{ sessionId
                     </Button>
                 </Group>
             </Paper>
+
+            {/* Tag Modal */}
+            <Modal
+                opened={tagModalOpen}
+                onClose={() => setTagModalOpen(false)}
+                title="태그 추가"
+            >
+                <Stack>
+                    <TextInput
+                        className="tag-input"
+                        label="태그 (쉼표로 구분)"
+                        placeholder="실수, 개념부족"
+                        value={currentTags}
+                        onChange={(e) => setCurrentTags(e.target.value)}
+                    />
+                    <Button onClick={handleSaveTags}>저장</Button>
+                </Stack>
+            </Modal>
+
+            {/* Memo Modal */}
+            <Modal
+                opened={memoModalOpen}
+                onClose={() => setMemoModalOpen(false)}
+                title="메모 작성"
+            >
+                <Stack>
+                    <Textarea
+                        className="memo-textarea"
+                        label="메모"
+                        placeholder="다음번에는 문제를 더 꼼꼼히 읽자"
+                        value={currentMemo}
+                        onChange={(e) => setCurrentMemo(e.target.value)}
+                        minRows={4}
+                    />
+                    <Button onClick={handleSaveMemo}>메모 저장</Button>
+                </Stack>
+            </Modal>
         </Stack>
     );
 }
