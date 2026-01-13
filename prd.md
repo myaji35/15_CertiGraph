@@ -59,7 +59,7 @@
 | :--- | :--- | :--- | :--- |
 | **US-01** | User | 문제집을 생성하고 관리하고 싶다. (CRUD) | 문제집명, 개요, 자격증, 시험일자 입력/수정/삭제 가능. |
 | **US-02** | User | 생성한 문제집에 PDF 학습자료를 업로드하고 싶다. | 문제집 선택 → PDF 업로드 → 진행률 표시 → 파싱 완료 알림. |
-| **US-03** | System | 업로드된 PDF에서 문제, 보기, 해설, 지문을 정확히 분리해야 한다. | Upstage API 활용, 지문이 있는 경우 문제마다 지문 복제 청킹. |
+| **US-03** | System | 업로드된 PDF에서 문제, 보기, 해설, 지문을 정확히 분리해야 한다. | 오픈소스 PDF 파서(pdf-reader) 활용, 지문이 있는 경우 문제마다 지문 복제 청킹. |
 | **US-04** | User | 문제집으로 모의고사를 응시하고 싶다. (CBT 환경) | 실제 시험과 유사한 UI, **보기 순서 랜덤 셔플링** 적용. |
 | **US-05** | System | 사용자의 오답을 분석해 취약 개념을 도출해야 한다. | GraphRAG 기반 추론, 오답 원인(개념 부족 vs 실수) 태깅. |
 | **US-06** | User | 이메일 또는 소셜 계정으로 회원가입/로그인하고 싶다. | 이메일/비밀번호 또는 Google/Kakao 소셜 로그인 지원, 로그인 후 대시보드 이동. |
@@ -90,9 +90,9 @@
     4. 업로드 진행률 표시
     5. 파싱 작업 시작 (백그라운드)
 * **파싱 프로세스:**
-    * **OCR & Parsing:** Upstage Document Parse API 사용
-    * **문서 구조 인식:** Heading, Paragraph, Table을 마크다운으로 변환
-    * **Image Handling:** 이미지 Crop 후 GPT-4o로 Captioning
+    * **PDF Parsing:** Ruby pdf-reader gem 사용 (오픈소스)
+    * **문제 추출:** 정규표현식 기반 문제 번호, 선택지, 정답 패턴 인식
+    * **표 처리:** 텍스트 기반 표 구조 파싱 및 마크다운 변환
     * **지문 복제 전략:** "다음 글을 읽고..." 유형 감지 시 지문을 하위 문제 각각에 포함
 * **데이터 스키마:**
     * 학습자료: PDF 경로, 파싱 상태, 문제 수
@@ -116,11 +116,15 @@
     * LLM 프롬프트: "사용자가 개념 A와 B가 연결된 문제를 틀렸다. 과거 C문제 오답 이력을 볼 때, 사용자는 어떤 원리 이해가 부족한가?"
 
 ### 4.4. Visualization (Frontend)
-* **Library:** React Three Fiber (Three.js).
+* **Library:** Three.js via Rails importmap + Stimulus controller
 * **Interaction:**
-    * Zoom/Pan 가능한 3D 네트워크 그래프.
-    * Node Color: Green(숙련), Red(취약), Gray(미응시).
-    * Click Event: 해당 개념 관련 문제만 모은 'Drill Mode' 진입.
+    * Zoom/Pan 가능한 3D 네트워크 그래프
+    * Node Color: Green(숙련), Red(취약), Gray(미응시)
+    * Click Event: 해당 개념 관련 문제만 모은 'Drill Mode' 진입 (Turbo Frame)
+* **Implementation:**
+    * Stimulus controller with Three.js initialization
+    * Fallback script pattern for library loading
+    * Data attributes for Rails -> JS communication
 
 ---
 
@@ -138,37 +142,43 @@
 ## 5. Technical Architecture
 
 ### 5.1. Tech Stack
-* **Frontend:**
-    * Framework: `Next.js 14+` (App Router)
-    * Visualization: `React Three Fiber`, `Drei`
-    * State Management: `Zustand`
-    * Styling: `Tailwind CSS`
+* **Frontend (Rails-integrated):**
+    * Framework: `Rails 8.0+` (with Turbo & Stimulus)
+    * Visualization: `Three.js` (via importmap)
+    * Styling: `Tailwind CSS v3` (tailwindcss-rails ~> 2.0)
+    * JavaScript: `Stimulus` controllers with fallback patterns
 * **Backend:**
-    * Language: `Python 3.10+`
-    * Framework: `FastAPI` (Async 처리 유리)
-    * Orchestration: `LangChain` or `LangGraph`
+    * Language: `Ruby 3.3.0+`
+    * Framework: `Rails 8.0+` (Action Cable for WebSockets)
+    * Background Jobs: `Sidekiq` or `Solid Queue`
+    * File Upload: `Active Storage` with `Direct Upload`
 * **Database:**
-    * **Vector DB:** `Pinecone` (Serverless, 관리 용이) - 문제 텍스트 임베딩 저장.
-    * **Graph DB:** `Neo4j` (AuraDB Free/Pro) - 개념 간 관계 및 학습 이력 저장.
-    * **RDB:** `PostgreSQL` (Supabase) - 사용자 정보, 결제 정보.
+    * **Vector DB:** `pgvector` (PostgreSQL extension) - 문제 텍스트 임베딩 저장
+    * **Graph DB:** `Neo4j` (AuraDB via REST API) - 개념 간 관계 및 학습 이력 저장
+    * **Primary DB:** `PostgreSQL` - 사용자, 결제, 문제집, 학습 데이터
+    * **Cache:** `Solid Cache` (SQLite-based) or `Redis`
 * **AI Models:**
-    * OCR: `Upstage Document Parse`
-    * LLM (Reasoning): `GPT-4o` (Main Logic), `GPT-4o-mini` (Simple Tasks)
-    * Embedding: `OpenAI text-embedding-3-small`
+    * PDF Parser: `pdf-reader` gem (오픈소스, 로컬 처리)
+    * LLM (Reasoning): `GPT-4o` (Main Logic), `GPT-4o-mini` (Simple Tasks) - via API
+    * Embedding: `OpenAI text-embedding-3-small` - via API
+* **Infrastructure:**
+    * Production: `Kamal` deployment or `Heroku`
+    * Asset Compilation: `Propshaft` (Rails 8 default)
+    * Development: `bin/dev` with Foreman
 
 ### 5.2. Data Flow
-1.  **Upload:** User -> Next.js -> FastAPI -> **Upstage API** -> JSON Return.
-2.  **Process:** FastAPI -> **Chunking Logic** -> Embedding -> **Pinecone**.
-3.  **Graph:** Chunk Data -> **LLM (Extraction)** -> **Neo4j** (Create Nodes/Rel).
-4.  **Test:** User Request -> FastAPI -> Pinecone (Fetch Qs) -> Next.js (Shuffle).
-5.  **Analyze:** Result -> **GraphRAG Search (Neo4j)** -> LLM (Insight) -> User Report.
+1.  **Upload:** User -> Rails View -> Active Storage -> Background Job -> **Local PDF Parser** -> JSON Return
+2.  **Process:** Sidekiq Job -> **Chunking Service** -> OpenAI Embedding -> **pgvector**
+3.  **Graph:** Processed Data -> **LLM Service** -> **Neo4j API** (Create Nodes/Relations)
+4.  **Test:** Turbo Frame Request -> Rails Controller -> pgvector Query -> Stimulus (Client-side Shuffle)
+5.  **Analyze:** Form Submit -> **GraphRAG Service (Neo4j)** -> LLM Service -> Turbo Stream Update
 
 ---
 
 ## 6. Roadmap & Milestones
 
 ### Phase 1: Core Engine & Payment (MVP) - 2 Weeks
-* [ ] Upstage API 연동 및 파싱 파이프라인 구축 (Python).
+* [ ] PDF 파싱 파이프라인 구축 (Ruby pdf-reader gem).
 * [ ] 지문 복제 청킹 로직 구현 및 Vector DB 적재.
 * [ ] 기본적인 문제 풀이 UI 및 채점 기능 개발.
 * [ ] **결제 모듈 연동 (토스페이먼츠) 및 권한 제어 로직 구현.**
@@ -344,6 +354,51 @@
 ```
 
 ---
+
+## 12.5. Rails-Specific Development Guidelines
+
+### Critical Rails 8 Configuration
+1. **Tailwind CSS Version Lock:**
+   ```ruby
+   # Gemfile - MUST use v2.0 for Rails 8 compatibility
+   gem "tailwindcss-rails", "~> 2.0"
+   ```
+
+2. **File Structure Requirements:**
+   ```
+   ✅ app/assets/stylesheets/application.tailwind.css
+   ✅ config/tailwind.config.js (NOT in root!)
+   ✅ app/javascript/controllers/ (Stimulus controllers)
+   ✅ config/importmap.rb (JavaScript dependencies)
+   ```
+
+3. **JavaScript Integration Pattern:**
+   - Use Stimulus controllers as primary approach
+   - Implement fallback initialization for external libraries
+   - Load external scripts before importmap tags
+
+4. **Development Server:**
+   ```bash
+   # Use Foreman for concurrent processes
+   bin/dev
+   ```
+
+### Rails Architecture Patterns
+
+1. **Service Objects:**
+   - `app/services/pdf_parser_service.rb` - Upstage API integration
+   - `app/services/embedding_service.rb` - OpenAI embeddings
+   - `app/services/graph_rag_service.rb` - Neo4j GraphRAG logic
+
+2. **Background Jobs:**
+   - PDF processing in background with progress tracking
+   - Embedding generation as async job
+   - Graph construction as chained jobs
+
+3. **Turbo Patterns:**
+   - Turbo Frames for partial page updates
+   - Turbo Streams for real-time progress updates
+   - Action Cable for PDF processing status
 
 ## 13. Appendix
 

@@ -31,7 +31,7 @@ export default defineConfig({
 
   use: {
     // 기본 URL
-    baseURL: process.env.BASE_URL || 'http://localhost:3030',
+    baseURL: process.env.BASE_URL || 'http://localhost:3000',
 
     // 스크린샷과 비디오
     trace: 'retain-on-failure',

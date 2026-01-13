@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OAuth Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .info {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .correct {
+            color: green;
+            font-weight: bold;
+        }
+        .wrong {
+            color: red;
+            font-weight: bold;
+        }
+        code {
+            background: #333;
+            color: #fff;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Google OAuth 리디렉션 URI 테스트</h1>
+
+    <div class="info">
+        <h2>현재 설정된 정보:</h2>
+        <p><strong>Client ID:</strong> 273058247956-nv6jple4jksd97iil16buf6ite6sjf5h.apps.googleusercontent.com</p>
+        <p><strong>Rails Callback URL:</strong> <code class="correct">http://localhost:3000/users/auth/google_oauth2/callback</code></p>
+    </div>
+
+    <div class="info">
+        <h2>✅ Google Cloud Console에 추가해야 할 URI:</h2>
+        <p class="correct">http://localhost:3000/users/auth/google_oauth2/callback</p>
+        <p>위 URI를 정확히 복사해서 Google Cloud Console에 붙여넣으세요!</p>
+    </div>
+
+    <div class="info">
+        <h2>❌ 잘못된 URI 예시 (이런 것들은 작동하지 않습니다):</h2>
+        <ul>
+            <li class="wrong">http://localhost:3000/</li>
+            <li class="wrong">http://localhost:3000/auth/google_oauth2/callback</li>
+            <li class="wrong">http://localhost:3000/user/auth/google_oauth2/callback</li>
+            <li class="wrong">https://localhost:3000/users/auth/google_oauth2/callback</li>
+        </ul>
+    </div>
+
+    <div class="info">
+        <h2>🚀 테스트 링크:</h2>
+        <a href="http://localhost:3000/signin" target="_blank" style="display: inline-block; padding: 10px 20px; background: #4285f4; color: white; text-decoration: none; border-radius: 5px;">로그인 페이지로 이동</a>
+    </div>
+</body>
+</html>

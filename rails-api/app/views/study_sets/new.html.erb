@@ -1,0 +1,87 @@
+<div class="min-h-screen bg-gray-50">
+  <%= render 'shared/navbar' %>
+
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">새 학습 세트 만들기</h1>
+      <p class="text-gray-600 mt-2">학습 세트를 만들고 PDF 자료를 업로드하세요</p>
+    </div>
+
+    <!-- Form -->
+    <div class="bg-white rounded-lg shadow-md p-8">
+      <%= form_with(model: @study_set, local: true) do |form| %>
+        <% if @study_set.errors.any? %>
+          <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <h3 class="text-red-800 font-semibold mb-2">
+              <%= pluralize(@study_set.errors.count, "error") %> 발생:
+            </h3>
+            <ul class="list-disc list-inside text-red-700">
+              <% @study_set.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <!-- Title Field -->
+        <div class="mb-6">
+          <%= form.label :title, "제목", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.text_field :title,
+              class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+              placeholder: "예: 2024년 사회복지사 1급 기출문제",
+              required: true %>
+        </div>
+
+        <!-- Description Field -->
+        <div class="mb-6">
+          <%= form.label :description, "설명", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.text_area :description,
+              rows: 4,
+              class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+              placeholder: "이 학습 세트에 대한 간단한 설명을 입력하세요" %>
+        </div>
+
+        <!-- Certification Field -->
+        <div class="mb-8">
+          <%= form.label :certification, "자격증 종류", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.select :certification,
+              options_for_select([
+                ["사회복지사 1급", "social_worker_1"],
+                ["사회복지사 2급", "social_worker_2"],
+                ["요양보호사", "care_worker"],
+                ["보육교사", "childcare_teacher"],
+                ["기타", "other"]
+              ]),
+              { prompt: "자격증을 선택하세요" },
+              class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+        </div>
+
+        <!-- Information Box -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <div class="flex">
+            <svg class="w-5 h-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+            </svg>
+            <div class="text-sm text-blue-800">
+              <p class="font-semibold mb-1">학습 세트 생성 후:</p>
+              <ul class="list-disc list-inside space-y-1">
+                <li>PDF 파일을 업로드하여 학습 자료를 추가할 수 있습니다</li>
+                <li>AI가 자동으로 문제와 답을 분석합니다</li>
+                <li>모의고사 기능으로 실전 연습이 가능합니다</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Buttons -->
+        <div class="flex justify-end gap-3">
+          <%= link_to "취소", study_sets_path,
+              class: "px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition" %>
+          <%= form.submit "학습 세트 만들기",
+              class: "px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition cursor-pointer" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

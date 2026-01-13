@@ -1,0 +1,137 @@
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+      <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-6">
+        <h1 class="text-3xl font-bold text-white">시험 설정</h1>
+        <p class="text-blue-100 mt-2"><%= @study_set.title %></p>
+      </div>
+
+      <!-- Test Configuration Form -->
+      <%= form_with model: [@study_set, @test_session], local: true, class: "p-8" do |form| %>
+        <div class="space-y-6">
+          <!-- Test Type -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-3">시험 유형</label>
+            <div class="grid grid-cols-3 gap-4">
+              <label class="relative cursor-pointer">
+                <%= form.radio_button :test_type, 'practice', class: 'peer sr-only', checked: true %>
+                <div class="peer-checked:border-blue-600 peer-checked:bg-blue-50 border-2 rounded-xl p-4 text-center hover:border-gray-400 transition-all">
+                  <div class="text-2xl mb-2">📝</div>
+                  <div class="font-semibold">연습 모드</div>
+                  <div class="text-sm text-gray-500 mt-1">즉시 정답 확인</div>
+                </div>
+              </label>
+
+              <label class="relative cursor-pointer">
+                <%= form.radio_button :test_type, 'mock_exam', class: 'peer sr-only' %>
+                <div class="peer-checked:border-blue-600 peer-checked:bg-blue-50 border-2 rounded-xl p-4 text-center hover:border-gray-400 transition-all">
+                  <div class="text-2xl mb-2">📋</div>
+                  <div class="font-semibold">모의고사</div>
+                  <div class="text-sm text-gray-500 mt-1">실전과 동일</div>
+                </div>
+              </label>
+
+              <label class="relative cursor-pointer">
+                <%= form.radio_button :test_type, 'review', class: 'peer sr-only' %>
+                <div class="peer-checked:border-blue-600 peer-checked:bg-blue-50 border-2 rounded-xl p-4 text-center hover:border-gray-400 transition-all">
+                  <div class="text-2xl mb-2">🔄</div>
+                  <div class="font-semibold">복습 모드</div>
+                  <div class="text-sm text-gray-500 mt-1">틀린 문제만</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Question Count -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-3">문제 수</label>
+            <div class="flex gap-3">
+              <% [10, 20, 30, 40, 50].each do |count| %>
+                <label class="relative cursor-pointer">
+                  <%= form.radio_button :question_count, count, class: 'peer sr-only', checked: count == 20 %>
+                  <div class="peer-checked:bg-blue-600 peer-checked:text-white bg-gray-200 rounded-lg px-5 py-2 font-semibold hover:bg-gray-300 transition-all">
+                    <%= count %>문제
+                  </div>
+                </label>
+              <% end %>
+            </div>
+          </div>
+
+          <!-- Time Limit -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-3">시간 제한</label>
+            <div class="flex gap-3">
+              <label class="relative cursor-pointer">
+                <%= form.radio_button :time_limit, nil, class: 'peer sr-only', checked: true %>
+                <div class="peer-checked:bg-blue-600 peer-checked:text-white bg-gray-200 rounded-lg px-5 py-2 font-semibold hover:bg-gray-300 transition-all">
+                  무제한
+                </div>
+              </label>
+              <% [30, 60, 90, 120].each do |minutes| %>
+                <label class="relative cursor-pointer">
+                  <%= form.radio_button :time_limit, minutes, class: 'peer sr-only' %>
+                  <div class="peer-checked:bg-blue-600 peer-checked:text-white bg-gray-200 rounded-lg px-5 py-2 font-semibold hover:bg-gray-300 transition-all">
+                    <%= minutes %>분
+                  </div>
+                </label>
+              <% end %>
+            </div>
+          </div>
+
+          <!-- Advanced Settings (Optional) -->
+          <details class="border-t pt-6">
+            <summary class="cursor-pointer font-semibold text-gray-700 hover:text-blue-600">
+              고급 설정 ▼
+            </summary>
+            <div class="mt-4 space-y-4">
+              <div>
+                <label class="flex items-center">
+                  <%= check_box_tag 'settings[shuffle_questions]', '1', true, class: 'mr-2 h-4 w-4 text-blue-600' %>
+                  <span>문제 순서 섞기</span>
+                </label>
+              </div>
+              <div>
+                <label class="flex items-center">
+                  <%= check_box_tag 'settings[shuffle_options]', '1', true, class: 'mr-2 h-4 w-4 text-blue-600' %>
+                  <span>보기 순서 섞기</span>
+                </label>
+              </div>
+              <div>
+                <label class="flex items-center">
+                  <%= check_box_tag 'settings[show_timer]', '1', true, class: 'mr-2 h-4 w-4 text-blue-600' %>
+                  <span>타이머 표시</span>
+                </label>
+              </div>
+            </div>
+          </details>
+
+          <!-- Submit Buttons -->
+          <div class="flex gap-4 pt-6 border-t">
+            <%= form.submit '시험 시작', class: 'flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3 px-6 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all transform hover:scale-105 shadow-lg' %>
+            <%= link_to '취소', study_set_path(@study_set), class: 'px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-300 transition-all' %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Statistics Card -->
+    <div class="mt-8 bg-white rounded-2xl shadow-xl p-6">
+      <h3 class="font-semibold text-gray-700 mb-4">최근 시험 기록</h3>
+      <div class="grid grid-cols-3 gap-4">
+        <div class="text-center">
+          <div class="text-3xl font-bold text-blue-600">85%</div>
+          <div class="text-sm text-gray-500">평균 점수</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-green-600">12</div>
+          <div class="text-sm text-gray-500">완료한 시험</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-purple-600">45분</div>
+          <div class="text-sm text-gray-500">평균 소요시간</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

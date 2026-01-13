@@ -1,0 +1,160 @@
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold text-gray-900 mb-2">시험 결과</h1>
+      <p class="text-lg text-gray-600"><%= @exam_session.study_set.title %></p>
+    </div>
+
+    <!-- Score Card -->
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl shadow-xl p-8 mb-8">
+      <div class="text-center text-white">
+        <div class="mb-4">
+          <% if @score >= 80 %>
+            <svg class="w-20 h-20 mx-auto text-yellow-300" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+          <% elsif @score >= 60 %>
+            <svg class="w-20 h-20 mx-auto text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          <% else %>
+            <svg class="w-20 h-20 mx-auto text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          <% end %>
+        </div>
+        <div class="text-6xl font-bold mb-2">
+          <%= @score.round %>점
+        </div>
+        <div class="text-xl opacity-90">
+          <%= @correct_count %> / <%= @exam_session.total_questions %> 문제 정답
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistics Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0 p-3 bg-green-100 rounded-lg">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm text-gray-500">정답</p>
+            <p class="text-2xl font-semibold text-gray-900"><%= @correct_count %></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0 p-3 bg-red-100 rounded-lg">
+            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm text-gray-500">오답</p>
+            <p class="text-2xl font-semibold text-gray-900"><%= @wrong_count %></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0 p-3 bg-blue-100 rounded-lg">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm text-gray-500">소요 시간</p>
+            <p class="text-xl font-semibold text-gray-900"><%= @exam_session.formatted_time_elapsed %></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0 p-3 bg-purple-100 rounded-lg">
+            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm text-gray-500">정답률</p>
+            <p class="text-2xl font-semibold text-gray-900"><%= @score.round %>%</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Answer Review Section -->
+    <div class="bg-white rounded-lg shadow overflow-hidden mb-8">
+      <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-900">답안 상세</h2>
+      </div>
+      <div class="divide-y divide-gray-200">
+        <% @exam_answers.each_with_index do |answer, index| %>
+          <div class="p-6 <%= answer.is_correct ? 'bg-green-50' : 'bg-red-50' %>">
+            <div class="flex items-start">
+              <div class="flex-shrink-0 mr-4">
+                <span class="inline-flex items-center justify-center w-10 h-10 rounded-full <%= answer.is_correct ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800' %> font-semibold">
+                  <%= index + 1 %>
+                </span>
+              </div>
+              <div class="flex-1">
+                <p class="text-gray-900 font-medium mb-2"><%= answer.question.question_text.truncate(100) %></p>
+                <div class="flex items-center space-x-4 text-sm">
+                  <span class="flex items-center">
+                    <span class="text-gray-600">내 답안:</span>
+                    <span class="ml-1 font-semibold <%= answer.is_correct ? 'text-green-600' : 'text-red-600' %>">
+                      <%= answer.selected_answer || "미답변" %>
+                    </span>
+                  </span>
+                  <% unless answer.is_correct %>
+                    <span class="flex items-center">
+                      <span class="text-gray-600">정답:</span>
+                      <span class="ml-1 font-semibold text-blue-600">
+                        <%= answer.question.correct_answer %>
+                      </span>
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+              <div class="flex-shrink-0 ml-4">
+                <% if answer.is_correct %>
+                  <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                  </svg>
+                <% else %>
+                  <svg class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                  </svg>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <%= link_to "오답 복습하기",
+                  new_study_set_exam_session_path(@exam_session.study_set, exam_type: ExamSession::EXAM_TYPE_WRONG_ANSWER),
+                  class: "px-6 py-3 bg-gradient-to-r from-red-600 to-pink-600 text-white font-semibold rounded-lg hover:from-red-700 hover:to-pink-700 shadow-lg transition-all text-center" %>
+
+      <%= link_to "다시 풀기",
+                  new_study_set_exam_session_path(@exam_session.study_set),
+                  class: "px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-800 shadow-lg transition-all text-center" %>
+
+      <%= link_to "문제집으로 돌아가기",
+                  @exam_session.study_set,
+                  class: "px-6 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors text-center" %>
+    </div>
+  </div>
+</div>

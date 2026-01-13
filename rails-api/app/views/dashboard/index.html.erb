@@ -1,0 +1,125 @@
+<div class="min-h-screen bg-gray-50">
+  <%= render 'shared/navbar' %>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- 사용자 인사 -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">
+        안녕하세요, <%= @user.name || @user.email.split('@').first %>님! 👋
+      </h1>
+      <p class="text-gray-600 mt-2">오늘도 ExamsGraph와 함께 학습을 시작해보세요.</p>
+    </div>
+
+    <!-- 대시보드 통계 카드 -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <!-- 학습 세트 카드 -->
+      <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+            <span class="text-2xl">📚</span>
+          </div>
+          <span class="text-sm text-gray-500">전체</span>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-900"><%= current_user.study_sets.count %></h3>
+        <p class="text-sm text-gray-600 mt-1">학습 세트</p>
+      </div>
+
+      <!-- 학습 진행률 카드 -->
+      <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg">
+            <svg class="w-7 h-7 text-white" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C9.62 2 7.5 3.12 6.03 4.82C5.61 4.5 5.14 4.27 4.64 4.12C3.84 3.88 2.97 3.88 2.17 4.12C1.37 4.37 0.687 4.85 0.187 5.5C-0.313 6.14 -0.562 6.95 -0.562 7.75C-0.562 8.56 -0.313 9.36 0.187 10C0.687 10.65 1.37 11.13 2.17 11.38C2.97 11.63 3.84 11.63 4.64 11.38C5.14 11.23 5.61 11 6.03 10.68C7.5 12.38 9.62 13.5 12 13.5C14.38 13.5 16.5 12.38 17.97 10.68C18.39 11 18.86 11.23 19.36 11.38C20.16 11.63 21.03 11.63 21.83 11.38C22.63 11.13 23.31 10.65 23.81 10C24.31 9.36 24.56 8.56 24.56 7.75C24.56 6.95 24.31 6.14 23.81 5.5C23.31 4.85 22.63 4.37 21.83 4.12C21.03 3.88 20.16 3.88 19.36 4.12C18.86 4.27 18.39 4.5 17.97 4.82C16.5 3.12 14.38 2 12 2M9 8C9.55 8 10 8.45 10 9C10 9.55 9.55 10 9 10C8.45 10 8 9.55 8 9C8 8.45 8.45 8 9 8M15 8C15.55 8 16 8.45 16 9C16 9.55 15.55 10 15 10C14.45 10 14 9.55 14 9C14 8.45 14.45 8 15 8M12 14C8.67 14 5.5 15.34 3.03 17.5C3.05 17.5 3.06 17.5 3.07 17.5C4.96 19.39 8.22 20.5 12 20.5C15.78 20.5 19.04 19.39 20.93 17.5C20.94 17.5 20.95 17.5 20.97 17.5C18.5 15.34 15.33 14 12 14Z"/>
+            </svg>
+          </div>
+          <span class="text-sm text-gray-500">이번 주</span>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-900">0</h3>
+        <p class="text-sm text-gray-600 mt-1">완료한 문제</p>
+      </div>
+
+      <!-- 정답률 카드 -->
+      <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+            <span class="text-2xl">🎯</span>
+          </div>
+          <span class="text-sm text-gray-500">평균</span>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-900">-%</h3>
+        <p class="text-sm text-gray-600 mt-1">정답률</p>
+      </div>
+    </div>
+
+    <!-- 빠른 작업 섹션 -->
+    <div class="mb-8">
+      <h2 class="text-xl font-bold text-gray-900 mb-4">빠른 작업</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <%= link_to new_study_set_path, class: "bg-white border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 hover:bg-blue-50 transition group" do %>
+          <div class="flex flex-col items-center">
+            <span class="text-3xl mb-2">➕</span>
+            <span class="text-gray-700 font-medium group-hover:text-blue-600">새 학습 세트 만들기</span>
+          </div>
+        <% end %>
+
+        <%= link_to study_sets_path, class: "bg-white border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-green-500 hover:bg-green-50 transition group" do %>
+          <div class="flex flex-col items-center">
+            <span class="text-3xl mb-2">📚</span>
+            <span class="text-gray-700 font-medium group-hover:text-green-600">내 학습 세트</span>
+          </div>
+        <% end %>
+
+        <%= link_to "#", class: "bg-white border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-purple-500 hover:bg-purple-50 transition group" do %>
+          <div class="flex flex-col items-center">
+            <span class="text-3xl mb-2">🔍</span>
+            <span class="text-gray-700 font-medium group-hover:text-purple-600">공개 문제집 탐색</span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- 최근 학습 세트 -->
+    <div class="mb-8">
+      <h2 class="text-xl font-bold text-gray-900 mb-4">최근 학습 세트</h2>
+      <% if @recent_study_sets.any? %>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <% @recent_study_sets.each do |study_set| %>
+            <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200 hover:shadow-md transition">
+              <h3 class="font-bold text-gray-900 mb-2"><%= study_set.title %></h3>
+              <p class="text-sm text-gray-600 mb-4"><%= study_set.description %></p>
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-gray-500">
+                  <%= study_set.created_at.strftime("%Y.%m.%d") %>
+                </span>
+                <%= link_to "학습하기 →", study_set_path(study_set),
+                    class: "text-blue-600 hover:text-blue-800 text-sm font-medium" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="bg-gray-100 rounded-lg p-12 text-center">
+          <span class="text-5xl mb-4 block">📚</span>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">아직 학습 세트가 없습니다</h3>
+          <p class="text-gray-600 mb-4">첫 학습 세트를 만들어 학습을 시작해보세요!</p>
+          <%= link_to "첫 학습 세트 만들기", new_study_set_path,
+              class: "inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition" %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- 학습 팁 섹션 -->
+    <div class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+      <div class="flex items-start">
+        <span class="text-2xl mr-3">💡</span>
+        <div>
+          <h3 class="font-bold text-gray-900 mb-1">오늘의 학습 팁</h3>
+          <p class="text-gray-700">
+            ExamsGraph의 지식 그래프 기능을 활용하면 약점 분석을 통해 효율적인 학습이 가능합니다.
+            PDF를 업로드하고 AI 분석을 시작해보세요!
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

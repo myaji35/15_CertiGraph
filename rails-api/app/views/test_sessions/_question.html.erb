@@ -1,0 +1,177 @@
+<% if question %>
+  <!-- Question Header -->
+  <div class="flex justify-between items-start mb-6">
+    <div class="flex items-center space-x-3">
+      <span class="inline-flex items-center justify-center w-10 h-10 bg-blue-100 text-blue-700 rounded-full font-bold text-lg">
+        <%= question.question_number %>
+      </span>
+      <h3 class="text-lg font-semibold text-gray-900">
+        문제 <%= question.question_number %> / <%= test_session.question_count %>
+      </h3>
+    </div>
+
+    <!-- Mark Button -->
+    <button id="mark-button"
+            data-question-id="<%= question.id %>"
+            class="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all
+                   <%= question.is_marked ? 'bg-orange-100 text-orange-700 hover:bg-orange-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' %>">
+      <svg class="w-5 h-5" fill="<%= question.is_marked ? 'currentColor' : 'none' %>" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+      </svg>
+      <span><%= question.is_marked ? '표시 해제' : '표시' %></span>
+    </button>
+  </div>
+
+  <!-- Question Content -->
+  <div class="prose prose-lg max-w-none mb-8">
+    <div class="bg-gray-50 rounded-lg p-6 mb-6">
+      <%= simple_format(question.question_text) %>
+    </div>
+  </div>
+
+  <!-- Answer Options -->
+  <%= form_with url: submit_answer_test_session_path(test_session),
+                method: :post,
+                local: false,
+                data: { turbo_frame: 'question-display' },
+                id: 'answer-form',
+                class: 'space-y-3' do |form| %>
+    <%= hidden_field_tag :question_id, question.id %>
+
+    <div class="space-y-3">
+      <% question.display_options.each do |key, value| %>
+        <label class="relative cursor-pointer block group">
+          <%= radio_button_tag :selected_answer, key,
+              question.test_answer&.selected_answer == key,
+              class: 'peer sr-only',
+              id: "option_#{key}" %>
+          <div class="peer-checked:bg-blue-50 peer-checked:border-blue-500 peer-checked:ring-2 peer-checked:ring-blue-200
+                      border-2 border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-all">
+            <div class="flex items-start">
+              <span class="flex-shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-full
+                           peer-checked:bg-blue-600 peer-checked:text-white bg-gray-200 text-gray-600 font-bold mr-3">
+                <%= key %>
+              </span>
+              <div class="flex-1 pt-1">
+                <%= value %>
+              </div>
+            </div>
+          </div>
+        </label>
+      <% end %>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="flex justify-between items-center pt-6 border-t">
+      <!-- Previous Button -->
+      <% if question.previous_question %>
+        <%= link_to test_session_path(test_session, question_id: question.previous_question.id),
+            class: 'px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium flex items-center' do %>
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          이전 문제
+        <% end %>
+      <% else %>
+        <div></div>
+      <% end %>
+
+      <!-- Action Buttons -->
+      <div class="flex space-x-3">
+        <% if test_session.test_type == 'practice' %>
+          <button type="button" id="check-answer-btn"
+                  class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium">
+            정답 확인
+          </button>
+        <% end %>
+
+        <!-- Submit/Next Button -->
+        <% if question.next_question %>
+          <%= submit_tag '다음 문제',
+              name: 'next_action',
+              value: 'next',
+              class: 'px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center' %>
+        <% else %>
+          <%= submit_tag '시험 완료',
+              name: 'next_action',
+              value: 'complete',
+              class: 'px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium' %>
+        <% end %>
+      </div>
+
+      <!-- Next Button (if not last question) -->
+      <% if question.next_question %>
+        <%= link_to test_session_path(test_session, question_id: question.next_question.id),
+            class: 'px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium flex items-center' do %>
+          다음 문제
+          <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        <% end %>
+      <% else %>
+        <div></div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <!-- Practice Mode: Show Answer Immediately -->
+  <% if test_session.test_type == 'practice' && question.answered? %>
+    <div class="mt-6 p-4 rounded-lg <%= question.correct? ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200' %> border">
+      <div class="flex items-center mb-2">
+        <% if question.correct? %>
+          <svg class="w-6 h-6 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+          </svg>
+          <span class="font-bold text-green-700">정답입니다!</span>
+        <% else %>
+          <svg class="w-6 h-6 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+          </svg>
+          <span class="font-bold text-red-700">오답입니다</span>
+        <% end %>
+      </div>
+      <p class="text-sm text-gray-700">
+        정답: <span class="font-bold"><%= question.correct_answer %></span>
+      </p>
+      <% if question.question.explanation.present? %>
+        <div class="mt-3 pt-3 border-t">
+          <p class="text-sm font-semibold text-gray-700 mb-1">해설:</p>
+          <p class="text-sm text-gray-600"><%= question.question.explanation %></p>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <script>
+  // Mark/Unmark question
+  document.getElementById('mark-button')?.addEventListener('click', function() {
+    const questionId = this.dataset.questionId;
+    const isMarked = this.textContent.includes('해제');
+
+    fetch(`/test_questions/${questionId}/mark`, {
+      method: 'PATCH',
+      headers: {
+        'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ marked: !isMarked })
+    }).then(response => {
+      if (response.ok) {
+        location.reload();
+      }
+    });
+  });
+
+  // Auto-save answer when selected
+  document.querySelectorAll('input[name="selected_answer"]').forEach(input => {
+    input.addEventListener('change', function() {
+      // Save answer to localStorage for recovery
+      localStorage.setItem(`question_${this.form.querySelector('[name="question_id"]').value}_answer`, this.value);
+    });
+  });
+  </script>
+<% else %>
+  <div class="text-center py-12">
+    <p class="text-gray-500">문제를 불러오는 중...</p>
+  </div>
+<% end %>

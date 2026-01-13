@@ -11,22 +11,24 @@ Currently in **Planning/MVP Preparation** stage. No source code exists yet - the
 
 ## Planned Tech Stack
 
-### Frontend
-- Next.js 14+ (App Router)
-- React Three Fiber + Drei (3D visualization)
-- Zustand (state management)
-- Tailwind CSS
+### Frontend (Rails-integrated)
+- Rails 8.0+ with Turbo & Stimulus
+- Three.js via importmap (3D visualization)
+- Tailwind CSS v3 (tailwindcss-rails ~> 2.0)
+- Stimulus controllers with fallback patterns
 
 ### Backend
-- Python 3.10+ with FastAPI
-- LangChain or LangGraph for orchestration
+- Ruby 3.3.0+ with Rails 8.0+
+- Sidekiq or Solid Queue (background jobs)
+- Active Storage with Direct Upload
+- Service Objects for business logic
 
 ### Databases
-- Pinecone (Vector DB for embeddings)
-- Neo4j AuraDB (Graph DB for concepts and learning history)
-- PostgreSQL via Supabase (user/payment data)
+- PostgreSQL with pgvector extension (embeddings)
+- Neo4j AuraDB via REST API (Graph DB)
+- Solid Cache or Redis (caching)
 
-### AI/ML
+### AI/ML (via API)
 - Upstage Document Parse (OCR)
 - OpenAI GPT-4o / GPT-4o-mini (reasoning)
 - OpenAI text-embedding-3-small (embeddings)

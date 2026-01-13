@@ -1,0 +1,105 @@
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">시험 설정</h1>
+      <p class="text-gray-600"><%= @study_set.title %></p>
+    </div>
+
+    <!-- Test Configuration Form -->
+    <%= form_with url: study_set_exam_sessions_path(@study_set), local: true, class: "space-y-6" do |form| %>
+
+      <!-- Exam Type Selection -->
+      <div class="bg-white shadow-sm rounded-lg p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">시험 유형 선택</h2>
+        <div class="space-y-3">
+          <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all cursor-pointer">
+            <%= form.radio_button :exam_type, ExamSession::EXAM_TYPE_MOCK, checked: true, class: "mr-3 text-blue-600" %>
+            <div class="flex-1">
+              <div class="font-medium text-gray-900">모의고사</div>
+              <div class="text-sm text-gray-500">실제 시험과 동일한 환경으로 진행됩니다</div>
+            </div>
+          </label>
+
+          <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all cursor-pointer">
+            <%= form.radio_button :exam_type, ExamSession::EXAM_TYPE_PRACTICE, class: "mr-3 text-blue-600" %>
+            <div class="flex-1">
+              <div class="font-medium text-gray-900">연습 모드</div>
+              <div class="text-sm text-gray-500">시간 제한 없이 자유롭게 학습합니다</div>
+            </div>
+          </label>
+
+          <% if current_user.wrong_answers.where(study_set: @study_set).any? %>
+            <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all cursor-pointer">
+              <%= form.radio_button :exam_type, ExamSession::EXAM_TYPE_WRONG_ANSWER, class: "mr-3 text-blue-600" %>
+              <div class="flex-1">
+                <div class="font-medium text-gray-900">오답 복습</div>
+                <div class="text-sm text-gray-500">틀린 문제만 다시 풀어봅니다 (<%= current_user.wrong_answers.where(study_set: @study_set).count %>문제)</div>
+              </div>
+            </label>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Question Count Selection -->
+      <div class="bg-white shadow-sm rounded-lg p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">문제 수 설정</h2>
+        <p class="text-sm text-gray-600 mb-4">전체 문제: <%= @study_set.questions.count %>개</p>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <label class="flex items-center justify-center p-3 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all cursor-pointer">
+            <%= form.radio_button :question_count, 10, class: "sr-only peer" %>
+            <span class="font-medium text-gray-700 peer-checked:text-blue-600">10문제</span>
+          </label>
+
+          <label class="flex items-center justify-center p-3 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all cursor-pointer">
+            <%= form.radio_button :question_count, 20, class: "sr-only peer" %>
+            <span class="font-medium text-gray-700 peer-checked:text-blue-600">20문제</span>
+          </label>
+
+          <label class="flex items-center justify-center p-3 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all cursor-pointer">
+            <%= form.radio_button :question_count, 30, class: "sr-only peer" %>
+            <span class="font-medium text-gray-700 peer-checked:text-blue-600">30문제</span>
+          </label>
+
+          <label class="flex items-center justify-center p-3 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all cursor-pointer">
+            <%= form.radio_button :question_count, 0, checked: true, class: "sr-only peer" %>
+            <span class="font-medium text-gray-700 peer-checked:text-blue-600">전체</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Time Limit Selection (Optional) -->
+      <div class="bg-white shadow-sm rounded-lg p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">시간 제한 (선택)</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <label class="flex items-center justify-center p-3 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all cursor-pointer">
+            <%= form.radio_button :time_limit, 0, checked: true, class: "sr-only peer" %>
+            <span class="font-medium text-gray-700 peer-checked:text-blue-600">제한 없음</span>
+          </label>
+
+          <label class="flex items-center justify-center p-3 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all cursor-pointer">
+            <%= form.radio_button :time_limit, 30, class: "sr-only peer" %>
+            <span class="font-medium text-gray-700 peer-checked:text-blue-600">30분</span>
+          </label>
+
+          <label class="flex items-center justify-center p-3 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all cursor-pointer">
+            <%= form.radio_button :time_limit, 60, class: "sr-only peer" %>
+            <span class="font-medium text-gray-700 peer-checked:text-blue-600">60분</span>
+          </label>
+
+          <label class="flex items-center justify-center p-3 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all cursor-pointer">
+            <%= form.radio_button :time_limit, 90, class: "sr-only peer" %>
+            <span class="font-medium text-gray-700 peer-checked:text-blue-600">90분</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex gap-4">
+        <%= form.submit "시험 시작", class: "flex-1 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 shadow-lg" %>
+        <%= link_to "취소", @study_set, class: "px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors" %>
+      </div>
+    <% end %>
+  </div>
+</div>

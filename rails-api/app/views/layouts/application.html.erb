@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>CertiGraph - AI 자격증 마스터</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="기출문제 PDF를 업로드하면 AI가 문제, 보기, 해설을 자동으로 분리합니다">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%232563eb'/><text x='50' y='65' text-anchor='middle' font-size='40'>🧠</text></svg>">
+
+    <!-- Inter Font (Notion's Font) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+
+    <style>
+      /* Notion-style Global Styles */
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* Notion-style selection */
+      ::selection {
+        background-color: rgba(35, 131, 226, 0.14);
+      }
+
+      /* Notion-style scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.2);
+      }
+
+      /* Notion-style focus */
+      *:focus-visible {
+        outline: 2px solid #2383e2;
+        outline-offset: 2px;
+      }
+
+      /* Smooth transitions */
+      * {
+        transition-property: background-color, border-color, color, fill, stroke;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 150ms;
+      }
+    </style>
+  </head>
+
+  <body class="text-gray-900 bg-white">
+    <main>
+      <%= yield %>
+    </main>
+  </body>
+</html>

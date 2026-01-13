@@ -1,0 +1,132 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+  <!-- Navigation -->
+  <%= render 'shared/navbar' %>
+
+  <!-- Hero Section -->
+  <section class="pt-20 pb-32">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div class="inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-full mb-6">
+        🚀 PDF 업로드만으로 지능 문제 분석
+      </div>
+
+      <h2 class="text-5xl font-bold text-gray-900 mb-6">
+        <span class="text-blue-600">기출문제 PDF</span>를 업로드하면<br>
+        AI가 문제, 보기, 해설을<br>
+        <span class="text-purple-600">자동으로 분리합니다</span>
+      </h2>
+
+      <p class="text-xl text-gray-600 mb-8">
+        반가로운 문제 업격은 그만! <strong>PDF 한 번 업로드로</strong> CBT 모의고시부터 AI 취약점 분석까지.
+      </p>
+
+      <div class="mb-8">
+        <strong class="text-gray-700">사회복지사 1급</strong> 시험 대비의 새로운 기준을 경험하세요.
+      </div>
+
+      <div class="flex justify-center gap-4">
+        <%= link_to "무료로 시작하기 →", new_user_registration_path, class: "bg-blue-600 text-white px-8 py-3 rounded-lg text-lg hover:bg-blue-700 transition" %>
+        <button class="bg-gray-100 text-gray-700 px-8 py-3 rounded-lg text-lg hover:bg-gray-200 transition">들어보기</button>
+      </div>
+
+      <div class="flex justify-center gap-12 mt-12">
+        <div class="flex items-center gap-2">
+          <span class="text-green-500">✓</span>
+          <span class="text-gray-600">무료 시작</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-green-500">✓</span>
+          <span class="text-gray-600">신용카드 불필요</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-green-500">✓</span>
+          <span class="text-gray-600">즉시 사용 가능</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="text-center">
+          <div class="text-4xl mb-4">📄</div>
+          <h3 class="text-xl font-semibold mb-2">PDF 자동 파싱</h3>
+          <p class="text-gray-600">기출문제 PDF를 업로드하면 AI가 문제, 보기, 해설을 자동으로 분리합니다.</p>
+        </div>
+        <div class="text-center">
+          <div class="text-4xl mb-4">📊</div>
+          <h3 class="text-xl font-semibold mb-2">CBT 모의고사</h3>
+          <p class="text-gray-600">실제 시험과 동시한 환경에서 연습하고, 점수와 해설 받아보세요 바랍니다.</p>
+        </div>
+        <div class="text-center">
+          <div class="text-4xl mb-4">📈</div>
+          <h3 class="text-xl font-semibold mb-2">AI 취약점 분석</h3>
+          <p class="text-gray-600">GraphRAG 기반 AI가 취약한 개념을 분석하고 학습 경로를 제공합니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Popular Exams Section -->
+  <section class="py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h3 class="text-2xl font-bold text-center mb-4">인기 문제집</h3>
+      <p class="text-center text-gray-600 mb-12">회원가입 없이도 문제집을 들어볼 수 있습니다</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <% @recent_exams.each do |exam| %>
+          <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition cursor-pointer">
+            <div class="text-3xl mb-4">📚</div>
+            <h4 class="font-semibold mb-2"><%= exam[:title] %></h4>
+            <p class="text-sm text-gray-600 mb-2"><%= exam[:category] %></p>
+            <p class="text-sm text-gray-500">문제 <%= exam[:questions] %>개</p>
+            <button class="mt-4 text-blue-600 hover:text-blue-700 text-sm font-semibold">살펴보기 →</button>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="text-center mt-12">
+        <%= link_to "더 많은 문제집 보기 →", "#", class: "text-blue-600 hover:text-blue-700" %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-gray-400 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div>
+          <h4 class="text-white font-bold mb-4">ExamsGraph</h4>
+          <p class="text-sm">AI 기반 자격증 학습 플랫폼으로 합격의 지름길을 제공합니다.</p>
+        </div>
+        <div>
+          <h5 class="text-white mb-4">서비스</h5>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="hover:text-white">문제집</a></li>
+            <li><a href="#" class="hover:text-white">이용방법</a></li>
+            <li><a href="#" class="hover:text-white">요금제</a></li>
+          </ul>
+        </div>
+        <div>
+          <h5 class="text-white mb-4">회사</h5>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="hover:text-white">회사소개</a></li>
+            <li><a href="#" class="hover:text-white">문의하기</a></li>
+          </ul>
+        </div>
+        <div>
+          <h5 class="text-white mb-4">법적고지</h5>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="hover:text-white">개인정보처리방침</a></li>
+            <li><a href="#" class="hover:text-white">이용약관</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-8 pt-8 border-t border-gray-800 text-center text-sm">
+        © 2024 ExamsGraph. All rights reserved.
+      </div>
+    </div>
+  </footer>
+</div>

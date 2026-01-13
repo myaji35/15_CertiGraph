@@ -1,0 +1,129 @@
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Result Header -->
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
+      <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-6">
+        <h1 class="text-3xl font-bold text-white">시험 결과</h1>
+        <p class="text-blue-100 mt-2"><%= @test_session.study_set.title %></p>
+      </div>
+
+      <!-- Score Display -->
+      <div class="p-8">
+        <div class="text-center mb-8">
+          <div class="inline-flex items-center justify-center w-32 h-32 rounded-full <%= @test_session.pass? ? 'bg-green-100' : 'bg-red-100' %> mb-4">
+            <span class="text-5xl font-bold <%= @test_session.pass? ? 'text-green-600' : 'text-red-600' %>">
+              <%= @test_session.score.to_i %>%
+            </span>
+          </div>
+          <h2 class="text-2xl font-bold <%= @test_session.pass? ? 'text-green-600' : 'text-red-600' %> mb-2">
+            <%= @test_session.pass? ? '합격' : '불합격' %>
+          </h2>
+          <p class="text-gray-600">
+            <%= @test_session.correct_answers %>/<%= @test_session.question_count %> 문제 정답
+          </p>
+        </div>
+
+        <!-- Statistics Grid -->
+        <div class="grid grid-cols-4 gap-4 mb-8">
+          <div class="bg-gray-50 rounded-lg p-4 text-center">
+            <div class="text-2xl font-bold text-gray-900"><%= @test_session.question_count %></div>
+            <div class="text-sm text-gray-500">전체 문제</div>
+          </div>
+          <div class="bg-green-50 rounded-lg p-4 text-center">
+            <div class="text-2xl font-bold text-green-600"><%= @test_session.correct_answers %></div>
+            <div class="text-sm text-gray-500">정답</div>
+          </div>
+          <div class="bg-red-50 rounded-lg p-4 text-center">
+            <div class="text-2xl font-bold text-red-600">
+              <%= @test_session.question_count - @test_session.correct_answers %>
+            </div>
+            <div class="text-sm text-gray-500">오답</div>
+          </div>
+          <div class="bg-blue-50 rounded-lg p-4 text-center">
+            <div class="text-2xl font-bold text-blue-600">
+              <%= Time.at((Time.current - @test_session.started_at).to_i).utc.strftime("%M:%S") %>
+            </div>
+            <div class="text-sm text-gray-500">소요시간</div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-4">
+          <%= link_to '다시 도전하기', new_study_set_test_session_path(@test_session.study_set),
+              class: 'flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3 px-6 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all text-center' %>
+          <%= link_to '오답 복습하기', '#',
+              class: 'flex-1 bg-orange-500 text-white font-bold py-3 px-6 rounded-xl hover:bg-orange-600 transition-all text-center' %>
+          <%= link_to '학습 세트로 돌아가기', study_set_path(@test_session.study_set),
+              class: 'flex-1 bg-gray-200 text-gray-700 font-bold py-3 px-6 rounded-xl hover:bg-gray-300 transition-all text-center' %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Question Review -->
+    <div class="bg-white rounded-2xl shadow-xl p-8">
+      <h3 class="text-xl font-bold text-gray-900 mb-6">문제별 결과</h3>
+
+      <div class="space-y-4">
+        <% @questions.each do |test_question| %>
+          <div class="border rounded-lg p-4 <%= test_question.correct? ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50' %>">
+            <div class="flex items-start justify-between mb-2">
+              <div class="flex items-center">
+                <span class="inline-flex items-center justify-center w-8 h-8 rounded-full <%= test_question.correct? ? 'bg-green-600 text-white' : 'bg-red-600 text-white' %> font-bold mr-3">
+                  <%= test_question.question_number %>
+                </span>
+                <span class="font-medium text-gray-900">
+                  문제 <%= test_question.question_number %>
+                </span>
+              </div>
+              <span class="px-3 py-1 rounded-full text-sm font-medium <%= test_question.correct? ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' %>">
+                <%= test_question.correct? ? '정답' : '오답' %>
+              </span>
+            </div>
+
+            <!-- Question Text Preview -->
+            <div class="ml-11 mb-3">
+              <p class="text-gray-700 line-clamp-2">
+                <%= truncate(test_question.question_text, length: 150) %>
+              </p>
+            </div>
+
+            <!-- Answer Details -->
+            <div class="ml-11 flex items-center justify-between text-sm">
+              <div class="flex items-center space-x-4">
+                <span class="text-gray-600">
+                  선택: <span class="font-medium <%= test_question.correct? ? 'text-green-600' : 'text-red-600' %>">
+                    <%= test_question.test_answer&.selected_answer || '미답변' %>
+                  </span>
+                </span>
+                <% unless test_question.correct? %>
+                  <span class="text-gray-600">
+                    정답: <span class="font-medium text-green-600">
+                      <%= test_question.correct_answer %>
+                    </span>
+                  </span>
+                <% end %>
+              </div>
+              <button class="text-blue-600 hover:text-blue-700 font-medium" onclick="toggleExplanation(<%= test_question.id %>)">
+                해설 보기 →
+              </button>
+            </div>
+
+            <!-- Explanation (Hidden by default) -->
+            <div id="explanation-<%= test_question.id %>" class="hidden ml-11 mt-4 pt-4 border-t">
+              <p class="text-sm text-gray-600">
+                <%= test_question.question.explanation || '해설이 없습니다.' %>
+              </p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleExplanation(questionId) {
+  const element = document.getElementById(`explanation-${questionId}`);
+  element.classList.toggle('hidden');
+}
+</script>

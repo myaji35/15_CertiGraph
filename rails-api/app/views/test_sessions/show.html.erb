@@ -1,0 +1,140 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Top Navigation Bar -->
+  <div class="bg-white border-b sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center py-4">
+        <!-- Test Info -->
+        <div class="flex items-center space-x-4">
+          <h2 class="text-xl font-bold text-gray-900"><%= @test_session.study_set.title %></h2>
+          <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+            <%= @test_session.test_type == 'practice' ? '연습 모드' : '모의고사' %>
+          </span>
+        </div>
+
+        <!-- Timer and Progress -->
+        <div class="flex items-center space-x-6">
+          <!-- Progress -->
+          <div id="progress-bar" class="flex items-center space-x-2">
+            <span class="text-sm font-medium text-gray-600">진행률</span>
+            <div class="w-32 bg-gray-200 rounded-full h-2">
+              <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: <%= @progress %>%"></div>
+            </div>
+            <span class="text-sm font-bold text-gray-900">
+              <%= @test_session.total_answered %>/<%= @test_session.question_count %>
+            </span>
+          </div>
+
+          <!-- Timer -->
+          <% if @test_session.time_limit.present? %>
+            <div class="flex items-center space-x-2 px-4 py-2 bg-red-50 rounded-lg">
+              <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span id="timer" class="font-mono text-lg font-bold text-red-600" data-time-remaining="<%= @time_remaining %>">
+                <%= Time.at(@time_remaining).utc.strftime("%H:%M:%S") %>
+              </span>
+            </div>
+          <% end %>
+
+          <!-- Exit Button -->
+          <%= link_to abandon_test_session_path(@test_session), method: :post,
+              data: { confirm: '시험을 중단하시겠습니까? 진행사항이 저장되지 않습니다.' },
+              class: 'px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium' do %>
+            나가기
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-12 gap-6">
+      <!-- Question Navigation Sidebar -->
+      <div class="col-span-3">
+        <div class="bg-white rounded-xl shadow-lg p-6 sticky top-24">
+          <h3 class="font-bold text-gray-900 mb-4">문제 목록</h3>
+          <div class="grid grid-cols-5 gap-2">
+            <% @test_session.test_questions.ordered.each do |q| %>
+              <%= link_to test_session_path(@test_session, question_id: q.id),
+                  class: "relative aspect-square flex items-center justify-center rounded-lg text-sm font-medium transition-all
+                         #{q.answered? ? 'bg-green-100 text-green-700 hover:bg-green-200' :
+                           (q == @current_question ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200')}
+                         #{q.is_marked ? 'ring-2 ring-orange-400' : ''}" do %>
+                <%= q.question_number %>
+                <% if q.is_marked %>
+                  <span class="absolute -top-1 -right-1 w-2 h-2 bg-orange-400 rounded-full"></span>
+                <% end %>
+              <% end %>
+            <% end %>
+          </div>
+
+          <div class="mt-6 space-y-2 text-sm">
+            <div class="flex items-center justify-between">
+              <span class="flex items-center">
+                <span class="w-4 h-4 bg-green-100 rounded mr-2"></span> 완료
+              </span>
+              <span class="font-semibold"><%= @test_session.test_questions.answered.count %></span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="flex items-center">
+                <span class="w-4 h-4 bg-gray-100 rounded mr-2"></span> 미답변
+              </span>
+              <span class="font-semibold"><%= @test_session.test_questions.unanswered.count %></span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="flex items-center">
+                <span class="w-4 h-4 bg-orange-100 rounded mr-2 ring-2 ring-orange-400"></span> 표시
+              </span>
+              <span class="font-semibold"><%= @test_session.test_questions.marked.count %></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Question Display Area -->
+      <div class="col-span-9">
+        <div id="test-content">
+          <div id="question-display" class="bg-white rounded-xl shadow-lg p-8">
+            <%= render 'question', question: @current_question, test_session: @test_session %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Timer functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const timerElement = document.getElementById('timer');
+  if (timerElement) {
+    let timeRemaining = parseInt(timerElement.dataset.timeRemaining);
+
+    const updateTimer = () => {
+      if (timeRemaining <= 0) {
+        // Auto-submit when time is up
+        alert('시간이 종료되었습니다. 시험이 자동으로 제출됩니다.');
+        document.getElementById('complete-test-form').submit();
+        return;
+      }
+
+      timeRemaining--;
+      const hours = Math.floor(timeRemaining / 3600);
+      const minutes = Math.floor((timeRemaining % 3600) / 60);
+      const seconds = timeRemaining % 60;
+
+      timerElement.textContent =
+        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+      // Warning colors
+      if (timeRemaining < 300) { // Less than 5 minutes
+        timerElement.classList.add('text-red-600');
+        timerElement.parentElement.classList.add('bg-red-100', 'animate-pulse');
+      }
+    };
+
+    setInterval(updateTimer, 1000);
+  }
+});
+</script>
