@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html class="dark" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ExamsGraph 실전 시험 모드 학습 센터</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;family=Noto+Serif+KR:wght@400;700&amp;family=Noto+Sans+KR:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-dark": "#0f172a",
+                        "surface-dark": "#1e293b",
+                        "border-dark": "#334155",
+                        "paper-bg": "#f9f9f7",
+                        "paper-text": "#1a1a1a"
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "Noto Sans KR", "sans-serif"],
+                        "sans": ["Noto Sans KR", "sans-serif"],
+                        "serif": ["Noto Serif KR", "serif"]
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .paper-texture {
+                background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+            }
+            .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+            .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+            .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+            .omr-active { @apply ring-2 ring-primary bg-primary/20 text-primary font-bold; }
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-slate-200 h-screen flex flex-col overflow-hidden font-sans">
+<header class="flex items-center justify-between border-b border-border-dark px-6 py-2 bg-surface-dark/80 backdrop-blur-md z-30 shrink-0">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2">
+<div class="size-8 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[22px]">psychology</span>
+</div>
+<h1 class="text-white text-base font-bold tracking-tight">ExamsGraph 실전 시험 모드</h1>
+</div>
+<div class="h-4 w-[1px] bg-border-dark hidden md:block"></div>
+<div class="hidden md:flex items-center gap-3 text-sm text-slate-400">
+<span class="bg-slate-700/50 px-2 py-0.5 rounded text-[11px] font-bold text-slate-300">시험 유형</span>
+<span class="font-medium">제1회 모의고사: AWS 솔루션 아키텍트 전문</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 text-amber-500 font-mono text-sm bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+<span class="material-symbols-outlined text-[18px]">timer</span>
+<span>42:15</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="text-[11px] text-slate-400">알렉스 존슨</p>
+<p class="text-[10px] text-primary font-bold">PRO ACCOUNT</p>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8 border border-primary" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCgADbo3v2jiyg-x4vopWYXga6mF7C55AWfd3DAaMJVGfg74nPuZuasotXaeSEtEGd8Eg65zDQlnvIEYHxjvo6vbALYfjPCe0Rp5kfiw2-IXIqDv6FHTGXRBkDG1YCsYlm6kuqgpGUKbczq9TUsCuRtbToyq7OgxpLmqyPcXyIERAVWj5B5J7nw_phMs8hsM7CUQmbr6ypaGgc2_hKBYh6iyVzw0VRaUu1YCJ2viREjLv91jImNjVA1D80qB5rljWFic_7htn7UvKU");'></div>
+</div>
+</div>
+</header>
+<main class="flex-1 flex overflow-hidden">
+<aside class="w-64 border-r border-border-dark bg-background-dark flex flex-col shrink-0">
+<div class="p-4 border-b border-border-dark bg-surface-dark/30">
+<h3 class="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-3">디지털 OMR 카드</h3>
+<div class="flex justify-between text-[10px] text-slate-400 mb-2">
+<span>진행 상태</span>
+<span>14 / 35</span>
+</div>
+<div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full" style="width: 40%;"></div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar p-4">
+<div class="grid grid-cols-5 gap-2">
+<button class="size-9 rounded-md border border-border-dark flex items-center justify-center text-xs font-medium hover:border-slate-500 transition-colors">1</button>
+<button class="size-9 rounded-md border border-border-dark flex items-center justify-center text-xs font-medium hover:border-slate-500 transition-colors">2</button>
+<button class="size-9 rounded-md border border-green-500/50 bg-green-500/10 text-green-500 flex items-center justify-center text-xs font-medium">3</button>
+<button class="size-9 rounded-md border border-border-dark flex items-center justify-center text-xs font-medium hover:border-slate-500 transition-colors">4</button>
+<button class="size-9 rounded-md border border-border-dark flex items-center justify-center text-xs font-medium hover:border-slate-500 transition-colors">5</button>
+<button class="size-9 rounded-md border border-border-dark flex items-center justify-center text-xs font-medium hover:border-slate-500 transition-colors">6</button>
+<button class="size-9 rounded-md border border-amber-500/50 bg-amber-500/10 text-amber-500 flex items-center justify-center text-xs font-medium">
+<span class="material-symbols-outlined text-[14px]">flag</span>
+</button>
+<button class="size-9 rounded-md border border-border-dark flex items-center justify-center text-xs font-medium hover:border-slate-500 transition-colors">8</button>
+<button class="size-9 rounded-md border border-border-dark flex items-center justify-center text-xs font-medium hover:border-slate-500 transition-colors">9</button>
+<button class="size-9 rounded-md border border-border-dark flex items-center justify-center text-xs font-medium hover:border-slate-500 transition-colors">10</button>
+<button class="size-9 rounded-md border border-border-dark flex items-center justify-center text-xs font-medium hover:border-slate-500 transition-colors">11</button>
+<button class="size-9 rounded-md border border-border-dark flex items-center justify-center text-xs font-medium hover:border-slate-500 transition-colors">12</button>
+<button class="size-9 rounded-md border border-border-dark flex items-center justify-center text-xs font-medium hover:border-slate-500 transition-colors">13</button>
+<button class="size-9 omr-active">14</button>
+<button class="size-9 rounded-md border border-slate-700/50 text-slate-600 flex items-center justify-center text-xs font-medium">15</button>
+<button class="size-9 rounded-md border border-slate-700/50 text-slate-600 flex items-center justify-center text-xs font-medium">16</button>
+<button class="size-9 rounded-md border border-slate-700/50 text-slate-600 flex items-center justify-center text-xs font-medium">17</button>
+<button class="size-9 rounded-md border border-slate-700/50 text-slate-600 flex items-center justify-center text-xs font-medium">18</button>
+<button class="size-9 rounded-md border border-slate-700/50 text-slate-600 flex items-center justify-center text-xs font-medium">19</button>
+<button class="size-9 rounded-md border border-slate-700/50 text-slate-600 flex items-center justify-center text-xs font-medium">20</button>
+</div>
+</div>
+<div class="p-4 border-t border-border-dark space-y-2">
+<button class="w-full py-2.5 bg-primary text-white rounded-lg text-xs font-bold flex items-center justify-center gap-2 hover:bg-primary/90 transition-all">
+                최종 답안 제출
+            </button>
+<button class="w-full py-2.5 bg-slate-800 text-slate-300 rounded-lg text-xs font-bold hover:bg-slate-700 transition-all">
+                임시 저장
+            </button>
+</div>
+</aside>
+<section class="flex-1 bg-slate-900 overflow-y-auto custom-scrollbar p-10 flex justify-center">
+<div class="w-full max-w-4xl bg-paper-bg paper-texture shadow-2xl min-h-[1100px] p-12 relative flex flex-col text-paper-text font-serif border border-slate-300">
+<div class="border-b-2 border-paper-text/20 pb-8 mb-10 flex justify-between items-end">
+<div>
+<div class="text-[11px] font-bold text-slate-500 mb-1 font-sans uppercase tracking-tight">2024년도 전문 자격 대비 평가</div>
+<h2 class="text-3xl font-bold tracking-tighter">제1회 모의고사</h2>
+</div>
+<div class="text-right font-sans">
+<div class="flex items-center gap-4 text-sm font-bold border-2 border-paper-text/10 p-2 rounded">
+<div class="flex gap-2">
+<span class="text-slate-400">수험번호</span>
+<span class="tracking-widest">2024-0014</span>
+</div>
+<div class="w-[1px] h-4 bg-slate-300"></div>
+<div class="flex gap-2">
+<span class="text-slate-400">성명</span>
+<span>알렉스 존슨</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-6">
+<div class="flex gap-4">
+<span class="text-3xl font-bold">14.</span>
+<div class="pt-1">
+<span class="bg-paper-text/5 px-2 py-0.5 rounded text-[12px] font-sans font-bold border border-paper-text/10 mr-2 uppercase">문항 번호</span>
+<span class="text-[12px] font-sans text-slate-500">[배점: 4.5점]</span>
+</div>
+</div>
+</div>
+<div class="mb-12">
+<h3 class="text-[1.35rem] leading-[1.7] font-medium text-justify">
+                        귀사가 운영 중인 미디어 스트리밍 애플리케이션이 특정 트래픽 피크 시간대에 일시적인 지연 현상을 겪고 있습니다. 
+                        현재 아키텍처는 고정 용량이 4개 인스턴스인 Auto Scaling Group(ASG)을 사용하고 있습니다. 
+                        애플리케이션 가용성을 유지하면서도 가장 <span class="underline underline-offset-4 decoration-2">비용 효율적인 확장성</span>을 제공하는 수정 사항은 무엇입니까?
+                    </h3>
+</div>
+<div class="space-y-6 pl-4 mb-20">
+<label class="flex items-start gap-4 cursor-pointer group">
+<input class="mt-1 size-5 text-paper-text focus:ring-paper-text border-slate-400" name="exam-paper-choice" type="radio"/>
+<div class="flex gap-2">
+<span class="font-bold min-w-[20px]">①</span>
+<span class="text-lg leading-relaxed group-hover:text-primary transition-colors">고정 용량을 3개의 가용 영역에 걸쳐 10개 인스턴스로 늘려 트래픽 피크를 감당한다.</span>
+</div>
+</label>
+<label class="flex items-start gap-4 cursor-pointer group">
+<input checked="" class="mt-1 size-5 text-paper-text focus:ring-paper-text border-slate-400" name="exam-paper-choice" type="radio"/>
+<div class="flex gap-2">
+<span class="font-bold min-w-[20px]">②</span>
+<span class="text-lg leading-relaxed font-bold group-hover:text-primary transition-colors">평균 CPU 사용률(70%)을 기반으로 한 대상 추적(Target Tracking) 정책을 구현한다.</span>
+</div>
+</label>
+<label class="flex items-start gap-4 cursor-pointer group">
+<input class="mt-1 size-5 text-paper-text focus:ring-paper-text border-slate-400" name="exam-paper-choice" type="radio"/>
+<div class="flex gap-2">
+<span class="font-bold min-w-[20px]">③</span>
+<span class="text-lg leading-relaxed group-hover:text-primary transition-colors">두 개의 개별 ASG 간에 트래픽을 분산하기 위해 보조 로드 밸런서를 추가 배포한다.</span>
+</div>
+</label>
+<label class="flex items-start gap-4 cursor-pointer group">
+<input class="mt-1 size-5 text-paper-text focus:ring-paper-text border-slate-400" name="exam-paper-choice" type="radio"/>
+<div class="flex gap-2">
+<span class="font-bold min-w-[20px]">④</span>
+<span class="text-lg leading-relaxed group-hover:text-primary transition-colors">서버리스 확장 기능을 보장하기 위해 기존의 모든 워크로드를 AWS Lambda로 즉시 마이그레이션한다.</span>
+</div>
+</label>
+</div>
+<div class="flex items-center justify-between font-sans border-t-2 border-paper-text/10 pt-8 pb-4">
+<button class="flex items-center gap-2 px-8 py-3 rounded-lg border-2 border-paper-text/20 hover:bg-paper-text/5 hover:border-paper-text/40 transition-all text-paper-text font-bold shadow-sm group">
+<span class="material-symbols-outlined text-[20px] group-hover:-translate-x-0.5 transition-transform">chevron_left</span>
+                        이전
+                    </button>
+<button class="flex items-center gap-2 px-8 py-3 rounded-lg border-2 border-paper-text/80 bg-paper-text/5 hover:bg-paper-text/10 transition-all text-paper-text font-bold shadow-sm group">
+                        다음
+                        <span class="material-symbols-outlined text-[20px] group-hover:translate-x-0.5 transition-transform">chevron_right</span>
+</button>
+</div>
+</div>
+<div class="mt-auto pt-10 border-t border-paper-text/10 flex justify-center font-sans text-sm text-slate-400">
+<span>- 14 -</span>
+</div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] pointer-events-none rotate-[-30deg]">
+<div class="text-[120px] font-bold border-[16px] border-paper-text p-10 rounded-full">ExamsGraph</div>
+</div>
+</div>
+</section>
+<aside class="w-80 border-l border-border-dark bg-background-dark flex flex-col shrink-0">
+<div class="p-5 bg-primary/5 border-b border-border-dark flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="size-9 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
+<span class="material-symbols-outlined text-primary text-[20px]">smart_toy</span>
+</div>
+<div>
+<h3 class="font-bold text-sm text-white">AI 학습 보조</h3>
+<p class="text-[10px] text-slate-400">실시간 피드백 대기 중</p>
+</div>
+</div>
+<button class="text-slate-500 hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">close_fullscreen</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar">
+<div class="p-5 border-b border-border-dark">
+<div class="flex items-center justify-between mb-4">
+<h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px]">account_tree</span>
+                        GraphRAG 연관 개념
+                    </h4>
+<span class="text-[10px] text-primary">실시간 분석</span>
+</div>
+<div class="aspect-square bg-slate-900 rounded-xl border border-border-dark relative overflow-hidden flex items-center justify-center p-4">
+<svg class="w-full h-full" viewBox="0 0 200 200">
+<line stroke="#334155" stroke-width="1" x1="100" x2="60" y1="100" y2="60"></line>
+<line stroke="#334155" stroke-width="1" x1="100" x2="140" y1="100" y2="60"></line>
+<line stroke="#137fec" stroke-width="2" x1="100" x2="100" y1="100" y2="150"></line>
+<circle cx="100" cy="100" fill="#137fec" r="7"></circle>
+<circle cx="60" cy="60" fill="#334155" r="4"></circle>
+<circle cx="140" cy="60" fill="#334155" r="4"></circle>
+<circle cx="100" cy="150" fill="#137fec" r="5"></circle>
+<text fill="#137fec" font-family="sans-serif" font-size="8" font-weight="bold" x="110" y="103">오토 스케일링</text>
+<text fill="#94a3b8" font-family="sans-serif" font-size="7" x="110" y="153">대상 추적 정책</text>
+<text fill="#475569" font-family="sans-serif" font-size="6" x="30" y="55">로드 밸런서</text>
+</svg>
+</div>
+</div>
+<div class="p-5">
+<h4 class="text-[10px] font-bold text-amber-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px]">psychology</span>
+                    미비 개요 집중 지도
+                </h4>
+<div class="space-y-4">
+<div class="bg-amber-500/5 border-l-2 border-amber-500 p-3 rounded-r-lg">
+<p class="text-[12px] leading-relaxed text-slate-300">
+                            최근 5문제 중 <span class="text-white font-bold">비용 최적화</span> 및 <span class="text-white font-bold">확장 전략</span> 관련 문항에서 취약점이 발견되었습니다. 
+                            <span class="text-primary underline">대상 추적</span>은 리소스 사용률에 따라 자동으로 인스턴스 수를 조정하여 최적의 비용 효율을 보장합니다.
+                        </p>
+</div>
+<div class="bg-surface-dark/50 border border-border-dark p-3 rounded-lg">
+<p class="text-[11px] text-slate-500 mb-2">PDF 워크북 핵심 요약:</p>
+<p class="text-[12px] italic text-slate-400">
+                            "Auto Scaling의 핵심은 단순히 성능을 높이는 것이 아니라, 비즈니스 지표에 따른 '유연한 비용 관리'에 있다."
+                        </p>
+</div>
+<button class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[11px] font-bold transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[16px]">quiz</span>
+                        유사 유형 문제 생성
+                    </button>
+</div>
+</div>
+</div>
+</aside>
+</main>
+<footer class="h-10 border-t border-border-dark bg-surface-dark flex items-center justify-between px-6 z-30 shrink-0">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="size-2 rounded-full bg-green-500 animate-pulse"></span>
+<span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">실시간 전국 비교</span>
+</div>
+<div class="flex items-center gap-4 border-l border-border-dark pl-4">
+<div class="flex items-center gap-2">
+<span class="text-[10px] text-slate-500">내 평균 속도:</span>
+<span class="text-[10px] font-bold text-white">45초</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] text-slate-500">전체 평균:</span>
+<span class="text-[10px] font-bold text-primary">62초</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-6 text-[10px] text-slate-400">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px]">groups</span>
+<span>현재 1,240명 응시 중</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+<span>최종 동기화 완료</span>
+</div>
+</div>
+</footer>
+
+</body></html>

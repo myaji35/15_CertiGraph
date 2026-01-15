@@ -1,0 +1,103 @@
+---
+default: &default
+  # SQLite 기반 Solid Queue 설정
+  db:
+    database: storage/solid_queue.sqlite3
+
+  # 큐 정의
+  queues:
+    - name: default
+      threads: 5
+      delay: 0
+    - name: high_priority
+      threads: 10
+      delay: 0
+    - name: low_priority
+      threads: 3
+      delay: 0
+    - name: pdf_processing
+      threads: 2
+      delay: 0
+    - name: embedding_generation
+      threads: 4
+      delay: 0
+    - name: graph_update
+      threads: 3
+      delay: 0
+
+  # 일반 설정
+  batch:
+    size: 100
+    timeout: 30
+
+  shutdown:
+    timeout: 30
+
+development:
+  <<: *default
+  db:
+    database: storage/solid_queue.sqlite3
+    logger: true  # 개발 환경에서는 로깅 활성화
+
+test:
+  <<: *default
+  db:
+    database: storage/test_solid_queue.sqlite3
+  queues:
+    - name: default
+      threads: 1
+      delay: 0
+    - name: high_priority
+      threads: 1
+      delay: 0
+    - name: low_priority
+      threads: 1
+      delay: 0
+    - name: pdf_processing
+      threads: 1
+      delay: 0
+    - name: embedding_generation
+      threads: 1
+      delay: 0
+    - name: graph_update
+      threads: 1
+      delay: 0
+
+production:
+  <<: *default
+  db:
+    database: storage/solid_queue.sqlite3
+    # 프로덕션에서는 PostgreSQL 사용 권장
+    # adapter: postgresql
+    # username: <%= ENV["DB_USERNAME"] %>
+    # password: <%= ENV["DB_PASSWORD"] %>
+    # host: <%= ENV["DB_HOST"] %>
+    # database: <%= ENV["DB_NAME"] %>
+
+  batch:
+    size: 500
+    timeout: 60
+
+  # 프로덕션에서는 더 많은 워커 스레드 사용
+  queues:
+    - name: default
+      threads: 10
+      delay: 0
+    - name: high_priority
+      threads: 15
+      delay: 0
+    - name: low_priority
+      threads: 5
+      delay: 0
+    - name: pdf_processing
+      threads: 8
+      delay: 0
+    - name: embedding_generation
+      threads: 10
+      delay: 0
+    - name: graph_update
+      threads: 8
+      delay: 0
+
+  shutdown:
+    timeout: 60

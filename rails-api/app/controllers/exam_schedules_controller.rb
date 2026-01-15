@@ -1,116 +1,201 @@
 class ExamSchedulesController < ApplicationController
-  before_action :authenticate_user!, except: [:index, :show]
+  before_action :set_exam_schedule, only: [:show, :register_notification]
 
+  # GET /exam_schedules
+  # 전체 시험 일정 조회 (캘린더 뷰용)
   def index
-    @year = params[:year] || 2026
-    @certification = params[:certification]
+    @schedules = ExamSchedule.includes(:certification)
 
-    @schedules = ExamSchedule.where(exam_year: @year)
-    @schedules = @schedules.where(certification_name: @certification) if @certification.present?
+    # 연도 필터 (기본: 현재 연도)
+    year = params[:year]&.to_i || Date.current.year
+    @schedules = @schedules.by_year(year)
 
-    # 가장 가까운 시험일정 순으로 정렬
-    @schedules = @schedules.order(:written_exam_date)
+    # 월 필터 (선택사항)
+    if params[:month].present?
+      month = params[:month].to_i
+      start_date = Date.new(year, month, 1)
+      end_date = start_date.end_of_month
+      @schedules = @schedules.where(exam_date: start_date..end_date)
+    end
 
-    # 필터용 자격증 목록
-    @certifications = ExamSchedule.where(exam_year: @year)
-                                  .select(:certification_name)
-                                  .distinct
-                                  .pluck(:certification_name)
-                                  .sort
+    # 카테고리 필터
+    if params[:category].present?
+      @schedules = @schedules.joins(:certification)
+                            .where(certifications: { category: params[:category] })
+    end
 
-    # 통계 데이터
-    @stats = {
-      total_schedules: @schedules.count,
-      total_certifications: @schedules.select(:certification_code).distinct.count,
-      upcoming_exam: @schedules.where('written_exam_date >= ?', Date.today).first
+    # 시험 타입 필터
+    @schedules = @schedules.by_type(params[:exam_type]) if params[:exam_type].present?
+
+    # 정렬
+    @schedules = @schedules.order(exam_date: :asc)
+
+    render json: {
+      year: year,
+      month: params[:month],
+      total: @schedules.count,
+      schedules: @schedules.map(&:to_calendar_event)
     }
-
-    respond_to do |format|
-      format.html
-      format.json { render json: @schedules }
-    end
   end
 
-  def show
-    @schedule = ExamSchedule.find(params[:id])
+  # GET /exam_schedules/upcoming
+  # 다가오는 시험 일정 (대시보드용)
+  def upcoming
+    limit = params[:limit]&.to_i || 10
+    @schedules = ExamSchedule.upcoming
+                            .includes(:certification)
+                            .limit(limit)
 
-    # 같은 자격증의 다른 회차 정보
-    @other_rounds = ExamSchedule.where(
-      certification_code: @schedule.certification_code,
-      exam_year: @schedule.exam_year
-    ).where.not(id: @schedule.id).order(:exam_round)
+    render json: {
+      upcoming_exams: @schedules.map(&:to_json_summary)
+    }
+  end
 
-    # D-Day 계산
-    if @schedule.written_exam_date
-      days_until = (@schedule.written_exam_date - Date.today).to_i
-      @d_day = if days_until > 0
-        "D-#{days_until}"
-      elsif days_until == 0
-        "D-Day"
-      else
-        "종료"
+  # GET /exam_schedules/open_registrations
+  # 현재 원서 접수 중인 시험
+  def open_registrations
+    @schedules = ExamSchedule.open_registration
+                            .includes(:certification)
+
+    render json: {
+      open_registrations: @schedules.map do |schedule|
+        schedule.to_json_summary.merge(
+          days_left: (schedule.registration_end_date - Date.current).to_i
+        )
       end
-    end
+    }
   end
 
-  def calendar
-    @year = params[:year]&.to_i || 2026
-    @month = params[:month]&.to_i || Date.today.month
+  # GET /exam_schedules/:id
+  def show
+    render json: {
+      schedule: @exam_schedule.as_json(
+        include: {
+          certification: {
+            only: [:id, :name, :organization, :category]
+          }
+        }
+      ),
+      d_day: @exam_schedule.d_day_text,
+      registration_open: @exam_schedule.registration_open?
+    }
+  end
 
-    # 해당 월의 시험일정
-    start_date = Date.new(@year, @month, 1)
+  # POST /exam_schedules/:id/register_notification
+  # 알림 등록
+  def register_notification
+    return render_unauthorized unless current_user
+
+    notification_type = params[:notification_type]
+    channel = params[:channel] || 'email'
+
+    # 이미 등록된 알림인지 확인
+    existing = ExamNotification.find_by(
+      user: current_user,
+      exam_schedule: @exam_schedule,
+      notification_type: notification_type,
+      status: 'pending'
+    )
+
+    if existing
+      return render json: {
+        success: false,
+        message: 'Already registered for this notification'
+      }, status: :unprocessable_entity
+    end
+
+    # 알림 스케줄링 시간 계산
+    scheduled_at = calculate_notification_time(notification_type)
+
+    notification = ExamNotification.create!(
+      user: current_user,
+      exam_schedule: @exam_schedule,
+      notification_type: notification_type,
+      channel: channel,
+      scheduled_at: scheduled_at,
+      status: 'pending'
+    )
+
+    render json: {
+      success: true,
+      notification: notification.as_json(only: [:id, :notification_type, :channel, :scheduled_at])
+    }
+  rescue => e
+    render json: {
+      success: false,
+      error: e.message
+    }, status: :unprocessable_entity
+  end
+
+  # GET /exam_schedules/calendar/:year/:month
+  # 월별 캘린더 데이터
+  def calendar
+    year = params[:year].to_i
+    month = params[:month].to_i
+
+    start_date = Date.new(year, month, 1)
     end_date = start_date.end_of_month
 
-    @exam_dates = ExamSchedule.where(exam_year: @year)
-                              .where(
-                                '(written_exam_date BETWEEN ? AND ?) OR (practical_exam_date BETWEEN ? AND ?)',
-                                start_date, end_date, start_date, end_date
-                              )
+    @schedules = ExamSchedule.includes(:certification)
+                            .where(exam_date: start_date..end_date)
+                            .order(exam_date: :asc)
 
-    @registration_dates = ExamSchedule.where(exam_year: @year)
-                                      .where(
-                                        '(written_exam_reg_start BETWEEN ? AND ?) OR (practical_exam_reg_start BETWEEN ? AND ?)',
-                                        start_date, end_date, start_date, end_date
-                                      )
+    # 날짜별로 그룹핑
+    schedules_by_date = @schedules.group_by { |s| s.exam_date.day }
+
+    render json: {
+      year: year,
+      month: month,
+      days: schedules_by_date.transform_values do |schedules|
+        schedules.map { |s| s.to_calendar_event }
+      end
+    }
   end
 
-  def my_schedules
-    @user_certifications = current_user.interested_certifications || []
+  # GET /exam_schedules/years
+  # 사용 가능한 연도 목록
+  def years
+    years = ExamSchedule.distinct.pluck(:year).sort
+    current_year = Date.current.year
 
-    @schedules = ExamSchedule.where(
-      certification_code: @user_certifications,
-      exam_year: 2026
-    ).order(:written_exam_date)
+    # 현재 연도와 다음 연도가 없으면 추가
+    years << current_year unless years.include?(current_year)
+    years << (current_year + 1) unless years.include?(current_year + 1)
 
-    @upcoming = @schedules.where('written_exam_date >= ?', Date.today).limit(5)
-  end
-
-  def add_interest
-    certification_code = params[:certification_code]
-
-    current_user.interested_certifications ||= []
-    unless current_user.interested_certifications.include?(certification_code)
-      current_user.interested_certifications << certification_code
-      current_user.save
-    end
-
-    redirect_to exam_schedules_path, notice: '관심 자격증에 추가되었습니다.'
-  end
-
-  def remove_interest
-    certification_code = params[:certification_code]
-
-    if current_user.interested_certifications
-      current_user.interested_certifications.delete(certification_code)
-      current_user.save
-    end
-
-    redirect_to my_exam_schedules_path, notice: '관심 자격증에서 제거되었습니다.'
+    render json: {
+      years: years.sort,
+      current_year: current_year
+    }
   end
 
   private
 
-  def schedule_params
-    params.require(:exam_schedule).permit(:certification_code, :year, :month)
+  def set_exam_schedule
+    @exam_schedule = ExamSchedule.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: 'Exam schedule not found' }, status: :not_found
+  end
+
+  def render_unauthorized
+    render json: { error: 'Please login to register notifications' }, status: :unauthorized
+  end
+
+  def calculate_notification_time(notification_type)
+    case notification_type
+    when 'registration_open'
+      # 원서 접수 3일 전
+      @exam_schedule.registration_start_date - 3.days
+    when 'exam_reminder_week'
+      # 시험 1주일 전
+      @exam_schedule.exam_date - 1.week
+    when 'exam_reminder_month'
+      # 시험 1개월 전
+      @exam_schedule.exam_date - 1.month
+    when 'result_announcement'
+      # 결과 발표일 당일
+      @exam_schedule.result_date
+    else
+      raise "Invalid notification type: #{notification_type}"
+    end
   end
 end

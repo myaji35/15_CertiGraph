@@ -1,0 +1,223 @@
+<!-- Ultra Modern Animated Background with Particles -->
+<div class="gradient-mesh-bg fixed inset-0 -z-10 overflow-hidden" data-controller="animated-background">
+  <!-- Main animated gradient blobs with organic movement -->
+  <div class="blob blob-1 animate-blob-morph"></div>
+  <div class="blob blob-2 animate-blob-morph animation-delay-2000"></div>
+  <div class="blob blob-3 animate-blob-morph animation-delay-4000"></div>
+
+  <!-- Additional floating orbs with different blend modes -->
+  <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-cyan-400/30 to-blue-600/30 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob-morph animation-delay-2000"></div>
+  <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-purple-400/30 to-pink-600/30 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob-morph animation-delay-4000"></div>
+
+  <!-- Ambient light layers for depth -->
+  <div class="ambient-light absolute top-1/3 left-1/2 bg-gradient-radial from-blue-400/20 via-purple-400/10 to-transparent"></div>
+  <div class="ambient-light absolute bottom-1/3 right-1/2 bg-gradient-radial from-pink-400/20 via-orange-400/10 to-transparent animation-delay-6000"></div>
+
+  <!-- Enhanced grid pattern with animated lines -->
+  <div class="absolute inset-0 opacity-10">
+    <svg width="100%" height="100%">
+      <defs>
+        <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+          <path d="M 60 0 L 0 0 0 60" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+        </pattern>
+        <linearGradient id="gridGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:rgba(19,127,236,0.2);stop-opacity:1">
+            <animate attributeName="stop-opacity" values="0.1;0.3;0.1" dur="4s" repeatCount="indefinite"/>
+          </stop>
+          <stop offset="100%" style="stop-color:rgba(168,85,247,0.2);stop-opacity:1">
+            <animate attributeName="stop-opacity" values="0.3;0.1;0.3" dur="4s" repeatCount="indefinite"/>
+          </stop>
+        </linearGradient>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#grid)" stroke="url(#gridGradient)" stroke-width="0.5"/>
+    </svg>
+  </div>
+
+  <!-- Noise texture overlay for depth -->
+  <div class="absolute inset-0 opacity-[0.03]">
+    <svg width="100%" height="100%">
+      <filter id="noise">
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" seed="5">
+          <animate attributeName="baseFrequency" values="0.8;1.0;0.8" dur="20s" repeatCount="indefinite"/>
+        </feTurbulence>
+        <feColorMatrix type="saturate" values="0"/>
+      </filter>
+      <rect width="100%" height="100%" filter="url(#noise)"/>
+    </svg>
+  </div>
+
+  <!-- Twinkling stars with varying sizes -->
+  <div class="stars absolute inset-0">
+    <% 30.times do |i| %>
+      <%
+        size = [1, 1.5, 2, 2.5].sample
+        left = rand(100)
+        top = rand(100)
+        delay = rand(5)
+        duration = 3 + rand(3)
+      %>
+      <div class="star absolute bg-white rounded-full"
+           style="
+             width: <%= size %>px;
+             height: <%= size %>px;
+             left: <%= left %>%;
+             top: <%= top %>%;
+             animation: twinkle <%= duration %>s ease-in-out <%= delay %>s infinite;
+             box-shadow: 0 0 <%= size * 5 %>px rgba(255, 255, 255, 0.8);
+           "></div>
+    <% end %>
+  </div>
+
+  <!-- Performance-optimized particle system -->
+  <div class="particles-system absolute inset-0 pointer-events-none">
+    <% 15.times do |i| %>
+      <%
+        size = [2, 3, 4].sample
+        left = rand(100)
+        delay = rand(10)
+        duration = 15 + rand(10)
+      %>
+      <div class="floating-particle absolute rounded-full bg-white/40"
+           style="
+             width: <%= size %>px;
+             height: <%= size %>px;
+             left: <%= left %>%;
+             bottom: -10%;
+             animation: particle-rise <%= duration %>s linear <%= delay %>s infinite;
+             filter: blur(<%= size * 0.5 %>px);
+           "></div>
+    <% end %>
+  </div>
+
+  <!-- Animated gradient lines with multiple layers -->
+  <div class="absolute inset-0 overflow-hidden">
+    <div class="gradient-line gradient-line-1"
+         style="background: linear-gradient(90deg,
+                transparent,
+                rgba(19, 127, 236, 0.3),
+                rgba(168, 85, 247, 0.3),
+                transparent);"></div>
+    <div class="gradient-line gradient-line-2"
+         style="background: linear-gradient(90deg,
+                transparent,
+                rgba(236, 72, 153, 0.3),
+                rgba(249, 115, 22, 0.3),
+                transparent);"></div>
+    <div class="gradient-line gradient-line-3"
+         style="background: linear-gradient(90deg,
+                transparent,
+                rgba(79, 172, 254, 0.3),
+                rgba(0, 242, 254, 0.3),
+                transparent);"></div>
+  </div>
+
+  <!-- Radial glow effects from corners -->
+  <div class="absolute top-0 left-0 w-1/3 h-1/3 bg-gradient-radial from-blue-500/10 to-transparent blur-3xl"></div>
+  <div class="absolute bottom-0 right-0 w-1/3 h-1/3 bg-gradient-radial from-pink-500/10 to-transparent blur-3xl"></div>
+  <div class="absolute top-0 right-0 w-1/4 h-1/4 bg-gradient-radial from-purple-500/10 to-transparent blur-2xl"></div>
+  <div class="absolute bottom-0 left-0 w-1/4 h-1/4 bg-gradient-radial from-cyan-500/10 to-transparent blur-2xl"></div>
+</div>
+
+<style>
+  /* 메인 그라디언트 블롭 스타일 */
+  .gradient-mesh-bg {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+    background-size: 400% 400%;
+    animation: gradient-shift 20s ease infinite;
+  }
+
+  @keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* 반짝이는 별 효과 */
+  .stars {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+
+  .star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle 4s infinite;
+    box-shadow: 0 0 10px white;
+  }
+
+  @keyframes twinkle {
+    0%, 100% {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.5);
+    }
+  }
+
+  /* 움직이는 그라디언트 라인 */
+  .gradient-line {
+    position: absolute;
+    width: 200%;
+    height: 2px;
+    background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.5),
+      transparent);
+  }
+
+  .gradient-line-1 {
+    top: 20%;
+    animation: slide-right 10s linear infinite;
+  }
+
+  .gradient-line-2 {
+    top: 50%;
+    animation: slide-left 15s linear infinite;
+  }
+
+  .gradient-line-3 {
+    top: 80%;
+    animation: slide-right 20s linear infinite;
+  }
+
+  @keyframes slide-right {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  @keyframes slide-left {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+
+  /* 다크 모드 대응 */
+  @media (prefers-color-scheme: dark) {
+    .gradient-mesh-bg {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #533483 75%, #1a1a2e 100%);
+      background-size: 400% 400%;
+    }
+
+    .blob {
+      opacity: 0.3;
+    }
+  }
+
+  /* 성능 최적화 */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-blob,
+    .star,
+    .gradient-line {
+      animation: none;
+    }
+
+    .gradient-mesh-bg {
+      animation: gradient-shift 60s ease infinite;
+    }
+  }
+</style>

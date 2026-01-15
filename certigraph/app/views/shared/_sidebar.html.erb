@@ -1,0 +1,56 @@
+<aside class="w-64 hidden lg:flex flex-col justify-between border-r border-slate-200 dark:border-slate-800 p-4 bg-white dark:bg-background-dark">
+  <div class="space-y-6">
+    <!-- Main Navigation -->
+    <div>
+      <p class="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">주요 탐색</p>
+      <nav class="space-y-1">
+        <%= link_to root_path, class: "flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary transition-all" do %>
+          <span class="material-symbols-outlined">dashboard</span>
+          <span class="text-sm font-medium">대시보드</span>
+        <% end %>
+        
+        <%= link_to '#', class: "flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" do %>
+          <span class="material-symbols-outlined">calendar_today</span>
+          <span class="text-sm font-medium">시험 일정</span>
+        <% end %>
+        
+        <%= link_to study_sets_path, class: "flex items-center gap-3 px-3 py-2.5 rounded-lg #{current_page?(study_sets_path) || current_page?(controller: 'study_sets') ? 'bg-primary/10 text-primary border border-primary/20' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'} transition-all" do %>
+          <span class="material-symbols-outlined">menu_book</span>
+          <span class="text-sm font-medium">문제집 관리</span>
+        <% end %>
+        
+        <%= link_to '#', class: "flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" do %>
+          <span class="material-symbols-outlined">leaderboard</span>
+          <span class="text-sm font-medium">랭킹</span>
+        <% end %>
+      </nav>
+    </div>
+    
+    <!-- System Navigation -->
+    <div>
+      <p class="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">시스템</p>
+      <nav class="space-y-1">
+        <%= link_to '#', class: "flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" do %>
+          <span class="material-symbols-outlined">settings</span>
+          <span class="text-sm font-medium">설정</span>
+        <% end %>
+        
+        <%= link_to '#', class: "flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-500 hover:bg-red-500/10 transition-all" do %>
+          <span class="material-symbols-outlined">logout</span>
+          <span class="text-sm font-medium">로그아웃</span>
+        <% end %>
+      </nav>
+    </div>
+  </div>
+  
+  <!-- CTA Card -->
+  <div class="bg-primary rounded-xl p-4 text-white relative overflow-hidden group cursor-pointer shadow-lg shadow-primary/20">
+    <div class="relative z-10">
+      <p class="text-xs font-medium opacity-80 mb-1">PDF 업로드 및 학습</p>
+      <p class="font-bold leading-tight">새로운 문제집으로 AI 학습하기</p>
+    </div>
+    <div class="absolute -right-2 -bottom-2 opacity-20 group-hover:scale-110 transition-transform">
+      <span class="material-symbols-outlined text-6xl">cloud_upload</span>
+    </div>
+  </div>
+</aside>

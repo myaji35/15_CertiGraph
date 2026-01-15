@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>옵션 2: 카드 + 리스트 하이브리드 (Balanced)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Comic Sans MS", cursive, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            border: 2px solid #333;
+            border-radius: 4px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        .title {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        .stat-card {
+            background: #f8f8f8;
+            border: 2px solid #333;
+            border-radius: 4px;
+            padding: 16px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #4a9eff;
+            margin-bottom: 4px;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        .upload-card {
+            background: white;
+            border: 2px solid #333;
+            border-radius: 4px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        .card-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+        .upload-zone {
+            border: 3px dashed #999;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            background: #fafafa;
+        }
+        .upload-icon {
+            width: 60px;
+            height: 60px;
+            background: #ddd;
+            margin: 0 auto 12px;
+            border: 2px solid #999;
+            border-radius: 4px;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #4a9eff;
+            color: white;
+            border: 2px solid #333;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .materials-card {
+            background: white;
+            border: 2px solid #333;
+            border-radius: 4px;
+            padding: 24px;
+        }
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 12px;
+        }
+        .search-box {
+            flex: 1;
+            display: flex;
+            gap: 8px;
+        }
+        .search-input {
+            flex: 1;
+            padding: 10px 16px;
+            border: 2px solid #999;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+        .filter-group {
+            display: flex;
+            gap: 8px;
+        }
+        .filter-btn {
+            padding: 10px 16px;
+            background: white;
+            border: 2px solid #999;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .filter-btn.active {
+            background: #4a9eff;
+            color: white;
+            border-color: #333;
+        }
+        .view-toggle {
+            display: flex;
+            border: 2px solid #333;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .view-btn {
+            padding: 10px 16px;
+            background: white;
+            border: none;
+            border-right: 2px solid #333;
+            cursor: pointer;
+        }
+        .view-btn:last-child {
+            border-right: none;
+        }
+        .view-btn.active {
+            background: #e8e8e8;
+        }
+        .material-item {
+            background: #f8f8f8;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 12px;
+            display: grid;
+            grid-template-columns: auto 1fr auto auto;
+            gap: 20px;
+            align-items: center;
+        }
+        .material-item:hover {
+            border-color: #4a9eff;
+            background: #f0f7ff;
+        }
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #666;
+            background: white;
+        }
+        .material-info {
+            flex: 1;
+        }
+        .material-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .material-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 14px;
+            color: #666;
+        }
+        .status-section {
+            text-align: center;
+            min-width: 120px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border: 2px solid #333;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .status-completed {
+            background: #d4f8d4;
+        }
+        .status-processing {
+            background: #fff3cd;
+        }
+        .status-failed {
+            background: #f8d7da;
+        }
+        .progress-container {
+            margin-top: 8px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border: 1px solid #999;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #4a9eff;
+        }
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border: 2px solid #666;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .action-btn:hover {
+            background: #f0f0f0;
+        }
+        .badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #4CAF50;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            z-index: 10;
+        }
+        .badge-new {
+            background: #FF9800;
+        }
+        .component-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .fab {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 64px;
+            height: 64px;
+            background: #4caf50;
+            color: white;
+            border: 3px solid #333;
+            border-radius: 50%;
+            font-size: 32px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Card -->
+        <div class="header">
+            <div style="margin-bottom: 16px;">
+                <span class="component-wrapper">
+                    <span class="badge" title="Rails link_to helper">[REUSE] link_to</span>
+                    <span style="color: #666; text-decoration: underline;">← 문제집 목록</span>
+                </span>
+            </div>
+            <h1 class="title">정보처리기사 필기 2024</h1>
+            <div class="component-wrapper" style="display: block;">
+                <span class="badge badge-new" title="certigraph/app/views/study_sets/_stats_grid.html.erb">[NEW] _stats_grid partial</span>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">12개</div>
+                        <div class="stat-label">학습자료</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">360개</div>
+                        <div class="stat-label">총 문제</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">92%</div>
+                        <div class="stat-label">완료율</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upload Card -->
+        <div class="upload-card">
+            <h2 class="card-title">📁 새 학습자료 추가</h2>
+            <div class="component-wrapper" style="display: block;">
+                <span class="badge badge-new" title="certigraph/app/views/study_materials/_upload_zone.html.erb">[NEW] _upload_zone partial</span>
+                <div class="upload-zone">
+                    <div class="upload-icon"></div>
+                    <p style="margin-bottom: 8px;">PDF 파일을 드롭하거나 클릭하여 업로드</p>
+                    <p style="color: #999; font-size: 12px; margin-bottom: 12px;">최대 50MB</p>
+                    <span class="component-wrapper">
+                        <span class="badge" title="Rails form_with helper">[REUSE] form_with</span>
+                        <button class="button">파일 선택</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Materials List Card -->
+        <div class="materials-card">
+            <h2 class="card-title">📚 학습자료 목록</h2>
+            
+            <!-- Toolbar -->
+            <div class="component-wrapper" style="display: block;">
+                <span class="badge badge-new" title="certigraph/app/views/study_materials/_toolbar.html.erb">[NEW] _toolbar partial</span>
+                <div class="toolbar">
+                    <div class="search-box">
+                        <input type="text" class="search-input" placeholder="🔍 학습자료 검색...">
+                    </div>
+                    <div class="filter-group">
+                        <button class="filter-btn active">전체 (12)</button>
+                        <button class="filter-btn">완료 (10)</button>
+                        <button class="filter-btn">처리중 (1)</button>
+                        <button class="filter-btn">실패 (1)</button>
+                    </div>
+                    <div class="view-toggle">
+                        <button class="view-btn active">📋</button>
+                        <button class="view-btn">📊</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Material Items -->
+            <div class="component-wrapper" style="display: block;">
+                <span class="badge badge-new" title="certigraph/app/views/study_materials/_material_item.html.erb">[NEW] _material_item partial</span>
+                
+                <!-- Item 1 -->
+                <div class="material-item">
+                    <div class="checkbox"></div>
+                    <div class="material-info">
+                        <div class="material-title">📄 2024년 1회 기출문제</div>
+                        <div class="material-meta">
+                            <span>📊 30문제</span>
+                            <span>💾 2.4 MB</span>
+                            <span>📅 2024.01.10</span>
+                        </div>
+                    </div>
+                    <div class="status-section">
+                        <span class="status-badge status-completed">✓ 완료</span>
+                        <div style="font-size: 11px; color: #666;">2분 전</div>
+                    </div>
+                    <div class="actions">
+                        <button class="action-btn">📖</button>
+                        <button class="action-btn">🔄</button>
+                        <button class="action-btn">🌐</button>
+                        <button class="action-btn">🗑️</button>
+                    </div>
+                </div>
+
+                <!-- Item 2 (Processing) -->
+                <div class="material-item">
+                    <div class="checkbox" style="background: #4a9eff;"></div>
+                    <div class="material-info">
+                        <div class="material-title">📄 2023년 3회 기출문제</div>
+                        <div class="material-meta">
+                            <span>📊 30문제</span>
+                            <span>💾 2.1 MB</span>
+                            <span>📅 2024.01.09</span>
+                        </div>
+                    </div>
+                    <div class="status-section">
+                        <span class="status-badge status-processing">⏳ 처리중</span>
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 65%;"></div>
+                            </div>
+                            <div style="font-size: 11px; color: #666; margin-top: 4px;">65%</div>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <button class="action-btn">🔄</button>
+                        <button class="action-btn">🗑️</button>
+                    </div>
+                </div>
+
+                <!-- Item 3 (Failed) -->
+                <div class="material-item" style="border-color: #f8d7da;">
+                    <div class="checkbox"></div>
+                    <div class="material-info">
+                        <div class="material-title">📄 데이터베이스 핵심정리</div>
+                        <div class="material-meta">
+                            <span>📊 0문제</span>
+                            <span>💾 1.8 MB</span>
+                            <span>📅 2024.01.08</span>
+                        </div>
+                    </div>
+                    <div class="status-section">
+                        <span class="status-badge status-failed">✗ 실패</span>
+                        <div style="font-size: 11px; color: #721c24; cursor: pointer; text-decoration: underline;">🐛 로그 보기</div>
+                    </div>
+                    <div class="actions">
+                        <button class="action-btn" style="background: #fff3cd;">🔄</button>
+                        <button class="action-btn">🗑️</button>
+                    </div>
+                </div>
+
+                <!-- More items (lighter) -->
+                <div class="material-item" style="opacity: 0.6;">
+                    <div class="checkbox"></div>
+                    <div class="material-info">
+                        <div class="material-title">📄 운영체제 문제집</div>
+                        <div class="material-meta">
+                            <span>📊 28문제</span>
+                            <span>💾 2.0 MB</span>
+                            <span>📅 2024.01.07</span>
+                        </div>
+                    </div>
+                    <div class="status-section">
+                        <span class="status-badge status-completed">✓ 완료</span>
+                    </div>
+                    <div class="actions">
+                        <button class="action-btn">📖</button>
+                        <button class="action-btn">🔄</button>
+                        <button class="action-btn">🗑️</button>
+                    </div>
+                </div>
+
+                <div class="material-item" style="opacity: 0.6;">
+                    <div class="checkbox"></div>
+                    <div class="material-info">
+                        <div class="material-title">📄 소프트웨어공학 요약</div>
+                        <div class="material-meta">
+                            <span>📊 22문제</span>
+                            <span>💾 1.5 MB</span>
+                            <span>📅 2024.01.06</span>
+                        </div>
+                    </div>
+                    <div class="status-section">
+                        <span class="status-badge status-completed">✓ 완료</span>
+                    </div>
+                    <div class="actions">
+                        <button class="action-btn">📖</button>
+                        <button class="action-btn">🔄</button>
+                        <button class="action-btn">🗑️</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Action Button -->
+        <span class="component-wrapper">
+            <span class="badge" title="Rails button_to helper">[REUSE] button_to</span>
+            <button class="fab">▶</button>
+        </span>
+    </div>
+
+    <!-- Description -->
+    <div style="margin-top: 40px; padding: 20px; background: white; border: 2px solid #333; border-radius: 4px; max-width: 1200px; margin-left: auto; margin-right: auto;">
+        <h3 style="margin-bottom: 16px;">💡 옵션 2: 카드 + 리스트 하이브리드 (Balanced)</h3>
+        <p style="margin-bottom: 12px;"><strong>접근 방식:</strong> 카드 스타일 디자인으로 모던하고 직관적인 UI를 제공하면서, 리스트 형태로 정보를 효율적으로 표시</p>
+        
+        <p style="margin-bottom: 8px;"><strong>주요 개선사항:</strong></p>
+        <ul style="margin-left: 24px; margin-bottom: 12px;">
+            <li>📊 통계 대시보드 - 한눈에 보는 학습 현황</li>
+            <li>🎨 카드 기반 레이아웃 - 시각적으로 구분하기 쉬움</li>
+            <li>🏷️ 상태별 필터 탭 - 빠른 카테고리 전환</li>
+            <li>📱 반응형 디자인 - 모바일/태블릿 환경 최적화</li>
+            <li>🎯 더 큰 터치 영역 - 모바일 사용성 개선</li>
+            <li>⚡ FAB 버튼 - 빠른 학습 시작</li>
+        </ul>
+
+        <p style="margin-bottom: 8px;"><strong>재사용 Rails 헬퍼/컴포넌트:</strong></p>
+        <ul style="margin-left: 24px; margin-bottom: 12px;">
+            <li>✅ link_to - 네비게이션</li>
+            <li>✅ form_with - 업로드 폼</li>
+            <li>✅ button_to - FAB 및 액션 버튼</li>
+        </ul>
+
+        <p style="margin-bottom: 8px;"><strong>새로 만들 Partials:</strong></p>
+        <ul style="margin-left: 24px;">
+            <li>🆕 _stats_grid.html.erb - 통계 카드 그리드</li>
+            <li>🆕 _upload_zone.html.erb - 업로드 영역</li>
+            <li>🆕 _toolbar.html.erb - 검색/필터 툴바</li>
+            <li>🆕 _material_item.html.erb - 개별 학습자료 카드</li>
+        </ul>
+
+        <p style="margin-top: 12px;"><strong>장점:</strong> 모던한 디자인, 모바일 친화적, 시각적 피드백 강화</p>
+        <p><strong>고려사항:</strong> 많은 자료 표시 시 스크롤 증가</p>
+    </div>
+</body>
+</html>

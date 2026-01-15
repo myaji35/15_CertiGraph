@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+
+<html class="" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ExamsGraph 문제집 관리 센터</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Noto+Sans+KR:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "Noto Sans KR"],
+                        "sans": ["Noto Sans KR", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Noto Sans KR', 'Space Grotesk', sans-serif;
+        }
+        .glass-card {
+            background: rgba(25, 38, 51, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .workbook-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }#workbook-modal:target {
+            display: flex;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen flex flex-col">
+<div class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4" id="workbook-modal">
+<div class="bg-white dark:bg-[#16212c] w-full max-w-xl rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+<div class="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800">
+<h3 class="text-xl font-bold">문제집 추가 / 수정</h3>
+<a class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined">close</span>
+</a>
+</div>
+<div class="p-6 space-y-6">
+<div class="space-y-2">
+<label class="text-sm font-bold text-slate-400">문제집 제목</label>
+<input class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary outline-none transition-all" placeholder="예: AWS Certified Solutions Architect 기출문제집" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-bold text-slate-400">설명 / 개요</label>
+<textarea class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary outline-none transition-all resize-none" placeholder="문제집에 대한 간단한 설명을 입력하세요." rows="3"></textarea>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-bold text-slate-400">PDF 파일 업로드</label>
+<div class="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-8 flex flex-col items-center justify-center gap-3 hover:border-primary/50 transition-colors bg-slate-50/50 dark:bg-slate-900/50 cursor-pointer">
+<span class="material-symbols-outlined text-4xl text-slate-400">upload_file</span>
+<div class="text-center">
+<p class="text-sm font-medium">PDF 파일을 드래그하여 놓거나 클릭하세요</p>
+<p class="text-xs text-slate-500 mt-1">최대 용량 50MB</p>
+</div>
+</div>
+</div>
+</div>
+<div class="p-6 bg-slate-50 dark:bg-slate-900/50 flex gap-3">
+<a class="flex-1 text-center py-3 rounded-xl font-bold border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">취소</a>
+<button class="flex-[2] bg-primary hover:bg-primary/90 text-white py-3 rounded-xl font-bold shadow-lg shadow-primary/20 transition-all">저장 및 AI 분석 시작</button>
+</div>
+</div>
+</div>
+<header class="sticky top-0 z-50 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md px-6 py-3">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3">
+<div class="bg-primary p-1.5 rounded-lg text-white">
+<span class="material-symbols-outlined text-2xl">account_tree</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight">ExamsGraph</h1>
+</div>
+<div class="hidden md:flex items-center">
+<label class="relative block">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+<span class="material-symbols-outlined text-sm">search</span>
+</span>
+<input class="w-72 bg-slate-100 dark:bg-slate-800 border-none rounded-lg py-2 pl-10 pr-3 focus:ring-2 focus:ring-primary text-sm placeholder:text-slate-500" placeholder="문제집, 시험 카테고리 검색..." type="text"/>
+</label>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
+<button class="p-1.5 rounded-md hover:bg-white dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-xl">light_mode</span>
+</button>
+<button class="p-1.5 rounded-md bg-white dark:bg-slate-700 shadow-sm transition-colors text-primary">
+<span class="material-symbols-outlined text-xl">dark_mode</span>
+</button>
+</div>
+<div class="flex items-center gap-3 border-l border-slate-200 dark:border-slate-800 pl-4 ml-2">
+<div class="text-right hidden sm:block">
+<p class="text-xs font-bold">알렉스 리베라</p>
+<p class="text-[10px] text-slate-500 uppercase">프로 멤버</p>
+</div>
+<div class="size-9 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden border border-primary/20">
+<img alt="User profile avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDM0kplg1UMoXYRjLPBcIUIysEXIbdv2rdHLo8lgvk18AdPD4GrooBlOBTC-pum-9XRuM6N3zUuRbut0BTd3iIvGxxAxfpD1pEMiiD2iyefMZenF98YlbNNbMGF1p0VSIaq0eOv5dtWoP6N0yopwG-uLt1aNWuC6lSzy_gL2pHxVMlmRkI1s4J8Jmv5HBdyAqko3Ujb2CZ_DfhFNSiPSifO33XJZWM1kjRKcMW7IPyjn2qetkDJ6hwNdsUye3XCELZLj1MDJqeJLQ"/>
+</div>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<aside class="w-64 hidden lg:flex flex-col justify-between border-r border-slate-200 dark:border-slate-800 p-4 bg-white dark:bg-background-dark">
+<div class="space-y-6">
+<div>
+<p class="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">주요 탐색</p>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">대시보드</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-sm font-medium">시험 일정</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary border border-primary/20" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="text-sm font-medium">문제집 관리</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">leaderboard</span>
+<span class="text-sm font-medium">랭킹</span>
+</a>
+</nav>
+</div>
+<div>
+<p class="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">필터</p>
+<div class="space-y-4 px-3">
+<div>
+<label class="text-[11px] text-slate-500 font-bold mb-2 block">시험 카테고리</label>
+<select class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-xs py-2 focus:ring-primary">
+<option>전체 보기</option>
+<option>AWS Certified</option>
+<option>정보처리기사</option>
+<option>Google Cloud</option>
+</select>
+</div>
+<div>
+<label class="text-[11px] text-slate-500 font-bold mb-2 block">학습 상태</label>
+<div class="space-y-2">
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="rounded border-slate-700 bg-slate-800 text-primary focus:ring-primary size-4" type="checkbox"/>
+<span class="text-xs">분석 완료</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="rounded border-slate-700 bg-slate-800 text-primary focus:ring-primary size-4" type="checkbox"/>
+<span class="text-xs">학습 중</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer">
+<input class="rounded border-slate-700 bg-slate-800 text-primary focus:ring-primary size-4" type="checkbox"/>
+<span class="text-xs">대기</span>
+</label>
+</div>
+</div>
+</div>
+</div>
+<div>
+<p class="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">시스템</p>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">설정</span>
+</a>
+</nav>
+</div>
+</div>
+</aside>
+<main class="flex-1 overflow-y-auto bg-slate-50 dark:bg-[#0b0c10] p-6 lg:p-8">
+<div class="max-w-[1400px] mx-auto">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+<div>
+<h2 class="text-3xl font-black tracking-tight mb-2 text-slate-900 dark:text-white">문제집 관리</h2>
+<p class="text-slate-500 dark:text-[#92adc9]">업로드한 PDF를 AI가 분석하여 나만의 학습 그래프를 생성합니다.</p>
+</div>
+<a class="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-primary/30 transition-all active:scale-95" href="#workbook-modal">
+<span class="material-symbols-outlined">add_circle</span>
+                    새 문제집 추가
+                </a>
+</div>
+<div class="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 mb-6 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<label class="flex items-center gap-2 cursor-pointer">
+<input class="rounded border-slate-700 bg-slate-700 text-primary focus:ring-primary size-4" type="checkbox"/>
+<span class="text-xs font-bold text-slate-700 dark:text-slate-300">전체 선택</span>
+</label>
+<div class="h-4 w-px bg-slate-300 dark:bg-slate-700 mx-2"></div>
+<p class="text-xs text-slate-500"><span class="text-primary font-bold">2</span>개의 항목 선택됨</p>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-bold transition-colors">
+<span class="material-symbols-outlined text-sm">folder_open</span>
+                        폴더로 이동
+                    </button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-red-500/10 text-red-500 text-xs font-bold transition-colors">
+<span class="material-symbols-outlined text-sm">delete</span>
+                        삭제
+                    </button>
+</div>
+</div>
+<div class="workbook-grid">
+<div class="glass-card rounded-xl overflow-hidden group hover:border-primary/40 transition-all flex flex-col relative">
+<div class="aspect-[4/3] relative overflow-hidden bg-slate-900">
+<img alt="PDF Thumbnail" class="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcyVf9130He3HvhWmEXKQm6mhqxsS6QD2cnKa-qQANLWR0LJprtKfsmATTI8hm9ABqnPbKuOV3GAqu-4Ek8HXun4xme_wjHbog4H6rNKNgY4sllQZbqgkQ2CF7zLzOeLpllPWBNcrXLVMRPbH15GQPRPVGF6S8u_v6qrqBIKbFP_6qs9yoqcCWOp19OmUe1sz3NgQACdb85cFzIvLjLNiXKaYTGTsbRhvl70AybGVgKJxybFFfzy4ZLL0_nNC7dFLP7UtUT2Ys3gc"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+<div class="absolute top-3 left-3 flex gap-2">
+<span class="bg-primary/90 text-white text-[10px] font-bold px-2 py-1 rounded">GraphRAG 분석 완료</span>
+</div>
+<div class="absolute bottom-3 left-3 right-3 flex justify-between items-end">
+<div>
+<p class="text-[10px] text-slate-300 font-bold mb-0.5">최근 학습: 어제</p>
+<p class="text-[10px] text-slate-400">생성일: 2023.09.15</p>
+</div>
+<div class="bg-emerald-500/20 text-emerald-500 text-[10px] font-bold px-2 py-1 rounded border border-emerald-500/30">
+                                적중률 94%
+                            </div>
+</div>
+<div class="absolute top-3 right-3">
+<input checked="" class="rounded border-white/20 bg-black/40 text-primary focus:ring-primary size-4" type="checkbox"/>
+</div>
+</div>
+<div class="p-4 flex-1 flex flex-col">
+<h3 class="font-bold text-sm mb-3 group-hover:text-primary transition-colors line-clamp-2">AWS Certified Solutions Architect (SAA-C03) 기출문제집</h3>
+<div class="flex items-center gap-4 mt-auto pt-3 border-t border-white/5">
+<div class="flex flex-col">
+<span class="text-[9px] text-slate-500 uppercase font-black tracking-wider">취약도</span>
+<span class="text-sm font-bold text-red-400">72점</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[9px] text-slate-500 uppercase font-black tracking-wider">문제 수</span>
+<span class="text-sm font-bold">180문항</span>
+</div>
+<div class="ml-auto flex items-center gap-1">
+<a class="p-2 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-white transition-all flex items-center justify-center" href="#workbook-modal" title="수정">
+<span class="material-symbols-outlined text-xl">edit</span>
+</a>
+<button class="p-2 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-white transition-all">
+<span class="material-symbols-outlined text-xl">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="glass-card rounded-xl overflow-hidden group hover:border-primary/40 transition-all flex flex-col relative">
+<div class="aspect-[4/3] relative overflow-hidden bg-slate-900">
+<img alt="PDF Thumbnail" class="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDr0ItOsdD5UJ2xeITaLBLGpV5DbMyWo5hZN6idwt1bNCqxyp4jzot822v-1dI_vXE58FlJYXOxzmJEo1hXVb4MJaycw6if6I3brGCr3ChTWDI9x9_WAUpPlzs-Y20AahcutZvff9kHasmC35irqunR6ctGJX9mhAdsuKvavV2M1ArsuB-iEX8BQx9ZdSe4_x91nzHcNQiluzBrakzzwSIVH0oOGb-HPWQnT2SPafX3vQ-llNMrig86rdrvN8URxk4pwX7gM_GDK8E"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+<div class="absolute top-3 left-3">
+<span class="bg-yellow-500/90 text-black text-[10px] font-bold px-2 py-1 rounded">AI 학습 중 (45%)</span>
+</div>
+<div class="absolute bottom-3 left-3 right-3">
+<div class="w-full h-1 bg-white/20 rounded-full overflow-hidden">
+<div class="h-full bg-yellow-500 w-[45%]"></div>
+</div>
+</div>
+<div class="absolute top-3 right-3">
+<input checked="" class="rounded border-white/20 bg-black/40 text-primary focus:ring-primary size-4" type="checkbox"/>
+</div>
+</div>
+<div class="p-4 flex-1 flex flex-col">
+<h3 class="font-bold text-sm mb-3 group-hover:text-primary transition-colors line-clamp-2">2023 정보처리기사 실기 최종 모의고사</h3>
+<div class="flex items-center gap-4 mt-auto pt-3 border-t border-white/5">
+<div class="flex flex-col">
+<span class="text-[9px] text-slate-500 uppercase font-black tracking-wider">취약도</span>
+<span class="text-sm font-bold text-slate-400">분석 중</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[9px] text-slate-500 uppercase font-black tracking-wider">문제 수</span>
+<span class="text-sm font-bold">120문항</span>
+</div>
+<div class="ml-auto flex items-center gap-1">
+<a class="p-2 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-white transition-all flex items-center justify-center" href="#workbook-modal" title="수정">
+<span class="material-symbols-outlined text-xl">edit</span>
+</a>
+<button class="p-2 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-white transition-all">
+<span class="material-symbols-outlined text-xl">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="glass-card rounded-xl overflow-hidden group hover:border-primary/40 transition-all flex flex-col relative opacity-90">
+<div class="aspect-[4/3] relative overflow-hidden bg-slate-900">
+<div class="w-full h-full flex items-center justify-center bg-slate-800 border-b border-white/5">
+<span class="material-symbols-outlined text-5xl text-slate-600">picture_as_pdf</span>
+</div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+<div class="absolute top-3 left-3">
+<span class="bg-slate-700 text-white text-[10px] font-bold px-2 py-1 rounded">대기 중</span>
+</div>
+<div class="absolute top-3 right-3">
+<input class="rounded border-white/20 bg-black/40 text-primary focus:ring-primary size-4" type="checkbox"/>
+</div>
+</div>
+<div class="p-4 flex-1 flex flex-col">
+<h3 class="font-bold text-sm mb-3 group-hover:text-primary transition-colors line-clamp-2">Google Professional Cloud Architect - Case Study</h3>
+<div class="flex items-center gap-4 mt-auto pt-3 border-t border-white/5">
+<div class="flex flex-col">
+<span class="text-[9px] text-slate-500 uppercase font-black tracking-wider">취약도</span>
+<span class="text-sm font-bold text-slate-500">-</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[9px] text-slate-500 uppercase font-black tracking-wider">문제 수</span>
+<span class="text-sm font-bold">50문항</span>
+</div>
+<div class="ml-auto flex items-center gap-1">
+<a class="p-2 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-white transition-all flex items-center justify-center" href="#workbook-modal" title="수정">
+<span class="material-symbols-outlined text-xl">edit</span>
+</a>
+<button class="p-2 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-white transition-all">
+<span class="material-symbols-outlined text-xl">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

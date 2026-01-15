@@ -1,0 +1,31 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  order_id: ORDER_20260115_TEST001
+  amount: 10000
+  currency: KRW
+  status: pending
+  metadata: { plan_type: 'season_pass' }
+
+two:
+  user: one
+  order_id: ORDER_20260115_TEST002
+  amount: 10000
+  currency: KRW
+  status: done
+  payment_key: test_payment_key_002
+  method: card
+  approved_at: <%= 1.day.ago.to_s(:db) %>
+  metadata: { plan_type: 'season_pass' }
+
+three:
+  user: one
+  order_id: ORDER_20260115_TEST003
+  amount: 50000
+  currency: KRW
+  status: done
+  payment_key: test_payment_key_003
+  method: card
+  approved_at: <%= 2.days.ago.to_s(:db) %>
+  metadata: { plan_type: 'vip_pass' }

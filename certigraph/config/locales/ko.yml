@@ -1,0 +1,4 @@
+ko:
+  time:
+    formats:
+      short: "%Y.%m.%d"

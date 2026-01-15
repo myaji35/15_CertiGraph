@@ -34,8 +34,8 @@
           </div>
           <span class="text-sm text-gray-500">이번 주</span>
         </div>
-        <h3 class="text-2xl font-bold text-gray-900">0</h3>
-        <p class="text-sm text-gray-600 mt-1">완료한 문제</p>
+        <h3 class="text-2xl font-bold text-gray-900"><%= @analytics[:completed_tests] %></h3>
+        <p class="text-sm text-gray-600 mt-1">완료한 시험</p>
       </div>
 
       <!-- 정답률 카드 -->
@@ -46,7 +46,7 @@
           </div>
           <span class="text-sm text-gray-500">평균</span>
         </div>
-        <h3 class="text-2xl font-bold text-gray-900">-%</h3>
+        <h3 class="text-2xl font-bold text-gray-900"><%= @analytics[:average_score].round %>%</h3>
         <p class="text-sm text-gray-600 mt-1">정답률</p>
       </div>
     </div>
@@ -108,6 +108,21 @@
       <% end %>
     </div>
 
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <!-- Weekly Performance Chart -->
+      <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">주간 학습 성과</h2>
+        <canvas id="weeklyPerformanceChart" height="250"></canvas>
+      </div>
+
+      <!-- Mastery Distribution Chart -->
+      <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">개념 숙달 현황</h2>
+        <canvas id="masteryDistributionChart" height="250"></canvas>
+      </div>
+    </div>
+
     <!-- 학습 팁 섹션 -->
     <div class="bg-blue-50 rounded-lg p-6 border border-blue-200">
       <div class="flex items-start">
@@ -123,3 +138,82 @@
     </div>
   </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Load weekly statistics
+    fetch('/dashboard/statistics?period=week')
+      .then(response => response.json())
+      .then(data => {
+        const dailyData = data.data.daily_breakdown;
+        const labels = dailyData.map(d => new Date(d.date).toLocaleDateString('ko-KR', { weekday: 'short' }));
+        const scores = dailyData.map(d => d.average_score);
+
+        const ctx = document.getElementById('weeklyPerformanceChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: '평균 점수',
+              data: scores,
+              borderColor: 'rgb(59, 130, 246)',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              tension: 0.4,
+              fill: true
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 100
+              }
+            },
+            plugins: {
+              legend: {
+                display: false
+              }
+            }
+          }
+        });
+      })
+      .catch(error => console.error('Error loading weekly stats:', error));
+
+    // Load mastery distribution
+    const masteryData = <%= raw @analytics[:mastery_overview].to_json %>;
+    const masteryCtx = document.getElementById('masteryDistributionChart').getContext('2d');
+    new Chart(masteryCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['숙달됨', '학습 중', '약함', '미학습'],
+        datasets: [{
+          data: [
+            masteryData.mastered,
+            masteryData.learning,
+            masteryData.weak,
+            masteryData.untested
+          ],
+          backgroundColor: [
+            'rgb(34, 197, 94)',
+            'rgb(59, 130, 246)',
+            'rgb(239, 68, 68)',
+            'rgb(156, 163, 175)'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+  });
+</script>

@@ -1,15 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html class="light" lang="ko">
   <head>
-    <title>CertiGraph - AI 자격증 마스터</title>
+    <meta charset="utf-8" />
+    <title>ExamsGraph - AI 자격증 마스터</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="description" content="기출문제 PDF를 업로드하면 AI가 문제, 보기, 해설을 자동으로 분리합니다">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%232563eb'/><text x='50' y='65' text-anchor='middle' font-size='40'>🧠</text></svg>">
 
-    <!-- Inter Font (Notion's Font) -->
+    <!-- ExamsGraph Logo -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M13.8261 17.4264C16.7203 18.1174 20.2244 18.5217 24 18.5217C27.7756 18.5217 31.2797 18.1174 34.1739 17.4264C36.9144 16.7722 39.9967 15.2331 41.3563 14.1648L24.8486 40.6391C24.4571 41.267 23.5429 41.267 23.1514 40.6391L6.64374 14.1648C8.00331 15.2331 11.0856 16.7722 13.8261 17.4264Z' fill='%23137fec'></path></svg>">
+
+    <!-- ExamsGraph Fonts: Lexend + Noto Sans KR -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -19,53 +26,134 @@
     <%= javascript_importmap_tags %>
 
     <style>
-      /* Notion-style Global Styles */
+      /* ExamsGraph Design System */
+      :root {
+        --primary: #137fec;
+        --background-light: #f6f7f8;
+        --background-dark: #101922;
+        --text-primary: #0d141b;
+        --text-secondary: #4c739a;
+      }
+
       body {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, sans-serif;
+        font-family: 'Noto Sans KR', 'Lexend', sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
       }
 
-      /* Notion-style selection */
-      ::selection {
-        background-color: rgba(35, 131, 226, 0.14);
+      /* Material Icons Settings */
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
       }
 
-      /* Notion-style scrollbar */
+      /* ExamsGraph Selection */
+      ::selection {
+        background-color: rgba(19, 127, 236, 0.2);
+      }
+
+      /* ExamsGraph Scrollbar */
       ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
+        width: 10px;
+        height: 10px;
       }
 
       ::-webkit-scrollbar-track {
-        background: transparent;
+        background: #f6f7f8;
       }
 
       ::-webkit-scrollbar-thumb {
-        background: rgba(0, 0, 0, 0.1);
-        border-radius: 4px;
+        background: #d1d5db;
+        border-radius: 5px;
       }
 
       ::-webkit-scrollbar-thumb:hover {
-        background: rgba(0, 0, 0, 0.2);
+        background: #9ca3af;
       }
 
-      /* Notion-style focus */
+      /* Focus Styles */
       *:focus-visible {
-        outline: 2px solid #2383e2;
+        outline: 2px solid var(--primary);
         outline-offset: 2px;
       }
 
       /* Smooth transitions */
       * {
-        transition-property: background-color, border-color, color, fill, stroke;
+        transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
         transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-        transition-duration: 150ms;
+        transition-duration: 200ms;
+      }
+
+      /* Glass Card Effect */
+      .glass-card {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      /* Primary Button Style */
+      .btn-primary {
+        background: linear-gradient(135deg, #137fec 0%, #0968d3 100%);
+        color: white;
+        font-weight: 600;
+        padding: 0.625rem 1.5rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px rgba(19, 127, 236, 0.25);
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(19, 127, 236, 0.35);
+      }
+
+      /* Card Hover Effect */
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+
+      .card-hover:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Progress Bar Animation */
+      @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+      }
+
+      .animate-shimmer {
+        animation: shimmer 2s infinite;
+      }
+
+      /* Badge Styles */
+      .badge-primary {
+        background-color: rgba(19, 127, 236, 0.1);
+        color: #137fec;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+
+      .badge-success {
+        background-color: rgba(34, 197, 94, 0.1);
+        color: #22c55e;
+      }
+
+      .badge-warning {
+        background-color: rgba(251, 191, 36, 0.1);
+        color: #fbbf24;
+      }
+
+      .badge-danger {
+        background-color: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
       }
     </style>
   </head>
 
-  <body class="text-gray-900 bg-white">
+  <body class="bg-[#f6f7f8] min-h-screen text-[#0d141b]">
     <main>
       <%= yield %>
     </main>

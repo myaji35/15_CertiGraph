@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html class="dark" lang="ko">
   <head>
-    <title><%= content_for(:title) || "Certigraph" %></title>
+    <title><%= content_for(:title) || "ExamsGraph" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
@@ -9,6 +9,10 @@
 
     <%= yield :head %>
 
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
@@ -16,11 +20,28 @@
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+    
+    <style>
+      body {
+        font-family: 'Noto Sans KR', 'Space Grotesk', sans-serif;
+      }
+      .glass-card {
+        background: rgba(25, 38, 51, 0.6);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+    </style>
   </head>
 
-  <body>
-    <main class="container mx-auto mt-28 px-5 flex">
-      <%= yield %>
-    </main>
+  <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen flex flex-col">
+    <%= render 'shared/header' %>
+    
+    <div class="flex flex-1 overflow-hidden">
+      <%= render 'shared/sidebar' %>
+      
+      <main class="flex-1 overflow-y-auto bg-slate-50 dark:bg-[#0b0c10] p-6 lg:p-8">
+        <%= yield %>
+      </main>
+    </div>
   </body>
 </html>

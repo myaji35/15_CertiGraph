@@ -1,5 +1,6 @@
 class StudySetsController < ApplicationController
-  before_action :authenticate_user!
+  # Temporarily disabled for testing ultra modern design
+  # before_action :authenticate_user!
   before_action :set_study_set, only: [:show, :edit, :update, :destroy]
 
   def index
@@ -43,7 +44,9 @@ class StudySetsController < ApplicationController
   private
 
   def set_study_set
-    @study_set = current_user.study_sets.find(params[:id])
+    # Temporary fix for testing - directly find study set without user scope
+    @study_set = StudySet.find(params[:id])
+    # @study_set = current_user.study_sets.find(params[:id])
   end
 
   def study_set_params

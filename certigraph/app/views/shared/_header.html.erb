@@ -1,0 +1,48 @@
+<header class="sticky top-0 z-50 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md px-6 py-3">
+  <div class="flex items-center gap-8">
+    <div class="flex items-center gap-3">
+      <div class="bg-primary p-1.5 rounded-lg text-white">
+        <span class="material-symbols-outlined text-2xl">psychology</span>
+      </div>
+      <h1 class="text-xl font-bold tracking-tight">ExamsGraph</h1>
+    </div>
+    
+    <div class="hidden md:flex items-center">
+      <label class="relative block">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+          <span class="material-symbols-outlined text-sm">search</span>
+        </span>
+        <input 
+          class="w-72 bg-slate-100 dark:bg-slate-800 border-none rounded-lg py-2 pl-10 pr-3 focus:ring-2 focus:ring-primary text-sm placeholder:text-slate-500" 
+          placeholder="개념, 문제집 검색..." 
+          type="text"
+        />
+      </label>
+    </div>
+  </div>
+  
+  <div class="flex items-center gap-4">
+    <!-- Dark Mode Toggle -->
+    <div class="flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
+      <button class="p-1.5 rounded-md hover:bg-white dark:hover:bg-slate-700 transition-colors">
+        <span class="material-symbols-outlined text-xl">light_mode</span>
+      </button>
+      <button class="p-1.5 rounded-md bg-white dark:bg-slate-700 shadow-sm transition-colors text-primary">
+        <span class="material-symbols-outlined text-xl">dark_mode</span>
+      </button>
+    </div>
+    
+    <!-- User Profile -->
+    <div class="flex items-center gap-3 border-l border-slate-200 dark:border-slate-800 pl-4 ml-2">
+      <div class="text-right hidden sm:block">
+        <p class="text-xs font-bold">사용자</p>
+        <p class="text-[10px] text-slate-500 uppercase">프로 멤버</p>
+      </div>
+      <div class="size-9 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden border border-primary/20">
+        <div class="w-full h-full bg-primary/20 flex items-center justify-center text-primary font-bold">
+          U
+        </div>
+      </div>
+    </div>
+  </div>
+</header>

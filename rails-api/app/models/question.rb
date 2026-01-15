@@ -1,6 +1,8 @@
 class Question < ApplicationRecord
   belongs_to :study_material
   has_many :test_questions, dependent: :destroy
+  has_many :chunk_questions, dependent: :destroy
+  has_many :document_chunks, through: :chunk_questions
 
   validates :content, presence: true
 

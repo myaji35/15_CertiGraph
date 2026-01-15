@@ -1,0 +1,579 @@
+<div class="min-h-screen bg-[#f6f7f8]">
+  <!-- Header -->
+  <header class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <%= link_to dashboard_index_path, class: "text-[#137fec] hover:text-[#0968d3]" do %>
+            <span class="material-symbols-outlined text-3xl">arrow_back</span>
+          <% end %>
+          <div>
+            <h1 class="text-2xl font-bold text-[#0d141b]">3D Knowledge Map</h1>
+            <p class="text-sm text-[#4c739a]" id="study-material-name">Loading...</p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-4">
+          <!-- Statistics Badge -->
+          <div class="flex space-x-2" id="statistics-badges">
+            <span class="badge-success">Mastered: <span id="mastered-count">0</span></span>
+            <span class="badge-warning">Learning: <span id="learning-count">0</span></span>
+            <span class="badge-danger">Weak: <span id="weak-count">0</span></span>
+            <span class="badge-primary">Untested: <span id="untested-count">0</span></span>
+          </div>
+
+          <!-- Controls -->
+          <button id="toggle-filters" class="btn-primary">
+            <span class="material-symbols-outlined">tune</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="flex h-[calc(100vh-80px)]">
+    <!-- 3D Visualization Canvas -->
+    <div class="flex-1 relative">
+      <div id="canvas-container" class="w-full h-full"></div>
+
+      <!-- Loading Overlay -->
+      <div id="loading-overlay" class="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center">
+        <div class="text-center">
+          <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#137fec] border-t-transparent"></div>
+          <p class="mt-4 text-[#4c739a]">Loading Knowledge Graph...</p>
+        </div>
+      </div>
+
+      <!-- Controls Overlay -->
+      <div class="absolute top-4 left-4 bg-white rounded-lg shadow-lg p-4 space-y-2">
+        <button id="reset-camera" class="flex items-center space-x-2 px-4 py-2 bg-white hover:bg-gray-100 rounded-lg border border-gray-200 w-full">
+          <span class="material-symbols-outlined">refresh</span>
+          <span>Reset Camera</span>
+        </button>
+        <button id="toggle-labels" class="flex items-center space-x-2 px-4 py-2 bg-white hover:bg-gray-100 rounded-lg border border-gray-200 w-full">
+          <span class="material-symbols-outlined">label</span>
+          <span>Toggle Labels</span>
+        </button>
+        <button id="toggle-edges" class="flex items-center space-x-2 px-4 py-2 bg-white hover:bg-gray-100 rounded-lg border border-gray-200 w-full">
+          <span class="material-symbols-outlined">share</span>
+          <span>Toggle Edges</span>
+        </button>
+
+        <div class="pt-2 border-t border-gray-200">
+          <label class="block text-sm font-medium text-[#4c739a] mb-2">Zoom</label>
+          <input type="range" id="zoom-slider" min="50" max="300" value="150"
+                 class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg p-4">
+        <h3 class="font-semibold text-[#0d141b] mb-2">Node Colors</h3>
+        <div class="space-y-2 text-sm">
+          <div class="flex items-center space-x-2">
+            <div class="w-4 h-4 rounded-full bg-green-500"></div>
+            <span>Mastered (80%+)</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <div class="w-4 h-4 rounded-full bg-yellow-500"></div>
+            <span>Learning (40-80%)</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <div class="w-4 h-4 rounded-full bg-red-500"></div>
+            <span>Weak (0-40%)</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <div class="w-4 h-4 rounded-full bg-gray-500"></div>
+            <span>Untested</span>
+          </div>
+        </div>
+
+        <h3 class="font-semibold text-[#0d141b] mt-4 mb-2">Edge Types</h3>
+        <div class="space-y-2 text-sm">
+          <div class="flex items-center space-x-2">
+            <div class="w-8 h-1 bg-red-400"></div>
+            <span>Prerequisite</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <div class="w-8 h-1 bg-teal-400"></div>
+            <span>Part of</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <div class="w-8 h-1 bg-yellow-400"></div>
+            <span>Leads to</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Side Panel -->
+    <div id="side-panel" class="w-96 bg-white shadow-lg overflow-y-auto hidden">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold text-[#0d141b]">Node Details</h2>
+          <button id="close-panel" class="text-gray-500 hover:text-gray-700">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <div id="node-details-content">
+          <p class="text-[#4c739a]">Select a node to view details</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Panel -->
+    <div id="filter-panel" class="w-80 bg-white shadow-lg overflow-y-auto hidden">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold text-[#0d141b]">Filters</h2>
+          <button id="close-filters" class="text-gray-500 hover:text-gray-700">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <!-- Difficulty Filter -->
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-[#4c739a] mb-2">Difficulty</label>
+          <select id="difficulty-filter" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+            <option value="">All Levels</option>
+            <option value="1">Very Easy (1)</option>
+            <option value="2">Easy (2)</option>
+            <option value="3">Medium (3)</option>
+            <option value="4">Hard (4)</option>
+            <option value="5">Very Hard (5)</option>
+          </select>
+        </div>
+
+        <!-- Level Filter -->
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-[#4c739a] mb-2">Concept Level</label>
+          <select id="level-filter" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+            <option value="">All Levels</option>
+            <option value="subject">Subject</option>
+            <option value="chapter">Chapter</option>
+            <option value="concept">Concept</option>
+            <option value="detail">Detail</option>
+          </select>
+        </div>
+
+        <!-- Status Filter -->
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-[#4c739a] mb-2">Mastery Status</label>
+          <select id="status-filter" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+            <option value="">All Status</option>
+            <option value="mastered">Mastered</option>
+            <option value="learning">Learning</option>
+            <option value="weak">Weak</option>
+            <option value="untested">Untested</option>
+          </select>
+        </div>
+
+        <!-- Color Filter -->
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-[#4c739a] mb-2">Color</label>
+          <div class="space-y-2">
+            <label class="flex items-center">
+              <input type="checkbox" value="green" class="color-filter mr-2">
+              <div class="w-4 h-4 rounded-full bg-green-500 mr-2"></div>
+              <span>Green (Mastered)</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" value="yellow" class="color-filter mr-2">
+              <div class="w-4 h-4 rounded-full bg-yellow-500 mr-2"></div>
+              <span>Yellow (Learning)</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" value="red" class="color-filter mr-2">
+              <div class="w-4 h-4 rounded-full bg-red-500 mr-2"></div>
+              <span>Red (Weak)</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" value="gray" class="color-filter mr-2">
+              <div class="w-4 h-4 rounded-full bg-gray-500 mr-2"></div>
+              <span>Gray (Untested)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="flex space-x-2">
+          <button id="apply-filters" class="flex-1 btn-primary">Apply</button>
+          <button id="reset-filters" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.159.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+  import * as THREE from 'three';
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+  import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+  // Global variables
+  let scene, camera, renderer, labelRenderer, controls;
+  let nodes = [];
+  let edges = [];
+  let nodeObjects = new Map();
+  let edgeObjects = [];
+  let selectedNode = null;
+  let showLabels = true;
+  let showEdges = true;
+
+  // Get study material ID from URL or data attribute
+  const studyMaterialId = <%= @study_material&.id || 'null' %>;
+
+  // Initialize Three.js scene
+  function initScene() {
+    const container = document.getElementById('canvas-container');
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+
+    // Scene
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xf6f7f8);
+
+    // Camera
+    camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 2000);
+    camera.position.set(0, 0, 300);
+
+    // Renderer
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+
+    // Label Renderer
+    labelRenderer = new CSS2DRenderer();
+    labelRenderer.setSize(width, height);
+    labelRenderer.domElement.style.position = 'absolute';
+    labelRenderer.domElement.style.top = '0';
+    labelRenderer.domElement.style.pointerEvents = 'none';
+    container.appendChild(labelRenderer.domElement);
+
+    // Controls
+    controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.minDistance = 50;
+    controls.maxDistance = 800;
+
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(100, 100, 100);
+    scene.add(directionalLight);
+
+    // Resize handler
+    window.addEventListener('resize', onWindowResize);
+
+    // Mouse click handler
+    container.addEventListener('click', onNodeClick);
+
+    // Start animation loop
+    animate();
+  }
+
+  // Load graph data
+  async function loadGraphData() {
+    try {
+      const response = await fetch(`/api/knowledge_visualization/${studyMaterialId}/graph_data`);
+      const result = await response.json();
+
+      if (result.success) {
+        nodes = result.data.nodes;
+        edges = result.data.edges;
+
+        createNodes();
+        createEdges();
+        loadStatistics();
+
+        document.getElementById('loading-overlay').style.display = 'none';
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (error) {
+      console.error('Failed to load graph:', error);
+      alert('Failed to load knowledge graph. Please try again.');
+    }
+  }
+
+  // Create 3D nodes
+  function createNodes() {
+    nodes.forEach(node => {
+      const geometry = new THREE.SphereGeometry(node.size, 32, 32);
+      const material = new THREE.MeshPhongMaterial({
+        color: node.color,
+        emissive: node.color,
+        emissiveIntensity: 0.2
+      });
+
+      const sphere = new THREE.Mesh(geometry, material);
+      sphere.position.set(node.position.x, node.position.y, node.position.z);
+      sphere.userData = node;
+
+      scene.add(sphere);
+      nodeObjects.set(node.id, sphere);
+
+      // Add label
+      if (showLabels) {
+        const labelDiv = document.createElement('div');
+        labelDiv.className = 'node-label';
+        labelDiv.textContent = node.name;
+        labelDiv.style.color = '#0d141b';
+        labelDiv.style.fontSize = '12px';
+        labelDiv.style.fontWeight = '500';
+        labelDiv.style.padding = '2px 6px';
+        labelDiv.style.background = 'rgba(255, 255, 255, 0.9)';
+        labelDiv.style.borderRadius = '4px';
+        labelDiv.style.pointerEvents = 'auto';
+        labelDiv.style.cursor = 'pointer';
+
+        const label = new CSS2DObject(labelDiv);
+        label.position.set(0, node.size + 5, 0);
+        sphere.add(label);
+      }
+    });
+  }
+
+  // Create edges
+  function createEdges() {
+    edges.forEach(edge => {
+      const sourceNode = nodeObjects.get(edge.source);
+      const targetNode = nodeObjects.get(edge.target);
+
+      if (sourceNode && targetNode) {
+        const points = [];
+        points.push(sourceNode.position);
+        points.push(targetNode.position);
+
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        const material = new THREE.LineBasicMaterial({
+          color: edge.color,
+          opacity: edge.strength * 0.5,
+          transparent: true,
+          linewidth: 1
+        });
+
+        const line = new THREE.Line(geometry, material);
+        line.userData = edge;
+
+        if (showEdges) {
+          scene.add(line);
+        }
+
+        edgeObjects.push(line);
+      }
+    });
+  }
+
+  // Load statistics
+  async function loadStatistics() {
+    try {
+      const response = await fetch(`/api/knowledge_visualization/${studyMaterialId}/statistics`);
+      const result = await response.json();
+
+      if (result.success) {
+        document.getElementById('mastered-count').textContent = result.data.mastered;
+        document.getElementById('learning-count').textContent = result.data.learning;
+        document.getElementById('weak-count').textContent = result.data.weak;
+        document.getElementById('untested-count').textContent = result.data.untested;
+      }
+    } catch (error) {
+      console.error('Failed to load statistics:', error);
+    }
+  }
+
+  // Animation loop
+  function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+    labelRenderer.render(scene, camera);
+  }
+
+  // Window resize handler
+  function onWindowResize() {
+    const container = document.getElementById('canvas-container');
+    camera.aspect = container.clientWidth / container.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    labelRenderer.setSize(container.clientWidth, container.clientHeight);
+  }
+
+  // Node click handler
+  function onNodeClick(event) {
+    const container = document.getElementById('canvas-container');
+    const rect = container.getBoundingClientRect();
+
+    const mouse = new THREE.Vector2();
+    mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    const raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(mouse, camera);
+
+    const intersects = raycaster.intersectObjects(Array.from(nodeObjects.values()));
+
+    if (intersects.length > 0) {
+      const node = intersects[0].object.userData;
+      showNodeDetails(node);
+    }
+  }
+
+  // Show node details in side panel
+  async function showNodeDetails(node) {
+    const panel = document.getElementById('side-panel');
+    const content = document.getElementById('node-details-content');
+
+    panel.classList.remove('hidden');
+    content.innerHTML = '<div class="text-center"><div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-[#137fec] border-t-transparent"></div></div>';
+
+    try {
+      const response = await fetch(`/api/knowledge_visualization/${studyMaterialId}/nodes/${node.id}`);
+      const result = await response.json();
+
+      if (result.success) {
+        const data = result.data;
+        content.innerHTML = `
+          <div class="space-y-4">
+            <div>
+              <h3 class="text-lg font-bold text-[#0d141b]">${data.node.name}</h3>
+              <p class="text-sm text-[#4c739a] mt-1">${data.node.description || 'No description available'}</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-xs text-[#4c739a]">Level</p>
+                <p class="font-semibold">${data.node.level}</p>
+              </div>
+              <div>
+                <p class="text-xs text-[#4c739a]">Difficulty</p>
+                <p class="font-semibold">${data.node.difficulty}/5</p>
+              </div>
+              <div>
+                <p class="text-xs text-[#4c739a]">Importance</p>
+                <p class="font-semibold">${data.node.importance}/5</p>
+              </div>
+              <div>
+                <p class="text-xs text-[#4c739a]">Mastery</p>
+                <p class="font-semibold">${(data.node.mastery_level * 100).toFixed(1)}%</p>
+              </div>
+            </div>
+
+            ${data.mastery ? `
+              <div class="border-t pt-4">
+                <h4 class="font-semibold mb-2">Learning Progress</h4>
+                <div class="space-y-2 text-sm">
+                  <div class="flex justify-between">
+                    <span>Attempts:</span>
+                    <span class="font-semibold">${data.mastery.attempts}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Correct:</span>
+                    <span class="font-semibold">${data.mastery.correct_attempts}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Accuracy:</span>
+                    <span class="font-semibold">${data.mastery.accuracy.toFixed(1)}%</span>
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+
+            ${data.prerequisites.length > 0 ? `
+              <div class="border-t pt-4">
+                <h4 class="font-semibold mb-2">Prerequisites</h4>
+                <div class="space-y-1">
+                  ${data.prerequisites.map(p => `<div class="text-sm">${p}</div>`).join('')}
+                </div>
+              </div>
+            ` : ''}
+
+            ${data.dependents.length > 0 ? `
+              <div class="border-t pt-4">
+                <h4 class="font-semibold mb-2">Dependent Concepts</h4>
+                <div class="space-y-1">
+                  ${data.dependents.map(d => `<div class="text-sm">${d}</div>`).join('')}
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }
+    } catch (error) {
+      console.error('Failed to load node details:', error);
+      content.innerHTML = '<p class="text-red-500">Failed to load node details</p>';
+    }
+  }
+
+  // Event Listeners
+  document.getElementById('close-panel').addEventListener('click', () => {
+    document.getElementById('side-panel').classList.add('hidden');
+  });
+
+  document.getElementById('toggle-filters').addEventListener('click', () => {
+    document.getElementById('filter-panel').classList.toggle('hidden');
+  });
+
+  document.getElementById('close-filters').addEventListener('click', () => {
+    document.getElementById('filter-panel').classList.add('hidden');
+  });
+
+  document.getElementById('reset-camera').addEventListener('click', () => {
+    camera.position.set(0, 0, 300);
+    controls.reset();
+  });
+
+  document.getElementById('toggle-labels').addEventListener('click', () => {
+    showLabels = !showLabels;
+    nodeObjects.forEach(sphere => {
+      const label = sphere.children.find(child => child instanceof CSS2DObject);
+      if (label) {
+        label.visible = showLabels;
+      }
+    });
+  });
+
+  document.getElementById('toggle-edges').addEventListener('click', () => {
+    showEdges = !showEdges;
+    edgeObjects.forEach(edge => {
+      edge.visible = showEdges;
+    });
+  });
+
+  document.getElementById('zoom-slider').addEventListener('input', (e) => {
+    const zoom = parseFloat(e.target.value);
+    camera.position.setLength(zoom);
+  });
+
+  // Initialize
+  if (studyMaterialId) {
+    initScene();
+    loadGraphData();
+  } else {
+    document.getElementById('loading-overlay').innerHTML = '<p class="text-red-500">Study material not found</p>';
+  }
+</script>
+
+<style>
+  #canvas-container {
+    position: relative;
+  }
+
+  .node-label {
+    white-space: nowrap;
+  }
+</style>

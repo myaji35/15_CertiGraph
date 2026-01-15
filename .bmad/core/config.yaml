@@ -5,7 +5,7 @@
 
 bmad_folder: .bmad
 user_name: Q123
-communication_language: English
-document_output_language: English
+communication_language: Korean
+document_output_language: Korean
 output_folder: '{project-root}/docs'
 install_user_docs: true

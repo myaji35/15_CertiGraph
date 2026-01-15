@@ -1,22 +1,18 @@
-<div id="<%= dom_id(study_material) %>" class="group bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-all">
+<div id="<%= dom_id(study_material) %>" class="group bg-white rounded-lg border border-[#e7edf3] p-4 hover:shadow-md transition-all card-hover">
   <div class="flex items-center justify-between">
     <div class="flex items-center space-x-4">
       <div class="flex-shrink-0">
-        <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-          <svg class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/>
-          </svg>
+        <div class="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center">
+          <span class="material-symbols-outlined text-red-500">picture_as_pdf</span>
         </div>
       </div>
       <div class="flex-1">
         <h3 class="text-sm font-medium text-gray-900">
           <%= study_material.name || study_material.file_name %>
         </h3>
-        <div class="flex items-center mt-1 space-x-4 text-xs text-gray-500">
+        <div class="flex items-center mt-1 space-x-4 text-xs text-[#4c739a]">
           <span class="inline-flex items-center">
-            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
+            <span class="material-symbols-outlined text-sm mr-1">schedule</span>
             <%= study_material.created_at&.strftime("%Y-%m-%d %H:%M") || "날짜 정보 없음" %>
           </span>
           <span class="inline-flex items-center">
@@ -43,38 +39,34 @@
 
         <% if study_material.status == 'processing' %>
           <!-- 파싱 진행 중 프로그레스 바 -->
-          <div class="mt-3 bg-blue-50 rounded-lg p-3">
+          <div class="mt-3 bg-[#137fec]/5 rounded-lg p-3 border border-[#137fec]/20">
             <div class="flex items-center justify-between mb-2">
-              <span class="text-sm font-medium text-blue-700">문제 추출 진행 중</span>
-              <span class="text-xs text-blue-600 animate-pulse">처리 중...</span>
+              <span class="text-sm font-medium text-[#137fec]">문제 추출 진행 중</span>
+              <span class="text-xs text-[#137fec] animate-pulse">처리 중...</span>
             </div>
             <div class="relative">
-              <div class="bg-blue-200 rounded-full h-3 overflow-hidden">
-                <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full relative overflow-hidden">
+              <div class="bg-[#137fec]/20 rounded-full h-3 overflow-hidden">
+                <div class="bg-gradient-to-r from-[#137fec] to-[#0968d3] h-3 rounded-full relative overflow-hidden">
                   <div class="absolute inset-0 bg-white/30 animate-pulse"></div>
                   <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer"></div>
                 </div>
               </div>
               <div class="flex justify-between mt-1">
-                <span class="text-xs text-blue-600">0%</span>
-                <span class="text-xs text-blue-600 animate-pulse">분석 중...</span>
-                <span class="text-xs text-blue-600">100%</span>
+                <span class="text-xs text-[#137fec]">0%</span>
+                <span class="text-xs text-[#137fec] animate-pulse">분석 중...</span>
+                <span class="text-xs text-[#137fec]">100%</span>
               </div>
             </div>
-            <p class="text-xs text-blue-600 mt-2">
-              <svg class="inline-block w-3 h-3 mr-1 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-              </svg>
+            <p class="text-xs text-[#137fec] mt-2 flex items-center">
+              <span class="material-symbols-outlined text-sm mr-1 animate-spin">sync</span>
               PDF에서 문제를 추출하고 있습니다. 파일 크기에 따라 1-3분 정도 소요됩니다.
             </p>
           </div>
         <% elsif study_material.status == 'completed' %>
           <!-- 처리 완료 상태 -->
-          <div class="mt-3 bg-green-50 rounded-lg p-3">
+          <div class="mt-3 bg-green-50 rounded-lg p-3 border border-green-200">
             <div class="flex items-center">
-              <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-              </svg>
+              <span class="material-symbols-outlined text-green-600 mr-2">check_circle</span>
               <span class="text-sm font-medium text-green-700">
                 문제 추출 완료 - <%= study_material.total_questions || 0 %>개 문제
               </span>
@@ -82,11 +74,9 @@
           </div>
         <% elsif study_material.status == 'failed' %>
           <!-- 처리 실패 상태 -->
-          <div class="mt-3 bg-red-50 rounded-lg p-3">
+          <div class="mt-3 bg-red-50 rounded-lg p-3 border border-red-200">
             <div class="flex items-center">
-              <svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-              </svg>
+              <span class="material-symbols-outlined text-red-600 mr-2">error</span>
               <span class="text-sm font-medium text-red-700">
                 처리 실패: <%= study_material.error_message || "알 수 없는 오류" %>
               </span>
@@ -104,31 +94,23 @@
         <%= button_to process_study_set_study_material_path(study_set, study_material),
                     method: :post,
                     remote: true,
-                    class: "inline-flex items-center px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors shadow-lg",
+                    class: "btn-primary text-sm",
                     title: "문제 추출 시작",
                     data: { turbo_method: :post } do %>
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
+          <span class="material-symbols-outlined text-base mr-2">play_circle</span>
           문제 추출
         <% end %>
       <% elsif study_material.persisted? && study_material.status == 'completed' %>
-        <button class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-          </svg>
+        <button class="p-2 text-[#4c739a] hover:text-[#137fec] hover:bg-[#137fec]/10 rounded-lg transition-colors">
+          <span class="material-symbols-outlined">visibility</span>
         </button>
       <% end %>
       <% if study_material.persisted? %>
         <%= link_to study_set_study_material_path(study_set, study_material),
                     method: :delete,
                     data: { confirm: '정말 삭제하시겠습니까?' },
-                    class: "p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" do %>
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-        </svg>
+                    class: "p-2 text-[#4c739a] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" do %>
+          <span class="material-symbols-outlined">delete</span>
         <% end %>
       <% end %>
     </div>

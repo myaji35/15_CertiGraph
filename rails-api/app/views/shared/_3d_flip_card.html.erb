@@ -1,0 +1,172 @@
+<!-- Enhanced 3D Flip Card Component with Depth -->
+<div class="perspective-1500 w-full h-64 cursor-pointer group/card"
+     data-controller="flip-card"
+     data-flip-card-auto-flip-value="<%= local_assigns[:auto_flip] || false %>">
+
+  <div class="card-3d relative w-full h-full"
+       data-flip-card-target="card"
+       style="transform-style: preserve-3d;">
+
+    <!-- Front face with enhanced depth -->
+    <div class="card-face card-front absolute w-full h-full rounded-2xl p-6">
+      <!-- Multi-layer gradient background -->
+      <div class="absolute inset-0 bg-gradient-to-br from-[#137fec] via-purple-500 to-pink-500 rounded-2xl opacity-90"></div>
+
+      <!-- Animated gradient overlay -->
+      <div class="absolute inset-0 bg-gradient-to-br from-cyan-400/20 via-transparent to-pink-400/20 rounded-2xl opacity-0 group-hover/card:opacity-100 transition-opacity duration-700"></div>
+
+      <!-- Shimmer effect -->
+      <div class="absolute inset-0 overflow-hidden rounded-2xl">
+        <div class="absolute top-0 left-0 w-full h-full shimmer-rainbow opacity-30"></div>
+      </div>
+
+      <!-- Content with parallax layers -->
+      <div class="relative z-10 h-full flex flex-col justify-between" style="transform-style: preserve-3d;">
+        <!-- Top section -->
+        <div style="transform: translateZ(30px);">
+          <div class="flex items-start justify-between mb-4">
+            <!-- Icon with glow and rotation -->
+            <div class="p-3 bg-white/20 backdrop-blur-sm rounded-xl transition-all duration-500 group-hover/card:bg-white/30 group-hover/card:shadow-2xl group-hover/card:shadow-white/30 group-hover/card:rotate-12 group-hover/card:scale-110">
+              <span class="material-symbols-outlined text-3xl text-white transition-transform duration-500 group-hover/card:scale-110">
+                <%= local_assigns[:icon] || 'rocket_launch' %>
+              </span>
+            </div>
+
+            <!-- Badge with pulse -->
+            <% if local_assigns[:badge] %>
+              <div class="px-3 py-1 bg-white/30 backdrop-blur rounded-full relative overflow-hidden">
+                <div class="absolute inset-0 bg-white/20 animate-pulse"></div>
+                <span class="text-white text-xs font-bold uppercase tracking-wider relative z-10"><%= badge %></span>
+              </div>
+            <% end %>
+          </div>
+
+          <!-- Title with scale animation -->
+          <h3 class="text-2xl font-bold text-white mb-2 transition-all duration-500 group-hover/card:scale-105 origin-left">
+            <%= title %>
+          </h3>
+
+          <!-- Description -->
+          <p class="text-white/90 text-sm transition-all duration-300 group-hover/card:text-white">
+            <%= description %>
+          </p>
+        </div>
+
+        <!-- Bottom hint with animated icon -->
+        <div class="flex items-center justify-between" style="transform: translateZ(20px);">
+          <span class="text-white/70 text-xs transition-all duration-300 group-hover/card:text-white/90">
+            클릭하여 자세히 보기
+          </span>
+          <span class="material-symbols-outlined text-white/70 animate-spin-slow transition-colors duration-300 group-hover/card:text-white/90">
+            360
+          </span>
+        </div>
+
+        <!-- Floating particles with various sizes -->
+        <div class="absolute inset-0 pointer-events-none" style="transform: translateZ(10px);">
+          <div class="absolute top-10 right-10 w-2 h-2 bg-white rounded-full animate-float shadow-lg shadow-white/50"></div>
+          <div class="absolute bottom-20 left-20 w-3 h-3 bg-white/50 rounded-full animate-float float-delay-1 shadow-lg shadow-white/30"></div>
+          <div class="absolute top-1/2 right-1/3 w-2 h-2 bg-white/30 rounded-full animate-float float-delay-2 shadow-lg shadow-white/20"></div>
+          <div class="absolute top-1/4 left-1/4 w-1.5 h-1.5 bg-white/60 rounded-full animate-float animation-delay-2000"></div>
+          <div class="absolute bottom-1/3 right-1/4 w-2.5 h-2.5 bg-white/40 rounded-full animate-float animation-delay-4000"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Back face with enhanced depth -->
+    <div class="card-face card-back absolute w-full h-full rounded-2xl p-6">
+      <!-- Reverse gradient background -->
+      <div class="absolute inset-0 bg-gradient-to-tl from-purple-600 via-pink-500 to-[#137fec] rounded-2xl opacity-90"></div>
+
+      <!-- Animated overlay -->
+      <div class="absolute inset-0 bg-gradient-to-tl from-orange-400/20 via-transparent to-purple-400/20 rounded-2xl"></div>
+
+      <!-- Content -->
+      <div class="relative z-10 h-full flex flex-col justify-between" style="transform-style: preserve-3d;">
+        <div style="transform: translateZ(30px);">
+          <!-- Title with glow -->
+          <h4 class="text-xl font-bold text-white mb-4 text-glow">
+            <%= local_assigns[:back_title] || "상세 정보" %>
+          </h4>
+
+          <!-- Stats with staggered animation -->
+          <% if local_assigns[:stats] %>
+            <div class="space-y-3">
+              <% stats.each_with_index do |stat, index| %>
+                <div class="flex items-center justify-between p-3 bg-white/10 backdrop-blur rounded-lg transition-all duration-300 hover:bg-white/20 hover:scale-105 hover:shadow-lg"
+                     style="animation: slideInRight 0.5s ease-out <%= index * 0.1 %>s both;">
+                  <span class="text-white/80 text-sm"><%= stat[:label] %></span>
+                  <span class="text-white font-bold text-lg"><%= stat[:value] %></span>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+
+        <!-- Enhanced action button -->
+        <div style="transform: translateZ(40px);">
+          <% if local_assigns[:action_path] %>
+            <%= link_to action_path,
+                class: "block w-full py-3 px-4 bg-white/90 text-purple-600 font-bold rounded-xl transition-all duration-300 transform hover:bg-white hover:scale-105 hover:shadow-2xl text-center btn-press relative overflow-hidden",
+                data: { turbo: false } do %>
+              <!-- Button shimmer effect -->
+              <div class="absolute inset-0 shimmer-rainbow opacity-0 hover:opacity-30 transition-opacity duration-300"></div>
+              <span class="relative z-10"><%= action_text || "시작하기" %> →</span>
+            <% end %>
+          <% end %>
+
+          <!-- Back hint -->
+          <div class="flex items-center justify-center mt-3">
+            <span class="text-white/70 text-xs">클릭하여 돌아가기</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Stimulus Controller for 3D Card Flip
+import { Controller } from "@hotwired/stimulus"
+
+export default class extends Controller {
+  static targets = ["card"]
+
+  connect() {
+    this.isFlipped = false
+    this.element.addEventListener('click', this.flip.bind(this))
+    this.element.addEventListener('mousemove', this.tilt.bind(this))
+    this.element.addEventListener('mouseleave', this.resetTilt.bind(this))
+  }
+
+  flip(e) {
+    e.preventDefault()
+    this.isFlipped = !this.isFlipped
+    this.cardTarget.classList.toggle('flipped')
+  }
+
+  tilt(e) {
+    if (this.isFlipped) return
+
+    const rect = this.element.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+    const centerX = rect.width / 2
+    const centerY = rect.height / 2
+
+    const tiltX = (y - centerY) / 10
+    const tiltY = (centerX - x) / 10
+
+    this.cardTarget.style.transform = `
+      rotateX(${tiltX}deg)
+      rotateY(${tiltY}deg)
+      scale(1.02)
+    `
+  }
+
+  resetTilt() {
+    if (this.isFlipped) return
+    this.cardTarget.style.transform = 'rotateX(0) rotateY(0) scale(1)'
+  }
+}
+</script>

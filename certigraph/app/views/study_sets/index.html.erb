@@ -1,0 +1,97 @@
+<div class="max-w-[1400px] mx-auto">
+  <!-- Page Header -->
+  <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+    <div>
+      <h2 class="text-3xl font-black tracking-tight mb-2 text-slate-900 dark:text-white">문제집 관리</h2>
+      <p class="text-slate-500 dark:text-[#92adc9]">업로드한 PDF를 AI가 분석하여 나만의 학습 그래프를 생성합니다.</p>
+    </div>
+    
+    <%= link_to '#', class: "bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-primary/30 transition-all active:scale-95" do %>
+      <span class="material-symbols-outlined">add_circle</span>
+      새 문제집 추가
+    <% end %>
+  </div>
+  
+  <!-- Filters Bar -->
+  <div class="bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 mb-6 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <label class="flex items-center gap-2 cursor-pointer">
+        <input class="rounded border-slate-700 bg-slate-700 text-primary focus:ring-primary size-4" type="checkbox">
+        <span class="text-xs font-bold text-slate-700 dark:text-slate-300">전체 선택</span>
+      </label>
+      <div class="h-4 w-px bg-slate-300 dark:bg-slate-700 mx-2"></div>
+      <p class="text-xs text-slate-500"><span class="text-primary font-bold">0</span>개의 항목 선택됨</p>
+    </div>
+    
+    <div class="flex items-center gap-2">
+      <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-bold transition-colors">
+        <span class="material-symbols-outlined text-sm">folder_open</span>
+        폴더로 이동
+      </button>
+      <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-red-500/10 text-red-500 text-xs font-bold transition-colors">
+        <span class="material-symbols-outlined text-sm">delete</span>
+        삭제
+      </button>
+    </div>
+  </div>
+  
+  <!-- Study Sets Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <% @study_sets.each do |study_set| %>
+      <div class="glass-card rounded-xl overflow-hidden group hover:border-primary/40 transition-all flex flex-col relative">
+        <!-- Thumbnail -->
+        <div class="aspect-[4/3] relative overflow-hidden bg-slate-900">
+          <div class="w-full h-full flex items-center justify-center bg-slate-800 border-b border-white/5">
+            <span class="material-symbols-outlined text-5xl text-slate-600">picture_as_pdf</span>
+          </div>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+          
+          <!-- Status Badge -->
+          <div class="absolute top-3 left-3">
+            <span class="bg-primary/90 text-white text-[10px] font-bold px-2 py-1 rounded">GraphRAG 분석 완료</span>
+          </div>
+          
+          <!-- Checkbox -->
+          <div class="absolute top-3 right-3">
+            <input class="rounded border-white/20 bg-black/40 text-primary focus:ring-primary size-4" type="checkbox">
+          </div>
+          
+          <!-- Bottom Info -->
+          <div class="absolute bottom-3 left-3 right-3 flex justify-between items-end">
+            <div>
+              <p class="text-[10px] text-slate-300 font-bold mb-0.5">최근 학습: <%= time_ago_in_words(study_set[:created_at]) %> 전</p>
+              <p class="text-[10px] text-slate-400">생성일: <%= l(study_set[:created_at], format: :short) %></p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Card Content -->
+        <div class="p-4 flex-1 flex flex-col">
+          <h3 class="font-bold text-sm mb-3 group-hover:text-primary transition-colors line-clamp-2">
+            <%= study_set[:name] %>
+          </h3>
+          
+          <div class="flex items-center gap-4 mt-auto pt-3 border-t border-white/5">
+            <div class="flex flex-col">
+              <span class="text-[9px] text-slate-500 uppercase font-black tracking-wider">자료 수</span>
+              <span class="text-sm font-bold"><%= study_set[:total_materials] %>개</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-[9px] text-slate-500 uppercase font-black tracking-wider">문제 수</span>
+              <span class="text-sm font-bold"><%= study_set[:total_questions] %>문항</span>
+            </div>
+            
+            <div class="ml-auto flex items-center gap-1">
+              <%= link_to study_set_path(study_set[:id]), class: "p-2 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-white transition-all flex items-center justify-center" do %>
+                <span class="material-symbols-outlined text-xl">visibility</span>
+              <% end %>
+              <button class="p-2 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-white transition-all">
+                <span class="material-symbols-outlined text-xl">more_vert</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

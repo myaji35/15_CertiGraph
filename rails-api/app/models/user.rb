@@ -8,6 +8,10 @@ class User < ApplicationRecord
   has_many :study_sets, dependent: :destroy
   has_many :exam_sessions, dependent: :destroy
   has_many :wrong_answers, dependent: :destroy
+  has_many :payments, dependent: :destroy
+  has_many :subscriptions, dependent: :destroy
+  has_many :user_masteries, dependent: :destroy
+  has_many :knowledge_nodes, through: :user_masteries
 
   # Devise handles email and password validation
   # validates :email, presence: true, uniqueness: true
@@ -31,5 +35,24 @@ class User < ApplicationRecord
       { user_id: id, exp: 24.hours.from_now.to_i },
       Rails.application.credentials.secret_key_base
     )
+  end
+
+  # Payment methods
+  def has_active_subscription?
+    is_paid && valid_until.present? && valid_until > Time.current
+  end
+
+  def subscription_expired?
+    valid_until.present? && valid_until <= Time.current
+  end
+
+  def current_subscription
+    subscriptions.active.order(created_at: :desc).first
+  end
+
+  def check_subscription_expiration
+    if subscription_expired? && is_paid
+      update!(is_paid: false, valid_until: nil, subscription_type: nil)
+    end
   end
 end

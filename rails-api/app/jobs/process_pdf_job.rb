@@ -1,5 +1,9 @@
 class ProcessPdfJob < ApplicationJob
-  queue_as :default
+  queue_as :pdf_processing
+
+  # PDF 처리 특화 재시도 정책
+  retry_on Timeout::Error, wait: 30.seconds, attempts: 3
+  retry_on StandardError, wait: :exponentially_longer, attempts: 5
 
   def perform(study_material_id)
     study_material = StudyMaterial.find(study_material_id)
@@ -13,30 +17,40 @@ class ProcessPdfJob < ApplicationJob
       pdf_file = study_material.pdf_file
 
       pdf_file.open do |file|
-        # PDF 파서 서비스 사용
-        parser = PdfParserService.new(file.path)
-        questions = parser.extract_questions
+        # 1. PDF 처리 서비스로 마크다운 변환 및 문제 추출
+        processing_service = PdfProcessingService.new(file.path)
+        processing_result = processing_service.process
 
-        # 지문 복제 처리
-        questions = parser.process_passage_replication(questions)
+        unless processing_result[:success]
+          raise "PDF processing failed: #{processing_result[:error]}"
+        end
 
-        # 문제들을 청킹 (10개씩)
-        chunks = parser.chunk_questions(questions, 10)
+        questions = processing_result[:questions]
+        markdown = processing_result[:markdown]
 
-        # 결과를 JSON으로 저장
+        # 2. 이미지 추출 및 캡션 생성 (선택적)
+        image_result = extract_images_with_captions(file.path)
+
+        # 3. 문제들을 청킹 (10개씩)
+        chunks = chunk_questions(questions, 10)
+
+        # 4. 결과를 JSON으로 저장
         study_material.update(
           status: 'completed',
           extracted_data: {
             total_questions: questions.length,
             chunks: chunks.length,
             questions: questions,
+            markdown: markdown,
+            images: image_result[:images] || [],
+            metadata: processing_result[:metadata] || {},
             processed_at: Time.current
           }
         )
 
         # 각 문제를 Question 모델로 저장
         questions.each do |q|
-          Question.create!(
+          question = Question.create!(
             study_material: study_material,
             content: q[:question_text],
             options: convert_options_to_hash(q[:options]),
@@ -47,6 +61,9 @@ class ProcessPdfJob < ApplicationJob
             topic: extract_topic_from_question(q[:question_text]),
             difficulty: estimate_difficulty(q)
           )
+
+          # 각 문제에 대해 임베딩 생성 작업 큐에 추가
+          GenerateEmbeddingJob.perform_later(question.id)
         end
 
         Rails.logger.info "Successfully processed PDF: #{study_material.id}, Questions: #{questions.length}"
@@ -113,6 +130,25 @@ class ProcessPdfJob < ApplicationJob
       'medium'
     else
       'easy'
+    end
+  end
+
+  def chunk_questions(questions, chunk_size)
+    questions.each_slice(chunk_size).to_a
+  end
+
+  def extract_images_with_captions(pdf_path)
+    begin
+      image_service = ImageExtractionService.new(pdf_path)
+      result = image_service.extract_and_caption
+
+      # 처리 후 임시 파일 정리
+      image_service.cleanup if result[:success]
+
+      result
+    rescue StandardError => e
+      Rails.logger.warn("Image extraction failed: #{e.message}")
+      { success: false, images: [], error: e.message }
     end
   end
 end

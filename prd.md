@@ -1,8 +1,8 @@
-# Product Requirements Document (PRD) - Certi-Graph
+# Product Requirements Document (PRD) - ExamsGraph
 
 | 문서 정보 | 내용 |
 | :--- | :--- |
-| **Project Name** | Certi-Graph (AI 자격증 마스터) |
+| **Project Name** | ExamsGraph (AI 자격증 마스터) |
 | **Version** | v1.2 |
 | **Status** | MVP Development - 사회복지사 1급 특화 |
 | **Owner** | CEO Seungsik Kang |
@@ -107,6 +107,27 @@
 
 ### 4.3. Test Engine & Analysis
 * **Randomization:** DB 저장 순서와 무관하게 Frontend 렌더링 시 보기 순서 무작위 섞기 (Anti-Memorization).
+
+### 4.4. Certification Information Hub (자격증 정보 허브)
+* **실시간 시험 정보 수집:**
+    * 한국산업인력공단 API 연동 (2025/2026년 시험 일정)
+    * 대한상공회의소 등 주요 기관 정보 통합
+    * 사회복지사 1급 시험 일정 특별 관리
+* **시험 일정 관리:**
+    * 연도별 시험 일정 캘린더 뷰
+    * 필기/실기 구분 표시
+    * 원서 접수 기간 알림
+    * D-Day 카운트다운
+* **알림 시스템:**
+    * 원서 접수 시작 3일 전 알림
+    * 시험일 1주일/1개월 전 알림
+    * 합격자 발표일 알림
+    * 이메일/푸시 알림 지원
+* **통계 및 분석:**
+    * 연도별 합격률 추이
+    * 시험 난이도 분석
+    * 응시자 수 통계
+    * 커트라인 예측 (AI 기반)
 * **Modes:**
     * **Standard:** 랜덤 셔플 모의고사.
     * **Retest (오답 노트):** 과거 틀린 문제만 모아서 다시 풀기.
@@ -143,20 +164,22 @@
 
 ### 5.1. Tech Stack
 * **Frontend (Rails-integrated):**
-    * Framework: `Rails 8.0+` (with Turbo & Stimulus)
+    * Framework: `Rails 8.0+` (with Hotwire: Turbo & Stimulus)
+    * Real-time: `Action Cable` with `Redis` adapter
     * Visualization: `Three.js` (via importmap)
     * Styling: `Tailwind CSS v3` (tailwindcss-rails ~> 2.0)
     * JavaScript: `Stimulus` controllers with fallback patterns
+    * Mobile: `Turbo Native` support for iOS/Android
 * **Backend:**
     * Language: `Ruby 3.3.0+`
     * Framework: `Rails 8.0+` (Action Cable for WebSockets)
     * Background Jobs: `Sidekiq` or `Solid Queue`
     * File Upload: `Active Storage` with `Direct Upload`
 * **Database:**
-    * **Vector DB:** `pgvector` (PostgreSQL extension) - 문제 텍스트 임베딩 저장
-    * **Graph DB:** `Neo4j` (AuraDB via REST API) - 개념 간 관계 및 학습 이력 저장
-    * **Primary DB:** `PostgreSQL` - 사용자, 결제, 문제집, 학습 데이터
-    * **Cache:** `Solid Cache` (SQLite-based) or `Redis`
+    * **Primary DB:** `SQLite3` - 사용자, 결제, 문제집, 학습 데이터, 임베딩 저장 (All-in-one)
+    * **Graph Data:** JSON column in SQLite3 for concept relationships
+    * **Cache:** `Solid Cache` (SQLite-based) - Rails 8 default caching
+    * **Note:** SQLite3의 JSON1 extension 활용하여 Graph 데이터 저장
 * **AI Models:**
     * PDF Parser: `pdf-reader` gem (오픈소스, 로컬 처리)
     * LLM (Reasoning): `GPT-4o` (Main Logic), `GPT-4o-mini` (Simple Tasks) - via API
@@ -168,10 +191,61 @@
 
 ### 5.2. Data Flow
 1.  **Upload:** User -> Rails View -> Active Storage -> Background Job -> **Local PDF Parser** -> JSON Return
-2.  **Process:** Sidekiq Job -> **Chunking Service** -> OpenAI Embedding -> **pgvector**
-3.  **Graph:** Processed Data -> **LLM Service** -> **Neo4j API** (Create Nodes/Relations)
-4.  **Test:** Turbo Frame Request -> Rails Controller -> pgvector Query -> Stimulus (Client-side Shuffle)
-5.  **Analyze:** Form Submit -> **GraphRAG Service (Neo4j)** -> LLM Service -> Turbo Stream Update
+2.  **Process:** Sidekiq Job -> **Chunking Service** -> OpenAI Embedding -> **SQLite3** (JSON column)
+3.  **Graph:** Processed Data -> **LLM Service** -> **SQLite3** (JSON1 extension for relationships)
+4.  **Test:** Turbo Frame Request -> Rails Controller -> SQLite3 Query -> Stimulus (Client-side Shuffle)
+5.  **Analyze:** Form Submit -> **GraphRAG Service (SQLite3 JSON)** -> LLM Service -> Turbo Stream Update
+
+### 5.3. Hotwire Architecture
+
+#### 5.3.1. Turbo Integration
+* **Turbo Drive:** SPA-like navigation without full page reloads
+* **Turbo Frames:** Partial page updates for dynamic content
+  - Dashboard statistics updates
+  - Question loading and navigation
+  - Real-time progress tracking
+* **Turbo Streams:** Real-time updates via WebSocket
+  - PDF parsing progress broadcasts
+  - Live test statistics
+  - Notification delivery
+
+#### 5.3.2. Stimulus Controllers
+* **Purpose:** Progressive enhancement with minimal JavaScript
+* **Key Controllers:**
+  - `exam_controller.js` - Test-taking interface, timer, answer submission
+  - `dashboard_controller.js` - Statistics updates, chart rendering
+  - `upload_controller.js` - File upload progress, drag-and-drop
+  - `graph_controller.js` - Three.js knowledge graph visualization
+  - `notification_controller.js` - Real-time notification handling
+
+#### 5.3.3. Action Cable Channels
+* **StudyChannel:** Broadcasts study progress, PDF parsing status
+* **NotificationChannel:** Real-time alerts and system notifications
+* **ExamChannel:** Live exam session updates (future: multi-user features)
+
+### 5.4. Native App Support (Turbo Native)
+
+#### 5.4.1. iOS/Android Integration
+* **Technology:** Turbo Native (wraps Rails web app)
+* **Native Features:**
+  - Native navigation bars
+  - Push notifications
+  - Biometric authentication
+  - Offline mode (cached content)
+  - Native file picker for PDF upload
+
+#### 5.4.2. Native Authentication
+* **Pattern:** User-Agent detection
+* **Flow:**
+  1. Native app sends custom User-Agent header
+  2. Rails detects Turbo Native via `NativeAuthenticatable` concern
+  3. Returns streamlined layout without web navigation chrome
+  4. Token-based authentication for persistent sessions
+
+#### 5.4.3. Native Layout Optimization
+* **Simplified UI:** Removes web-specific elements (footer, external links)
+* **Touch-Optimized:** Larger tap targets, swipe gestures
+* **Performance:** Reduced asset loading, optimized for mobile networks
 
 ---
 
@@ -218,7 +292,7 @@
 
 | 구분 | 제약 | 상세 |
 |------|------|------|
-| **예산** | 인프라 | 월 30만원 이내 (Vercel, Supabase, Neo4j Free Tier) |
+| **예산** | 인프라 | 월 30만원 이내 (Heroku, SQLite3 로컬 DB) |
 | **예산** | LLM API | 월 50만원 이내 (GPT-4o 사용량 제한 필요) |
 | **인력** | 개발 | 1인 풀스택 개발 (CEO 직접 개발) |
 | **시간** | MVP | 2025년 1월 사회복지사 1급 시험 전 출시 필수 |

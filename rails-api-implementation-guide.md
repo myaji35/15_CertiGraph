@@ -1,49 +1,60 @@
-# Rails API Implementation Guide for Certi-Graph
+# Rails API Implementation Guide for ExamsGraph
 
-## 프로젝트 구조 (UI/UX 유지 전략)
+## 프로젝트 구조 (Ultra Modern UI/UX 전략)
 
 ```
-15_CertiGraph/
-├── frontend/               # Next.js Frontend (기존 UI 유지)
-│   ├── src/
-│   │   ├── app/           # App Router pages
-│   │   ├── components/    # React components
-│   │   ├── services/      # API 통신 서비스
-│   │   └── hooks/         # Custom React hooks
-│   └── package.json
-│
-├── rails-api/             # Rails API Backend (새로 추가)
+ExamsGraph/
+├── rails-api/              # Rails 8.0 Full-Stack Application
 │   ├── app/
-│   │   ├── controllers/api/v1/
-│   │   ├── models/
-│   │   ├── services/      # 비즈니스 로직
-│   │   ├── jobs/          # Background jobs
-│   │   └── channels/      # WebSocket
+│   │   ├── controllers/   # MVC Controllers + API endpoints
+│   │   ├── models/        # Active Record models
+│   │   ├── views/         # ERB templates with Ultra Modern UI
+│   │   │   └── shared/    # Glass morphism, 3D cards components
+│   │   ├── services/      # 비즈니스 로직 & AI services
+│   │   ├── jobs/          # Sidekiq background jobs
+│   │   └── assets/
+│   │       └── stylesheets/
+│   │           └── ultra_modern.css  # ExamsGraph design system
 │   ├── config/
+│   ├── db/                # SQLite3 + JSON columns for graph
 │   └── Gemfile
 │
-└── docs/                  # 문서
+├── .claude/
+│   └── skills/
+│       └── stitch_agent.md # Ultra Modern UI/UX patterns
+│
+└── docs/                   # 문서 & PRD
 ```
 
 ## Rails API 초기 설정
 
-### 1. Rails API 프로젝트 생성
+### 1. Rails Full-Stack 프로젝트 생성
 
 ```bash
-# Rails API 프로젝트 생성 (SQLite3 사용)
-rails new rails-api --api --skip-test  # SQLite3가 기본값
+# Rails 8.0 Full-Stack 프로젝트 생성 (SQLite3 기본)
+rails new examsgraph-api --css=tailwind --javascript=importmap
 
-cd rails-api
+cd examsgraph-api
 
-# 필요한 gem 추가
-bundle add jwt
-bundle add bcrypt
-bundle add rack-cors
-bundle add sidekiq
-bundle add sqlite3  # 이미 포함되어 있음
-bundle add solid_cache  # SQLite 기반 캐싱
-bundle add solid_queue  # SQLite 기반 job queue
-bundle add httparty  # for external API calls
+# 필요한 gem 추가 - Core
+bundle add devise               # Authentication
+bundle add jwt                   # API tokens
+bundle add rack-cors             # CORS support
+bundle add sidekiq               # Background jobs
+bundle add redis                 # Sidekiq backend
+
+# AI/ML Integration gems
+bundle add ruby-openai           # OpenAI GPT-4o
+bundle add faraday               # HTTP client for APIs
+bundle add pdf-reader            # PDF parsing
+
+# Database & Performance
+bundle add solid_cache           # SQLite-based caching
+bundle add solid_queue           # SQLite-based job queue
+
+# UI/UX Enhancement
+bundle add stimulus-rails        # Already included in Rails 8
+bundle add turbo-rails           # Already included in Rails 8
 ```
 
 ### 2. Gemfile 설정

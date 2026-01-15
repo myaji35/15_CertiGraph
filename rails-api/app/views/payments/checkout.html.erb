@@ -1,0 +1,178 @@
+<div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-3xl mx-auto">
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">결제하기</h1>
+      <p class="mt-2 text-gray-600">AI 자격증 마스터 시즌 패스</p>
+    </div>
+
+    <!-- Pricing Cards -->
+    <div class="grid md:grid-cols-2 gap-6 mb-8">
+      <!-- Season Pass -->
+      <div class="bg-white rounded-lg shadow-md p-6 border-2 border-blue-500" id="season-pass-card">
+        <div class="text-center">
+          <h3 class="text-xl font-bold text-gray-900">시즌 패스</h3>
+          <div class="mt-4">
+            <span class="text-4xl font-bold text-blue-600">₩10,000</span>
+            <span class="text-gray-600">/90일</span>
+          </div>
+          <ul class="mt-6 space-y-3 text-left">
+            <li class="flex items-center">
+              <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+              </svg>
+              <span>모든 학습 자료 무제한 업로드</span>
+            </li>
+            <li class="flex items-center">
+              <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+              </svg>
+              <span>AI 기반 오답노트</span>
+            </li>
+            <li class="flex items-center">
+              <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+              </svg>
+              <span>3D 지식 그래프 시각화</span>
+            </li>
+            <li class="flex items-center">
+              <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+              </svg>
+              <span>맞춤형 학습 추천</span>
+            </li>
+          </ul>
+          <button onclick="selectPlan('season_pass')"
+                  class="mt-6 w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition">
+            선택하기
+          </button>
+        </div>
+      </div>
+
+      <!-- VIP Pass -->
+      <div class="bg-white rounded-lg shadow-md p-6 border-2 border-purple-500" id="vip-pass-card">
+        <div class="absolute top-4 right-4">
+          <span class="bg-purple-600 text-white text-xs px-3 py-1 rounded-full">PREMIUM</span>
+        </div>
+        <div class="text-center">
+          <h3 class="text-xl font-bold text-gray-900">VIP 패스</h3>
+          <div class="mt-4">
+            <span class="text-4xl font-bold text-purple-600">₩50,000</span>
+            <span class="text-gray-600">/365일</span>
+          </div>
+          <ul class="mt-6 space-y-3 text-left">
+            <li class="flex items-center">
+              <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+              </svg>
+              <span>시즌 패스 모든 기능</span>
+            </li>
+            <li class="flex items-center">
+              <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+              </svg>
+              <span>우선 고객 지원</span>
+            </li>
+            <li class="flex items-center">
+              <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+              </svg>
+              <span>베타 기능 우선 체험</span>
+            </li>
+            <li class="flex items-center">
+              <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+              </svg>
+              <span>1년 이용권</span>
+            </li>
+          </ul>
+          <button onclick="selectPlan('vip_pass')"
+                  class="mt-6 w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition">
+            선택하기
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Widget Container -->
+    <div id="payment-widget" class="bg-white rounded-lg shadow-md p-6 hidden">
+      <h2 class="text-xl font-bold mb-4">결제 정보</h2>
+      <div id="payment-method"></div>
+      <div id="agreement"></div>
+      <button id="payment-button" class="mt-6 w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition">
+        결제하기
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toss Payments SDK -->
+<script src="https://js.tosspayments.com/v1/payment-widget"></script>
+
+<script>
+  let selectedPlan = null;
+  let paymentWidget = null;
+
+  async function selectPlan(planType) {
+    selectedPlan = planType;
+
+    try {
+      // Request payment from backend
+      const response = await fetch('/payments/request', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content
+        },
+        body: JSON.stringify({ plan_type: planType })
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        alert('결제 요청 실패: ' + data.error);
+        return;
+      }
+
+      // Initialize Toss Payment Widget
+      paymentWidget = await loadTossPayments(data.clientKey);
+
+      // Render payment widget
+      await paymentWidget.renderPaymentMethods(
+        '#payment-method',
+        { value: data.payment.amount, currency: data.payment.currency }
+      );
+
+      await paymentWidget.renderAgreement('#agreement');
+
+      // Show payment widget
+      document.getElementById('payment-widget').classList.remove('hidden');
+
+      // Setup payment button
+      document.getElementById('payment-button').onclick = async () => {
+        try {
+          await paymentWidget.requestPayment({
+            orderId: data.payment.order_id,
+            orderName: planType === 'vip_pass' ? 'VIP 패스' : '시즌 패스',
+            successUrl: data.successUrl,
+            failUrl: data.failUrl,
+            customerEmail: '<%= current_user&.email %>',
+            customerName: '<%= current_user&.name || current_user&.email %>'
+          });
+        } catch (error) {
+          console.error('Payment request failed:', error);
+          alert('결제 요청 중 오류가 발생했습니다.');
+        }
+      };
+    } catch (error) {
+      console.error('Error:', error);
+      alert('결제 초기화 중 오류가 발생했습니다.');
+    }
+  }
+
+  function loadTossPayments(clientKey) {
+    return new Promise((resolve) => {
+      const tossPayments = TossPayments(clientKey);
+      resolve(tossPayments.widgets({ customerKey: 'customer_<%= current_user&.id %>' }));
+    });
+  }
+</script>

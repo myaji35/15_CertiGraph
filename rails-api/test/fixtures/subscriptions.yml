@@ -1,0 +1,31 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  payment: two
+  plan_type: season_pass
+  price: 10000
+  starts_at: <%= Time.current.to_s(:db) %>
+  expires_at: <%= 90.days.from_now.to_s(:db) %>
+  is_active: true
+  status: active
+
+two:
+  user: one
+  payment: three
+  plan_type: vip_pass
+  price: 50000
+  starts_at: <%= Time.current.to_s(:db) %>
+  expires_at: <%= 365.days.from_now.to_s(:db) %>
+  is_active: true
+  status: active
+
+expired:
+  user: one
+  payment: two
+  plan_type: season_pass
+  price: 10000
+  starts_at: <%= 100.days.ago.to_s(:db) %>
+  expires_at: <%= 10.days.ago.to_s(:db) %>
+  is_active: false
+  status: inactive

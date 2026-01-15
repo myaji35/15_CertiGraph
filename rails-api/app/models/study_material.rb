@@ -1,6 +1,9 @@
 class StudyMaterial < ApplicationRecord
   belongs_to :study_set
   has_many :questions, dependent: :destroy
+  has_many :document_chunks, dependent: :destroy
+  has_many :knowledge_nodes, dependent: :destroy
+  has_many :knowledge_edges, through: :knowledge_nodes
 
   # Active Storage for PDF files
   has_one_attached :pdf_file

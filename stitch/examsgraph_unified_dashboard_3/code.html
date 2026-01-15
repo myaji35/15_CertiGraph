@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html class="dark" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ExamsGraph 문제집 상세 관리</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Noto+Sans+KR:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "Noto Sans KR"],
+                        "sans": ["Noto Sans KR", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Noto Sans KR', 'Space Grotesk', sans-serif;
+        }
+        .glass-card {
+            background: rgba(25, 38, 51, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .pdf-preview-mesh {
+            background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.05) 1px, transparent 0);
+            background-size: 16px 16px;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen flex flex-col">
+<header class="sticky top-0 z-50 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md px-6 py-3">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3">
+<div class="bg-primary p-1.5 rounded-lg text-white">
+<span class="material-symbols-outlined text-2xl">account_tree</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight">ExamsGraph</h1>
+</div>
+<div class="hidden md:flex items-center">
+<label class="relative block">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+<span class="material-symbols-outlined text-sm">search</span>
+</span>
+<input class="w-72 bg-slate-100 dark:bg-slate-800 border-none rounded-lg py-2 pl-10 pr-3 focus:ring-2 focus:ring-primary text-sm placeholder:text-slate-500" placeholder="개념, 문제집 검색..." type="text"/>
+</label>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
+<button class="p-1.5 rounded-md hover:bg-white dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-xl">light_mode</span>
+</button>
+<button class="p-1.5 rounded-md bg-white dark:bg-slate-700 shadow-sm transition-colors text-primary">
+<span class="material-symbols-outlined text-xl">dark_mode</span>
+</button>
+</div>
+<div class="flex items-center gap-3 border-l border-slate-200 dark:border-slate-800 pl-4 ml-2">
+<div class="text-right hidden sm:block">
+<p class="text-xs font-bold">알렉스 리베라</p>
+<p class="text-[10px] text-slate-500 uppercase">프로 멤버</p>
+</div>
+<div class="size-9 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden border border-primary/20">
+<img alt="User profile avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDM0kplg1UMoXYRjLPBcIUIysEXIbdv2rdHLo8lgvk18AdPD4GrooBlOBTC-pum-9XRuM6N3zUuRbut0BTd3iIvGxxAxfpD1pEMiiD2iyefMZenF98YlbNNbMGF1p0VSIaq0eOv5dtWoP6N0yopwG-uLt1aNWuC6lSzy_gL2pHxVMlmRkI1s4J8Jmv5HBdyAqko3Ujb2CZ_DfhFNSiPSifO33XJZWM1kjRKcMW7IPyjn2qetkDJ6hwNdsUye3XCELZLj1MDJqeJLQ"/>
+</div>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<aside class="w-64 hidden lg:flex flex-col justify-between border-r border-slate-200 dark:border-slate-800 p-4 bg-white dark:bg-background-dark">
+<div class="space-y-6">
+<div>
+<p class="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">주요 탐색</p>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">대시보드</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-sm font-medium">시험 일정</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary border border-primary/20" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="text-sm font-medium">문제집 관리</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">leaderboard</span>
+<span class="text-sm font-medium">랭킹</span>
+</a>
+</nav>
+</div>
+<div>
+<p class="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">시스템</p>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">설정</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-500 hover:bg-red-500/10 transition-all" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="text-sm font-medium">로그아웃</span>
+</a>
+</nav>
+</div>
+</div>
+<div class="bg-primary rounded-xl p-4 text-white relative overflow-hidden group cursor-pointer shadow-lg shadow-primary/20">
+<div class="relative z-10">
+<p class="text-xs font-medium opacity-80 mb-1">PDF 업로드 및 학습</p>
+<p class="font-bold leading-tight">새로운 문제집으로 AI 학습하기</p>
+</div>
+<div class="absolute -right-2 -bottom-2 opacity-20 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-6xl">cloud_upload</span>
+</div>
+</div>
+</aside>
+<main class="flex-1 overflow-y-auto bg-slate-50 dark:bg-[#0b0c10] p-6 lg:p-8">
+<div class="max-w-[1400px] mx-auto">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+<div>
+<nav class="flex items-center gap-2 text-xs text-slate-500 mb-2">
+<a class="hover:text-primary" href="#">문제집 관리</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-slate-300">상세 정보</span>
+</nav>
+<h2 class="text-3xl font-black tracking-tight mb-2">ExamsGraph 문제집 상세 관리</h2>
+<div class="flex items-center gap-3">
+<span class="px-2 py-0.5 bg-primary/20 text-primary text-[10px] font-bold rounded">SAA-C03</span>
+<p class="text-slate-500 dark:text-[#92adc9]">AWS Certified Solutions Architect (SAA-C03) 통합 문제집</p>
+</div>
+</div>
+<div class="flex flex-wrap gap-2">
+<button class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-bold flex items-center gap-2 transition-all">
+<span class="material-symbols-outlined text-lg">upload_file</span>
+                            PDF 다시 업로드
+                        </button>
+<button class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-bold flex items-center gap-2 transition-all">
+<span class="material-symbols-outlined text-lg">psychology</span>
+                            AI 취약점 다시 분석
+                        </button>
+<button class="px-6 py-2.5 bg-primary hover:bg-primary/80 text-white rounded-lg text-sm font-black flex items-center gap-2 shadow-lg shadow-primary/20 transition-all">
+<span class="material-symbols-outlined text-lg">play_circle</span>
+                            학습 시작 (Solve Questions)
+                        </button>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-8">
+<div class="col-span-12 xl:col-span-7 space-y-8">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<div class="glass-card rounded-xl overflow-hidden flex flex-col h-[400px]">
+<div class="p-4 border-b border-white/5 flex items-center justify-between">
+<h3 class="text-sm font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">picture_as_pdf</span>
+                                        PDF 미리보기
+                                    </h3>
+<span class="text-[10px] text-slate-500">총 248 페이지</span>
+</div>
+<div class="flex-1 bg-slate-900/40 relative pdf-preview-mesh flex items-center justify-center p-8">
+<div class="w-full h-full bg-white rounded shadow-2xl relative overflow-hidden group">
+<div class="absolute inset-0 bg-slate-200/50 flex flex-col items-center justify-center p-4 text-center">
+<span class="material-symbols-outlined text-4xl text-slate-400 mb-2">description</span>
+<p class="text-[10px] text-slate-500 font-bold">표지 미리보기</p>
+</div>
+<div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+<button class="size-8 bg-black/60 rounded-full flex items-center justify-center text-white"><span class="material-symbols-outlined text-sm">chevron_left</span></button>
+<button class="size-8 bg-black/60 rounded-full flex items-center justify-center text-white"><span class="material-symbols-outlined text-sm">chevron_right</span></button>
+</div>
+</div>
+</div>
+</div>
+<div class="glass-card rounded-xl p-6 flex flex-col justify-between">
+<div>
+<h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">문제집 정보</h3>
+<div class="space-y-4">
+<div>
+<p class="text-[10px] text-slate-500 mb-1">파일 이름</p>
+<p class="text-sm font-medium truncate">AWS_SAA_Comprehensive_Guide_2023.pdf</p>
+</div>
+<div>
+<p class="text-[10px] text-slate-500 mb-1">업로드 날짜</p>
+<p class="text-sm font-medium">2023년 09월 12일</p>
+</div>
+<div>
+<p class="text-[10px] text-slate-500 mb-1">식별된 개념 수</p>
+<p class="text-sm font-medium">1,248개 노드</p>
+</div>
+<div>
+<p class="text-[10px] text-slate-500 mb-1">식별된 문제 수</p>
+<p class="text-sm font-medium">450개 문항</p>
+</div>
+</div>
+</div>
+<div class="pt-6 border-t border-white/5 mt-auto">
+<div class="flex items-center gap-2 mb-2">
+<div class="size-2 rounded-full bg-emerald-500"></div>
+<p class="text-xs font-bold text-emerald-500">AI 분석 완료</p>
+</div>
+<p class="text-[10px] text-slate-500 leading-relaxed">GraphRAG가 지식 구조를 100% 매핑했습니다. 현재 모든 챕터에서 학습이 가능합니다.</p>
+</div>
+</div>
+</div>
+<div class="glass-card rounded-xl overflow-hidden">
+<div class="p-4 border-b border-white/5 flex items-center justify-between">
+<h3 class="text-sm font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">list_alt</span>
+                                    식별된 챕터 및 주제
+                                </h3>
+<div class="flex items-center gap-2">
+<span class="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-400">총 8개 섹션</span>
+</div>
+</div>
+<div class="divide-y divide-white/5">
+<div class="p-4 flex items-center justify-between hover:bg-white/5 transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<span class="text-xs font-bold text-slate-600">01</span>
+<div>
+<p class="text-sm font-bold">AWS 글로벌 인프라 및 네트워킹</p>
+<p class="text-[10px] text-slate-500">VPC, Route 53, CloudFront 등 14개 개념</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="text-right">
+<p class="text-[10px] text-slate-500">달성도</p>
+<p class="text-xs font-bold text-emerald-500">92%</p>
+</div>
+<span class="material-symbols-outlined text-slate-700 group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+<div class="p-4 flex items-center justify-between hover:bg-white/5 transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<span class="text-xs font-bold text-slate-600">02</span>
+<div>
+<p class="text-sm font-bold">컴퓨팅 서비스 심화</p>
+<p class="text-[10px] text-slate-500">EC2 Auto Scaling, Lambda, ECS 등 22개 개념</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="text-right">
+<p class="text-[10px] text-slate-500">달성도</p>
+<p class="text-xs font-bold text-yellow-500">65%</p>
+</div>
+<span class="material-symbols-outlined text-slate-700 group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+<div class="p-4 flex items-center justify-between hover:bg-white/5 transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<span class="text-xs font-bold text-slate-600">03</span>
+<div>
+<p class="text-sm font-bold">데이터 저장소 및 DB 아키텍처</p>
+<p class="text-[10px] text-slate-500">S3, RDS, Aurora, DynamoDB 등 18개 개념</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="text-right">
+<p class="text-[10px] text-slate-500">달성도</p>
+<p class="text-xs font-bold text-red-500">34%</p>
+</div>
+<span class="material-symbols-outlined text-slate-700 group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+</div>
+<button class="w-full py-3 bg-white/5 text-[10px] font-bold text-slate-500 hover:text-white transition-colors">모든 챕터 보기</button>
+</div>
+</div>
+<div class="col-span-12 xl:col-span-5 space-y-8">
+<div class="glass-card rounded-xl p-6">
+<h3 class="text-lg font-bold mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">analytics</span>
+                                학습 통계 (Learning Analytics)
+                            </h3>
+<div class="grid grid-cols-2 gap-4 mb-8">
+<div class="bg-slate-800/50 p-4 rounded-xl border border-white/5">
+<p class="text-[10px] text-slate-500 font-bold uppercase mb-1">평균 점수</p>
+<div class="text-3xl font-black text-primary">74.5</div>
+<p class="text-[10px] text-slate-500 mt-1">상위 15% 수준</p>
+</div>
+<div class="bg-slate-800/50 p-4 rounded-xl border border-white/5">
+<p class="text-[10px] text-slate-500 font-bold uppercase mb-1">학습 시간</p>
+<div class="text-3xl font-black">12h</div>
+<p class="text-[10px] text-slate-500 mt-1">이번 주 +2.5h</p>
+</div>
+</div>
+<div class="space-y-4">
+<p class="text-xs font-bold text-slate-400 uppercase tracking-tight">가장 많이 틀린 개념</p>
+<div class="space-y-3">
+<div class="flex items-center justify-between p-3 rounded-lg bg-red-500/5 border border-red-500/20">
+<div class="flex items-center gap-3">
+<div class="size-2 rounded-full bg-red-500"></div>
+<p class="text-sm font-medium">VPC 피어링 연결성</p>
+</div>
+<span class="text-xs font-black text-red-400">8회 오답</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-slate-800/30 border border-white/5">
+<div class="flex items-center gap-3">
+<div class="size-2 rounded-full bg-yellow-500"></div>
+<p class="text-sm font-medium">S3 수명 주기 정책</p>
+</div>
+<span class="text-xs font-black text-slate-400">5회 오답</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-slate-800/30 border border-white/5">
+<div class="flex items-center gap-3">
+<div class="size-2 rounded-full bg-yellow-500"></div>
+<p class="text-sm font-medium">SQS 가시성 제한 시간</p>
+</div>
+<span class="text-xs font-black text-slate-400">4회 오답</span>
+</div>
+</div>
+</div>
+</div>
+<div class="glass-card rounded-xl p-6">
+<h3 class="text-lg font-bold mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">history</span>
+                                학습 히스토리
+                            </h3>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-3 rounded-lg bg-slate-800/30 border border-white/5 group hover:border-primary/30 transition-all cursor-pointer">
+<div class="flex gap-3">
+<div class="size-10 rounded bg-slate-700 flex flex-col items-center justify-center text-[10px] font-bold">
+<span class="text-slate-400">09</span>
+<span>24</span>
+</div>
+<div>
+<p class="text-sm font-bold">모의고사 4회 차</p>
+<p class="text-[10px] text-slate-500">65문항 중 52문항 정답</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-lg font-black text-primary">80</p>
+<p class="text-[10px] text-emerald-500">합격권</p>
+</div>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-slate-800/30 border border-white/5 group hover:border-primary/30 transition-all cursor-pointer">
+<div class="flex gap-3">
+<div class="size-10 rounded bg-slate-700 flex flex-col items-center justify-center text-[10px] font-bold">
+<span class="text-slate-400">09</span>
+<span>21</span>
+</div>
+<div>
+<p class="text-sm font-bold">섹션 2 집중 훈련</p>
+<p class="text-[10px] text-slate-500">20문항 중 13문항 정답</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-lg font-black text-slate-400">65</p>
+<p class="text-[10px] text-slate-500">보통</p>
+</div>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-slate-800/30 border border-white/5 group hover:border-primary/30 transition-all cursor-pointer">
+<div class="flex gap-3">
+<div class="size-10 rounded bg-slate-700 flex flex-col items-center justify-center text-[10px] font-bold">
+<span class="text-slate-400">09</span>
+<span>18</span>
+</div>
+<div>
+<p class="text-sm font-bold">진단 테스트</p>
+<p class="text-[10px] text-slate-500">100문항 중 58문항 정답</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-lg font-black text-red-400">58</p>
+<p class="text-[10px] text-red-500">미달</p>
+</div>
+</div>
+<button class="w-full py-2.5 mt-2 text-xs font-bold bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors">전체 히스토리 보기</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

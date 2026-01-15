@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: #3B82F6; color: white; padding: 20px; text-align: center; }
+    .content { background: #f9f9f9; padding: 20px; }
+    .info-box { background: white; border: 1px solid #ddd; padding: 15px; margin: 15px 0; }
+    .footer { text-align: center; color: #666; font-size: 12px; margin-top: 20px; }
+    .button { display: inline-block; background: #3B82F6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>결제가 완료되었습니다</h1>
+    </div>
+    <div class="content">
+      <p>안녕하세요, <%= @user.name || @user.email %>님!</p>
+      <p>ExamsGraph <%= @plan_name %> 결제가 성공적으로 완료되었습니다.</p>
+
+      <div class="info-box">
+        <h3>결제 정보</h3>
+        <table width="100%">
+          <tr>
+            <td><strong>주문번호:</strong></td>
+            <td><%= @payment.order_id %></td>
+          </tr>
+          <tr>
+            <td><strong>상품명:</strong></td>
+            <td><%= @plan_name %></td>
+          </tr>
+          <tr>
+            <td><strong>결제금액:</strong></td>
+            <td><%= number_to_currency(@payment.amount, unit: '₩', precision: 0) %></td>
+          </tr>
+          <tr>
+            <td><strong>결제일시:</strong></td>
+            <td><%= @payment.approved_at&.strftime('%Y년 %m월 %d일 %H:%M') || @payment.created_at.strftime('%Y년 %m월 %d일 %H:%M') %></td>
+          </tr>
+          <% if @expires_at %>
+          <tr>
+            <td><strong>만료일:</strong></td>
+            <td><%= @expires_at.strftime('%Y년 %m월 %d일') %></td>
+          </tr>
+          <% end %>
+        </table>
+      </div>
+
+      <p style="text-align: center; margin: 30px 0;">
+        <a href="<%= ENV['APP_URL'] %>/dashboard" class="button">대시보드로 이동</a>
+      </p>
+
+      <p>이제 모든 학습 자료에 접근하실 수 있습니다. ExamsGraph와 함께 효율적인 학습을 시작해보세요!</p>
+    </div>
+
+    <div class="footer">
+      <p>문의사항이 있으시면 <%= ENV['SUPPORT_EMAIL'] || 'support@examsgraph.com' %>으로 연락주세요.</p>
+      <p>&copy; <%= Time.current.year %> ExamsGraph. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>

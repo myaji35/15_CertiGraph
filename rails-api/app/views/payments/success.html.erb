@@ -1,0 +1,83 @@
+<div class="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full">
+    <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+      <!-- Success Icon -->
+      <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+        <svg class="h-10 w-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+
+      <h2 class="text-2xl font-bold text-gray-900 mb-2">결제 완료!</h2>
+      <p class="text-gray-600 mb-6">결제가 성공적으로 완료되었습니다.</p>
+
+      <div class="bg-gray-50 rounded-lg p-4 mb-6 text-left">
+        <div class="space-y-2">
+          <div class="flex justify-between">
+            <span class="text-gray-600">주문번호</span>
+            <span class="font-medium"><%= @order_id %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">결제금액</span>
+            <span class="font-medium">₩<%= number_with_delimiter(@amount) %></span>
+          </div>
+          <% if @subscription %>
+          <div class="flex justify-between">
+            <span class="text-gray-600">구독 종류</span>
+            <span class="font-medium"><%= @subscription.plan_type == 'vip_pass' ? 'VIP 패스' : '시즌 패스' %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">만료일</span>
+            <span class="font-medium"><%= @subscription.expires_at.strftime('%Y년 %m월 %d일') %></span>
+          </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <a href="/dashboard" class="block w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition">
+          대시보드로 이동
+        </a>
+        <a href="/payments" class="block w-full bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 transition">
+          결제 내역 보기
+        </a>
+      </div>
+
+      <p class="mt-6 text-sm text-gray-500">
+        결제 영수증은 이메일로 발송되었습니다.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Auto-confirm payment after redirect
+  window.addEventListener('DOMContentLoaded', async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderId = urlParams.get('orderId');
+    const paymentKey = urlParams.get('paymentKey');
+    const amount = urlParams.get('amount');
+
+    if (orderId && paymentKey && amount) {
+      try {
+        const response = await fetch('/payments/confirm', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content
+          },
+          body: JSON.stringify({ orderId, paymentKey, amount })
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+          console.error('Payment confirmation failed:', data.error);
+          window.location.href = `/payments/fail?message=${encodeURIComponent(data.error.message || 'Payment confirmation failed')}`;
+        }
+      } catch (error) {
+        console.error('Error confirming payment:', error);
+      }
+    }
+  });
+</script>

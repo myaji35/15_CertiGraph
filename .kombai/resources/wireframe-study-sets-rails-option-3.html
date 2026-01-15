@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>옵션 3: 칸반 보드 스타일 (Innovative)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Comic Sans MS", cursive, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            border: 2px solid #333;
+            border-radius: 4px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .title {
+            font-size: 32px;
+            font-weight: bold;
+        }
+        .quick-stats {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+        .quick-stat {
+            text-align: center;
+        }
+        .quick-stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4a9eff;
+        }
+        .quick-stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+        .search-bar {
+            flex: 1;
+            max-width: 400px;
+            padding: 10px 16px;
+            border: 2px solid #999;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+        .button-group {
+            display: flex;
+            gap: 8px;
+        }
+        .button {
+            padding: 10px 20px;
+            background: #4a9eff;
+            color: white;
+            border: 2px solid #333;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .button-secondary {
+            background: white;
+            color: #333;
+        }
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .kanban-column {
+            background: white;
+            border: 2px solid #333;
+            border-radius: 4px;
+            padding: 16px;
+            min-height: 500px;
+        }
+        .column-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #ddd;
+        }
+        .column-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .column-count {
+            background: #e8e8e8;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .kanban-card {
+            background: #f8f8f8;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: move;
+        }
+        .kanban-card:hover {
+            border-color: #4a9eff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        .card-title {
+            font-size: 16px;
+            font-weight: bold;
+            flex: 1;
+        }
+        .drag-handle {
+            width: 24px;
+            height: 24px;
+            background: #ddd;
+            border: 2px solid #999;
+            border-radius: 4px;
+            cursor: grab;
+        }
+        .card-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #666;
+        }
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+        }
+        .progress-section {
+            margin-bottom: 12px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border: 1px solid #999;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #4caf50;
+        }
+        .card-actions {
+            display: flex;
+            gap: 4px;
+            justify-content: flex-end;
+        }
+        .icon-btn {
+            width: 28px;
+            height: 28px;
+            border: 2px solid #666;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .icon-btn:hover {
+            background: #f0f0f0;
+        }
+        .status-completed {
+            border-left: 4px solid #4caf50;
+        }
+        .status-processing {
+            border-left: 4px solid #ff9800;
+        }
+        .status-failed {
+            border-left: 4px solid #f44336;
+        }
+        .add-card {
+            border: 2px dashed #999;
+            background: #fafafa;
+            padding: 16px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .add-card:hover {
+            border-color: #4a9eff;
+            background: #f0f7ff;
+        }
+        .badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #4CAF50;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            z-index: 10;
+        }
+        .badge-new {
+            background: #FF9800;
+        }
+        .component-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .stats-bar {
+            background: white;
+            border: 2px solid #333;
+            border-radius: 4px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-around;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #4a9eff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-top">
+                <div>
+                    <div style="margin-bottom: 12px;">
+                        <span class="component-wrapper">
+                            <span class="badge" title="Rails link_to helper">[REUSE] link_to</span>
+                            <span style="color: #666; text-decoration: underline;">← 문제집 목록</span>
+                        </span>
+                    </div>
+                    <h1 class="title">정보처리기사 필기 2024</h1>
+                </div>
+                <div class="quick-stats">
+                    <div class="quick-stat">
+                        <div class="quick-stat-number">12</div>
+                        <div class="quick-stat-label">총 자료</div>
+                    </div>
+                    <div class="quick-stat">
+                        <div class="quick-stat-number">360</div>
+                        <div class="quick-stat-label">총 문제</div>
+                    </div>
+                    <div class="quick-stat">
+                        <div class="quick-stat-number">92%</div>
+                        <div class="quick-stat-label">완료율</div>
+                    </div>
+                </div>
+            </div>
+            <div class="controls">
+                <input type="text" class="search-bar" placeholder="🔍 학습자료 검색...">
+                <div class="button-group">
+                    <span class="component-wrapper">
+                        <span class="badge" title="Rails form_with helper">[REUSE] form_with</span>
+                        <button class="button">📁 자료 추가</button>
+                    </span>
+                    <button class="button button-secondary">일괄 작업</button>
+                    <span class="component-wrapper">
+                        <span class="badge" title="Rails button_to helper">[REUSE] button_to</span>
+                        <button class="button" style="background: #4caf50;">🎯 학습 시작</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kanban Board -->
+        <div class="component-wrapper" style="display: block;">
+            <span class="badge badge-new" title="certigraph/app/views/study_materials/_kanban_board.html.erb">[NEW] _kanban_board partial</span>
+            <div class="kanban-board">
+                <!-- Column 1: Completed -->
+                <div class="kanban-column">
+                    <div class="column-header">
+                        <span class="column-title">✓ 완료</span>
+                        <span class="column-count">10</span>
+                    </div>
+                    
+                    <div class="component-wrapper" style="display: block; margin-bottom: 12px;">
+                        <span class="badge badge-new" title="certigraph/app/views/study_materials/_kanban_card.html.erb">[NEW] _kanban_card partial</span>
+                        <div class="kanban-card status-completed">
+                            <div class="card-header">
+                                <div class="card-title">📄 2024년 1회 기출문제</div>
+                                <div class="drag-handle"></div>
+                            </div>
+                            <div class="card-meta">
+                                <div class="meta-row">
+                                    <span>📊 30문제</span>
+                                    <span>💾 2.4 MB</span>
+                                </div>
+                                <div class="meta-row">
+                                    <span>📅 2024.01.10</span>
+                                    <span>⏱️ 2분 전</span>
+                                </div>
+                            </div>
+                            <div class="card-actions">
+                                <button class="icon-btn">📖</button>
+                                <button class="icon-btn">🔄</button>
+                                <button class="icon-btn">🌐</button>
+                                <button class="icon-btn">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="kanban-card status-completed" style="opacity: 0.7;">
+                        <div class="card-header">
+                            <div class="card-title">📄 운영체제 문제집</div>
+                            <div class="drag-handle"></div>
+                        </div>
+                        <div class="card-meta">
+                            <div class="meta-row">
+                                <span>📊 28문제</span>
+                                <span>💾 2.0 MB</span>
+                            </div>
+                            <div class="meta-row">
+                                <span>📅 2024.01.07</span>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="icon-btn">📖</button>
+                            <button class="icon-btn">🔄</button>
+                            <button class="icon-btn">🗑️</button>
+                        </div>
+                    </div>
+
+                    <div class="kanban-card status-completed" style="opacity: 0.7;">
+                        <div class="card-header">
+                            <div class="card-title">📄 소프트웨어공학 요약</div>
+                            <div class="drag-handle"></div>
+                        </div>
+                        <div class="card-meta">
+                            <div class="meta-row">
+                                <span>📊 22문제</span>
+                                <span>💾 1.5 MB</span>
+                            </div>
+                            <div class="meta-row">
+                                <span>📅 2024.01.06</span>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="icon-btn">📖</button>
+                            <button class="icon-btn">🔄</button>
+                            <button class="icon-btn">🗑️</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 2: Processing -->
+                <div class="kanban-column">
+                    <div class="column-header">
+                        <span class="column-title">⏳ 처리중</span>
+                        <span class="column-count">1</span>
+                    </div>
+                    
+                    <div class="kanban-card status-processing">
+                        <div class="card-header">
+                            <div class="card-title">📄 2023년 3회 기출문제</div>
+                            <div class="drag-handle"></div>
+                        </div>
+                        <div class="card-meta">
+                            <div class="meta-row">
+                                <span>📊 30문제</span>
+                                <span>💾 2.1 MB</span>
+                            </div>
+                            <div class="meta-row">
+                                <span>📅 2024.01.09</span>
+                                <span>⏱️ 진행중</span>
+                            </div>
+                        </div>
+                        <div class="progress-section">
+                            <div style="font-size: 12px; color: #666; margin-bottom: 4px;">처리 진행률: 65%</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 65%; background: #ff9800;"></div>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="icon-btn">⏸️</button>
+                            <button class="icon-btn">🗑️</button>
+                        </div>
+                    </div>
+
+                    <div class="add-card">
+                        <div style="font-size: 32px; margin-bottom: 4px;">+</div>
+                        <div style="font-size: 12px; color: #666;">드래그하여 이동</div>
+                    </div>
+                </div>
+
+                <!-- Column 3: Failed / Queue -->
+                <div class="kanban-column">
+                    <div class="column-header">
+                        <span class="column-title">⚠️ 실패 / 대기</span>
+                        <span class="column-count">1</span>
+                    </div>
+                    
+                    <div class="kanban-card status-failed">
+                        <div class="card-header">
+                            <div class="card-title">📄 데이터베이스 핵심정리</div>
+                            <div class="drag-handle"></div>
+                        </div>
+                        <div class="card-meta">
+                            <div class="meta-row">
+                                <span>📊 0문제</span>
+                                <span>💾 1.8 MB</span>
+                            </div>
+                            <div class="meta-row">
+                                <span>📅 2024.01.08</span>
+                                <span style="color: #f44336;">✗ 실패</span>
+                            </div>
+                        </div>
+                        <div style="background: #fff3cd; padding: 8px; border-radius: 4px; margin-bottom: 8px; font-size: 12px;">
+                            ⚠️ PDF 파싱 오류 발생
+                        </div>
+                        <div class="card-actions">
+                            <button class="icon-btn" style="background: #fff3cd;">🔄</button>
+                            <button class="icon-btn">🐛</button>
+                            <button class="icon-btn">🗑️</button>
+                        </div>
+                    </div>
+
+                    <div class="add-card">
+                        <div style="font-size: 32px; margin-bottom: 4px;">+</div>
+                        <div style="font-size: 12px; color: #666;">드래그하여 이동</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Stats Bar -->
+        <div class="component-wrapper" style="display: block;">
+            <span class="badge badge-new" title="certigraph/app/views/study_sets/_summary_stats.html.erb">[NEW] _summary_stats partial</span>
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-label">평균 문제 수</div>
+                    <div class="stat-value">30개</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">평균 파일 크기</div>
+                    <div class="stat-value">2.1 MB</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">총 학습 시간</div>
+                    <div class="stat-value">24시간</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">성공률</div>
+                    <div class="stat-value">92%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Description -->
+    <div style="margin-top: 40px; padding: 20px; background: white; border: 2px solid #333; border-radius: 4px; max-width: 1400px; margin-left: auto; margin-right: auto;">
+        <h3 style="margin-bottom: 16px;">💡 옵션 3: 칸반 보드 스타일 (Innovative)</h3>
+        <p style="margin-bottom: 12px;"><strong>접근 방식:</strong> 칸반 보드 방식으로 학습자료의 상태를 시각적으로 관리하고, 드래그 앤 드롭으로 직관적인 워크플로우 제공</p>
+        
+        <p style="margin-bottom: 8px;"><strong>주요 개선사항:</strong></p>
+        <ul style="margin-left: 24px; margin-bottom: 12px;">
+            <li>📋 3단계 상태 관리 - 완료 / 처리중 / 실패·대기</li>
+            <li>🖱️ 드래그 앤 드롭 - 카드를 끌어서 상태 변경</li>
+            <li>👁️ 시각적 워크플로우 - 한눈에 보는 진행 상황</li>
+            <li>📊 실시간 진행률 - 각 칼럼별 개수 표시</li>
+            <li>🎨 색상 코딩 - 상태별 시각적 구분</li>
+            <li>📈 통계 대시보드 - 전체 학습 현황 요약</li>
+            <li>⚡ 빠른 액션 - 카드 내 직접 작업 가능</li>
+        </ul>
+
+        <p style="margin-bottom: 8px;"><strong>재사용 Rails 헬퍼/컴포넌트:</strong></p>
+        <ul style="margin-left: 24px; margin-bottom: 12px;">
+            <li>✅ link_to - 네비게이션</li>
+            <li>✅ form_with - 파일 업로드</li>
+            <li>✅ button_to - 학습 시작 버튼</li>
+        </ul>
+
+        <p style="margin-bottom: 8px;"><strong>새로 만들 Partials:</strong></p>
+        <ul style="margin-left: 24px; margin-bottom: 12px;">
+            <li>🆕 _kanban_board.html.erb - 칸반 보드 레이아웃</li>
+            <li>🆕 _kanban_card.html.erb - 드래그 가능한 자료 카드</li>
+            <li>🆕 _summary_stats.html.erb - 통계 요약 바</li>
+        </ul>
+
+        <p style="margin-bottom: 8px;"><strong>필요한 JavaScript:</strong></p>
+        <ul style="margin-left: 24px; margin-bottom: 12px;">
+            <li>⚙️ Stimulus Controller - 드래그 앤 드롭 기능</li>
+            <li>⚙️ Turbo Frame - 실시간 상태 업데이트</li>
+        </ul>
+
+        <p style="margin-top: 12px;"><strong>장점:</strong> 직관적인 워크플로우, 시각적 관리, 재미있는 인터랙션, 프로젝트 관리 도구 느낌</p>
+        <p><strong>고려사항:</strong> 드래그 앤 드롭 구현 필요, 많은 자료 시 칼럼이 길어질 수 있음</p>
+        <p><strong>추천 대상:</strong> 학습자료 관리를 프로젝트 관리처럼 체계적으로 하고 싶은 사용자</p>
+    </div>
+</body>
+</html>

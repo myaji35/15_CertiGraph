@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>옵션 1: 개선된 테이블 레이아웃 (Conservative)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Comic Sans MS", cursive, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border: 2px solid #333;
+            border-radius: 4px;
+        }
+
+        .header {
+            background: #e8e8e8;
+            border-bottom: 2px solid #333;
+            padding: 24px;
+        }
+
+        .title {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 24px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .icon-placeholder {
+            width: 16px;
+            height: 16px;
+            background: #999;
+            border: 1px solid #666;
+        }
+
+        .section {
+            padding: 24px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+
+        .upload-zone {
+            border: 3px dashed #999;
+            border-radius: 8px;
+            padding: 48px;
+            text-align: center;
+            background: #fafafa;
+        }
+
+        .upload-icon {
+            width: 64px;
+            height: 64px;
+            background: #ddd;
+            margin: 0 auto 16px;
+            border: 2px solid #999;
+            border-radius: 4px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #4a9eff;
+            color: white;
+            border: 2px solid #333;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+
+        .filter-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding: 16px;
+            background: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .filter-left {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .filter-input {
+            padding: 8px 12px;
+            border: 2px solid #999;
+            border-radius: 4px;
+            font-family: inherit;
+            min-width: 200px;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 2px solid #999;
+            border-radius: 4px;
+            font-family: inherit;
+            background: white;
+        }
+
+        .bulk-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            background: #ff6b6b;
+            color: white;
+            border: 2px solid #333;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 2px solid #333;
+        }
+
+        thead {
+            background: #e8e8e8;
+            border-bottom: 2px solid #333;
+        }
+
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            border-right: 1px solid #999;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #ddd;
+        }
+
+        tbody tr:hover {
+            background: #f9f9f9;
+        }
+
+        td {
+            padding: 12px;
+            border-right: 1px solid #ddd;
+        }
+
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #666;
+            background: white;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border: 2px solid #333;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-completed {
+            background: #d4f8d4;
+        }
+
+        .status-processing {
+            background: #fff3cd;
+        }
+
+        .status-failed {
+            background: #f8d7da;
+        }
+
+        .progress-bar {
+            width: 100px;
+            height: 8px;
+            background: #e0e0e0;
+            border: 1px solid #999;
+            border-radius: 4px;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #4a9eff;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 4px;
+        }
+
+        .icon-btn {
+            width: 28px;
+            height: 28px;
+            border: 2px solid #666;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #4CAF50;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        .badge-new {
+            background: #FF9800;
+        }
+
+        .component-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .footer-actions {
+            padding: 24px;
+            text-align: right;
+        }
+
+        .btn-primary {
+            padding: 12px 32px;
+            background: #4caf50;
+            color: white;
+            border: 2px solid #333;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div style="margin-bottom: 16px;">
+                <span class="component-wrapper">
+                    <span class="badge" title="Rails link_to helper">[REUSE] link_to</span>
+                    <span style="color: #666; text-decoration: underline;">← 문제집 목록</span>
+                </span>
+            </div>
+            <h1 class="title">정보처리기사 필기 2024</h1>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="icon-placeholder"></div>
+                    <span>학습자료 12개</span>
+                </div>
+                <div class="stat-item">
+                    <div class="icon-placeholder"></div>
+                    <span>총 문제 360개</span>
+                </div>
+                <div class="stat-item">
+                    <div class="icon-placeholder"></div>
+                    <span>2024. 01. 10</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="section">
+            <h2 class="section-title">학습자료 업로드</h2>
+            <div class="component-wrapper" style="display: block;">
+                <span class="badge badge-new" title="certigraph/app/views/study_materials/_upload_form.html.erb">[NEW]
+                    _upload_form partial</span>
+                <div class="upload-zone">
+                    <div class="upload-icon"></div>
+                    <p style="margin-bottom: 8px;">PDF 파일을 선택하거나 드래그하여 업로드하세요</p>
+                    <p style="color: #999; font-size: 12px; margin-bottom: 12px;">최대 50MB, PDF 형식만 가능</p>
+                    <span class="component-wrapper">
+                        <span class="badge" title="Rails form_with helper">[REUSE] form_with</span>
+                        <button class="button">📁 PDF 선택</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Materials List -->
+        <div class="section">
+            <h2 class="section-title">학습자료 목록 (12개)</h2>
+
+            <!-- Filter Bar -->
+            <div class="component-wrapper" style="display: block; margin-bottom: 16px;">
+                <span class="badge badge-new" title="certigraph/app/views/study_materials/_filter_bar.html.erb">[NEW]
+                    _filter_bar partial</span>
+                <div class="filter-bar">
+                    <div class="filter-left">
+                        <input type="text" class="filter-input" placeholder="🔍 학습자료 검색...">
+                        <select class="filter-select">
+                            <option>모든 상태</option>
+                            <option>완료</option>
+                            <option>처리 중</option>
+                            <option>실패</option>
+                        </select>
+                        <select class="filter-select">
+                            <option>업로드 날짜순</option>
+                            <option>이름순</option>
+                            <option>문제 수순</option>
+                        </select>
+                    </div>
+                    <div class="bulk-actions">
+                        <button class="btn-small">선택 삭제 (3개)</button>
+                        <button class="btn-small" style="background: #4a9eff;">일괄 재처리</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="component-wrapper" style="display: block;">
+                <span class="badge badge-new"
+                    title="certigraph/app/views/study_materials/_materials_table.html.erb">[NEW] _materials_table
+                    partial</span>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">
+                                <div class="checkbox"></div>
+                            </th>
+                            <th style="width: 60px;">순서</th>
+                            <th>제목</th>
+                            <th style="width: 100px;">문제 수</th>
+                            <th style="width: 100px;">파일 크기</th>
+                            <th style="width: 120px;">업로드 날짜</th>
+                            <th style="width: 140px;">상태</th>
+                            <th style="width: 180px;">작업</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="checkbox"></div>
+                            </td>
+                            <td>1 ↕</td>
+                            <td style="font-weight: bold;">📄 2024년 1회 기출문제</td>
+                            <td>30개</td>
+                            <td>2.4 MB</td>
+                            <td>2024.01.10</td>
+                            <td><span class="status-badge status-completed">완료</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <div class="icon-btn">📖</div>
+                                    <div class="icon-btn">🔄</div>
+                                    <div class="icon-btn">🌐</div>
+                                    <div class="icon-btn">🗑️</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="checkbox" style="background: #4a9eff;"></div>
+                            </td>
+                            <td>2 ↕</td>
+                            <td style="font-weight: bold;">📄 2023년 3회 기출문제</td>
+                            <td>30개</td>
+                            <td>2.1 MB</td>
+                            <td>2024.01.09</td>
+                            <td>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 65%;"></div>
+                                </div>
+                                <span style="font-size: 12px; margin-left: 4px;">65%</span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <div class="icon-btn">🔄</div>
+                                    <div class="icon-btn">🗑️</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="checkbox"></div>
+                            </td>
+                            <td>3 ↕</td>
+                            <td style="font-weight: bold;">📄 데이터베이스 핵심정리</td>
+                            <td>25개</td>
+                            <td>1.8 MB</td>
+                            <td>2024.01.08</td>
+                            <td>
+                                <span class="status-badge status-failed">실패</span>
+                                <span style="font-size: 11px; color: #721c24; margin-left: 4px; cursor: pointer;">▼ 로그
+                                    보기</span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <div class="icon-btn" style="background: #fff3cd;">🔄</div>
+                                    <div class="icon-btn">🗑️</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr style="opacity: 0.6;">
+                            <td>
+                                <div class="checkbox"></div>
+                            </td>
+                            <td>4 ↕</td>
+                            <td>📄 운영체제 문제집</td>
+                            <td>28개</td>
+                            <td>2.0 MB</td>
+                            <td>2024.01.07</td>
+                            <td><span class="status-badge status-completed">완료</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <div class="icon-btn">📖</div>
+                                    <div class="icon-btn">🔄</div>
+                                    <div class="icon-btn">🗑️</div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr style="opacity: 0.6;">
+                            <td>
+                                <div class="checkbox"></div>
+                            </td>
+                            <td>5 ↕</td>
+                            <td>📄 소프트웨어공학 요약</td>
+                            <td>22개</td>
+                            <td>1.5 MB</td>
+                            <td>2024.01.06</td>
+                            <td><span class="status-badge status-completed">완료</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <div class="icon-btn">📖</div>
+                                    <div class="icon-btn">🔄</div>
+                                    <div class="icon-btn">🗑️</div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer-actions">
+            <span class="component-wrapper">
+                <span class="badge" title="Rails button_to helper">[REUSE] button_to</span>
+                <button class="btn-primary">🎯 학습 시작</button>
+            </span>
+        </div>
+    </div>
+
+    <!-- Description -->
+    <div
+        style="margin-top: 40px; padding: 20px; background: white; border: 2px solid #333; border-radius: 4px; max-width: 1200px; margin-left: auto; margin-right: auto;">
+        <h3 style="margin-bottom: 16px;">💡 옵션 1: 개선된 테이블 레이아웃 (Conservative)</h3>
+        <p style="margin-bottom: 12px;"><strong>접근 방식:</strong> 기존 테이블 구조를 유지하면서 검색/필터/정렬 기능을 추가하여 대량의 자료를 효율적으로 관리할 수
+            있도록 개선</p>
+
+        <p style="margin-bottom: 8px;"><strong>주요 개선사항:</strong></p>
+        <ul style="margin-left: 24px; margin-bottom: 12px;">
+            <li>🔍 통합 검색 바 - 제목, 내용으로 빠른 검색</li>
+            <li>🎛️ 상태별 필터 - 완료/처리중/실패 자료만 보기</li>
+            <li>📊 정렬 옵션 - 날짜순, 이름순, 문제 수순</li>
+            <li>☑️ 일괄 작업 - 여러 자료 동시 삭제/재처리</li>
+            <li>📈 진행률 표시 개선 - 시각적 프로그레스 바</li>
+            <li>🐛 오류 로그 접근 - 클릭 한 번에 상세 로그 확인</li>
+        </ul>
+
+        <p style="margin-bottom: 8px;"><strong>재사용 Rails 헬퍼/컴포넌트:</strong></p>
+        <ul style="margin-left: 24px; margin-bottom: 12px;">
+            <li>✅ link_to - 페이지 간 네비게이션</li>
+            <li>✅ form_with - PDF 업로드 폼</li>
+            <li>✅ button_to - 액션 버튼</li>
+        </ul>
+
+        <p style="margin-bottom: 8px;"><strong>새로 만들 Partials:</strong></p>
+        <ul style="margin-left: 24px;">
+            <li>🆕 _upload_form.html.erb - 업로드 영역</li>
+            <li>🆕 _filter_bar.html.erb - 검색/필터/정렬 바</li>
+            <li>🆕 _materials_table.html.erb - 학습자료 테이블</li>
+        </ul>
+
+        <p style="margin-top: 12px;"><strong>장점:</strong> 기존 익숙한 테이블 UI 유지, 빠른 구현, 데스크톱 환경 최적화</p>
+        <p><strong>고려사항:</strong> 모바일 환경에서는 가로 스크롤 필요</p>
+    </div>
+</body>
+
+</html>
