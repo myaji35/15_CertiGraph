@@ -1,7 +1,7 @@
 {
-  "name": "certigraph-tests",
+  "name": "examsgraph-tests",
   "version": "1.0.0",
-  "description": "CertiGraph Playwright 병렬 테스트",
+  "description": "ExamsGraph Playwright 병렬 테스트",
   "scripts": {
     "test": "playwright test",
     "test:parallel": "playwright test --project=auth-parallel --project=read-only-parallel --project=independent-e2e",

@@ -5,8 +5,7 @@ class TestQuestion < ApplicationRecord
 
   validates :question_number, presence: true, numericality: { greater_than: 0 }
 
-  # JSON serialization for shuffled_options
-  serialize :shuffled_options, coder: JSON
+  # JSON column (shuffled_options) - auto-serialized by Rails
 
   scope :answered, -> { joins(:test_answer) }
   scope :unanswered, -> { left_joins(:test_answer).where(test_answers: { id: nil }) }

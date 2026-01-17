@@ -4,6 +4,23 @@ class ProgressAnalyticsService
     @user = user
   end
 
+  # Helper method for database-agnostic time difference calculation
+  def time_diff_sql
+    if ActiveRecord::Base.connection.adapter_name == 'PostgreSQL'
+      'EXTRACT(EPOCH FROM (completed_at - started_at))'
+    else
+      '(julianday(completed_at) - julianday(started_at)) * 86400'
+    end
+  end
+
+  def hour_extract_sql(column)
+    if ActiveRecord::Base.connection.adapter_name == 'PostgreSQL'
+      "EXTRACT(HOUR FROM #{column})"
+    else
+      "CAST(strftime('%H', #{column}) AS INTEGER)"
+    end
+  end
+
   # Overview statistics for dashboard
   def overview
     {
@@ -28,7 +45,7 @@ class ProgressAnalyticsService
       sessions_count: sessions_today.count,
       questions_answered: sessions_today.sum(:total_answered),
       correct_answers: sessions_today.sum(:correct_answers),
-      study_time_minutes: sessions_today.sum('EXTRACT(EPOCH FROM (completed_at - started_at))/60'),
+      study_time_minutes: sessions_today.sum("#{time_diff_sql}/60"),
       average_score: sessions_today.average(:score)&.round(2) || 0,
       hourly_breakdown: hourly_activity_breakdown(today)
     }
@@ -45,7 +62,7 @@ class ProgressAnalyticsService
       sessions_count: sessions_this_week.count,
       questions_answered: sessions_this_week.sum(:total_answered),
       correct_answers: sessions_this_week.sum(:correct_answers),
-      study_time_hours: (sessions_this_week.sum('EXTRACT(EPOCH FROM (completed_at - started_at))/3600') || 0).round(2),
+      study_time_hours: (sessions_this_week.sum("#{time_diff_sql}/3600") || 0).round(2),
       average_score: sessions_this_week.average(:score)&.round(2) || 0,
       daily_breakdown: daily_breakdown(week_start, Time.current.end_of_week),
       improvement_rate: calculate_improvement_rate(week_start)
@@ -62,7 +79,7 @@ class ProgressAnalyticsService
       sessions_count: sessions_this_month.count,
       questions_answered: sessions_this_month.sum(:total_answered),
       correct_answers: sessions_this_month.sum(:correct_answers),
-      study_time_hours: (sessions_this_month.sum('EXTRACT(EPOCH FROM (completed_at - started_at))/3600') || 0).round(2),
+      study_time_hours: (sessions_this_month.sum("#{time_diff_sql}/3600") || 0).round(2),
       average_score: sessions_this_month.average(:score)&.round(2) || 0,
       weekly_breakdown: weekly_breakdown(month_start, Time.current.end_of_month),
       best_day: best_performance_day(month_start),
@@ -80,7 +97,7 @@ class ProgressAnalyticsService
       sessions_count: sessions_this_year.count,
       questions_answered: sessions_this_year.sum(:total_answered),
       correct_answers: sessions_this_year.sum(:correct_answers),
-      study_time_hours: (sessions_this_year.sum('EXTRACT(EPOCH FROM (completed_at - started_at))/3600') || 0).round(2),
+      study_time_hours: (sessions_this_year.sum("#{time_diff_sql}/3600") || 0).round(2),
       average_score: sessions_this_year.average(:score)&.round(2) || 0,
       monthly_breakdown: monthly_breakdown(year_start, Time.current),
       total_improvement: total_improvement_rate(year_start)
@@ -188,7 +205,7 @@ class ProgressAnalyticsService
   def total_study_time
     total_seconds = @user.test_sessions
                         .where.not(started_at: nil, completed_at: nil)
-                        .sum('EXTRACT(EPOCH FROM (completed_at - started_at))') || 0
+                        .sum(time_diff_sql) || 0
     (total_seconds / 3600).round(2) # Convert to hours
   end
 
@@ -389,7 +406,7 @@ class ProgressAnalyticsService
 
   def preferred_study_times
     sessions = @user.test_sessions.where.not(started_at: nil)
-    hour_counts = sessions.group('EXTRACT(HOUR FROM started_at)').count
+    hour_counts = sessions.group(hour_extract_sql('started_at')).count
 
     hour_counts.map { |hour, count| { hour: hour.to_i, count: count } }
                .sort_by { |h| -h[:count] }
@@ -399,7 +416,7 @@ class ProgressAnalyticsService
   def average_session_duration
     total_seconds = @user.test_sessions
                         .where.not(started_at: nil, completed_at: nil)
-                        .average('EXTRACT(EPOCH FROM (completed_at - started_at))') || 0
+                        .average(time_diff_sql) || 0
     (total_seconds / 60).round(2) # Convert to minutes
   end
 

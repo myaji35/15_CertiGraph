@@ -42,20 +42,167 @@
               placeholder: "이 학습 세트에 대한 간단한 설명을 입력하세요" %>
         </div>
 
-        <!-- Certification Field -->
-        <div class="mb-8">
-          <%= form.label :certification, "자격증 종류", class: "block text-sm font-medium text-gray-700 mb-2" %>
-          <%= form.select :certification,
-              options_for_select([
-                ["사회복지사 1급", "social_worker_1"],
-                ["사회복지사 2급", "social_worker_2"],
-                ["요양보호사", "care_worker"],
-                ["보육교사", "childcare_teacher"],
-                ["기타", "other"]
-              ], @study_set.certification),
-              { prompt: "자격증을 선택하세요" },
+        <!-- Exam Date Field -->
+        <div class="mb-6">
+          <%= form.label :exam_date, "시험일자", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.date_field :exam_date,
               class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
         </div>
+
+        <!-- Certification Field with Search -->
+        <div class="mb-8">
+          <%= form.label :certification, "자격증 종류", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <div class="relative">
+            <%= form.text_field :certification,
+                value: @study_set.certification,
+                list: "certification-options",
+                autocomplete: "off",
+                placeholder: "자격증명을 입력하세요 (예: 정보처리기사, 사회복지사)",
+                class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+                data: { certification_search: true } %>
+            <span class="absolute right-3 top-2.5 text-gray-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </span>
+          </div>
+
+          <!-- Datalist for autocomplete -->
+          <datalist id="certification-options">
+            <% all_certifications_flat.each do |cert| %>
+              <option value="<%= cert %>"><%= cert %></option>
+            <% end %>
+          </datalist>
+
+          <!-- Category buttons for quick access -->
+          <div class="mt-3">
+            <div class="text-xs text-gray-600 mb-2">빠른 선택:</div>
+            <div class="flex flex-wrap gap-2">
+              <% certification_list.keys.first(8).each do |category| %>
+                <button type="button"
+                        class="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded-full transition"
+                        data-category="<%= category %>">
+                  <%= category %>
+                </button>
+              <% end %>
+            </div>
+          </div>
+
+          <!-- Dropdown for category selection -->
+          <div id="category-dropdown" class="hidden absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-96 overflow-y-auto">
+            <!-- Will be populated by JavaScript -->
+          </div>
+        </div>
+
+        <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            const input = document.querySelector('[data-certification-search]');
+            const dropdown = document.getElementById('category-dropdown');
+            const categoryButtons = document.querySelectorAll('[data-category]');
+
+            // Certification data
+            const certifications = <%= raw certification_list.to_json %>;
+
+            // Show dropdown with filtered results
+            function showDropdown(query = '') {
+              dropdown.innerHTML = '';
+              dropdown.classList.remove('hidden');
+
+              const searchLower = query.toLowerCase();
+              let hasResults = false;
+
+              Object.entries(certifications).forEach(([category, certs]) => {
+                const filteredCerts = query
+                  ? certs.filter(cert => cert.toLowerCase().includes(searchLower))
+                  : certs;
+
+                if (filteredCerts.length > 0) {
+                  hasResults = true;
+
+                  const categoryDiv = document.createElement('div');
+                  categoryDiv.className = 'p-2';
+
+                  const categoryTitle = document.createElement('div');
+                  categoryTitle.className = 'font-semibold text-sm text-gray-700 px-2 py-1 bg-gray-50';
+                  categoryTitle.textContent = category;
+                  categoryDiv.appendChild(categoryTitle);
+
+                  filteredCerts.slice(0, query ? 100 : 5).forEach(cert => {
+                    const certOption = document.createElement('button');
+                    certOption.type = 'button';
+                    certOption.className = 'w-full text-left px-3 py-2 hover:bg-blue-50 text-sm';
+                    certOption.textContent = cert;
+                    certOption.addEventListener('click', function() {
+                      input.value = cert;
+                      dropdown.classList.add('hidden');
+                    });
+                    categoryDiv.appendChild(certOption);
+                  });
+
+                  dropdown.appendChild(categoryDiv);
+                }
+              });
+
+              if (!hasResults) {
+                dropdown.innerHTML = '<div class="p-4 text-center text-gray-500 text-sm">검색 결과가 없습니다</div>';
+              }
+            }
+
+            // Input event - show filtered results
+            input.addEventListener('input', function(e) {
+              if (e.target.value.length >= 1) {
+                showDropdown(e.target.value);
+              } else {
+                dropdown.classList.add('hidden');
+              }
+            });
+
+            // Focus - show all categories
+            input.addEventListener('focus', function() {
+              if (input.value.length === 0) {
+                showDropdown('');
+              }
+            });
+
+            // Click outside to close
+            document.addEventListener('click', function(e) {
+              if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.add('hidden');
+              }
+            });
+
+            // Category button clicks
+            categoryButtons.forEach(button => {
+              button.addEventListener('click', function() {
+                const category = this.dataset.category;
+                dropdown.innerHTML = '';
+                dropdown.classList.remove('hidden');
+
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'p-2';
+
+                const categoryTitle = document.createElement('div');
+                categoryTitle.className = 'font-semibold text-sm text-gray-700 px-2 py-1 bg-gray-50';
+                categoryTitle.textContent = category;
+                categoryDiv.appendChild(categoryTitle);
+
+                certifications[category].forEach(cert => {
+                  const certOption = document.createElement('button');
+                  certOption.type = 'button';
+                  certOption.className = 'w-full text-left px-3 py-2 hover:bg-blue-50 text-sm';
+                  certOption.textContent = cert;
+                  certOption.addEventListener('click', function() {
+                    input.value = cert;
+                    dropdown.classList.add('hidden');
+                  });
+                  categoryDiv.appendChild(certOption);
+                });
+
+                dropdown.appendChild(categoryDiv);
+              });
+            });
+          });
+        </script>
 
         <!-- Submit Buttons -->
         <div class="flex justify-end gap-3">

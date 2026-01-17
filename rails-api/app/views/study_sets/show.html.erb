@@ -1,246 +1,313 @@
-<!-- ExamsGraph Ultra Modern Study Set View -->
-<%= render 'shared/animated_background' %>
-<div class="min-h-screen relative">
-  <!-- Header Navigation -->
-  <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-[#e7edf3] bg-white px-10 py-3 sticky top-0 z-50 shadow-sm">
-    <div class="flex items-center gap-4">
-      <!-- Logo -->
-      <div class="flex items-center gap-3">
-        <div class="size-8 text-[#137fec]">
-          <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-            <path d="M13.8261 17.4264C16.7203 18.1174 20.2244 18.5217 24 18.5217C27.7756 18.5217 31.2797 18.1174 34.1739 17.4264C36.9144 16.7722 39.9967 15.2331 41.3563 14.1648L24.8486 40.6391C24.4571 41.267 23.5429 41.267 23.1514 40.6391L6.64374 14.1648C8.00331 15.2331 11.0856 16.7722 13.8261 17.4264Z" fill="currentColor"></path>
-            <path clip-rule="evenodd" d="M39.998 12.236C39.9944 12.2537 39.9875 12.2845 39.9748 12.3294C39.9436 12.4399 39.8949 12.5741 39.8346 12.7175C39.8168 12.7597 39.7989 12.8007 39.7813 12.8398C38.5103 13.7113 35.9788 14.9393 33.7095 15.4811C30.9875 16.131 27.6413 16.5217 24 16.5217C20.3587 16.5217 17.0125 16.131 14.2905 15.4811C12.0012 14.9346 9.44505 13.6897 8.18538 12.8168C8.17384 12.7925 8.16216 12.767 8.15052 12.7408C8.09919 12.6249 8.05721 12.5114 8.02977 12.411C8.00356 12.3152 8.00039 12.2667 8.00004 12.2612C8.00004 12.261 8 12.2607 8.00004 12.2612C8.00004 12.2359 8.0104 11.9233 8.68485 11.3686C9.34546 10.8254 10.4222 10.2469 11.9291 9.72276C14.9242 8.68098 19.1919 8 24 8C28.8081 8 33.0758 8.68098 36.0709 9.72276C37.5778 10.2469 38.6545 10.8254 39.3151 11.3686C39.9006 11.8501 39.9857 12.1489 39.998 12.236ZM4.95178 15.2312L21.4543 41.6973C22.6288 43.5809 25.3712 43.5809 26.5457 41.6973L43.0534 15.223C43.0709 15.1948 43.0878 15.1662 43.104 15.1371L41.3563 14.1648C43.104 15.1371 43.1038 15.1374 43.104 15.1371L43.1051 15.135L43.1065 15.1325L43.1101 15.1261L43.1199 15.1082C43.1276 15.094 43.1377 15.0754 43.1497 15.0527C43.1738 15.0075 43.2062 14.9455 43.244 14.8701C43.319 14.7208 43.4196 14.511 43.5217 14.2683C43.6901 13.8679 44 13.0689 44 12.2609C44 10.5573 43.003 9.22254 41.8558 8.2791C40.6947 7.32427 39.1354 6.55361 37.385 5.94477C33.8654 4.72057 29.133 4 24 4C18.867 4 14.1346 4.72057 10.615 5.94478C8.86463 6.55361 7.30529 7.32428 6.14419 8.27911C4.99695 9.22255 3.99999 10.5573 3.99999 12.2609C3.99999 13.1275 4.29264 13.9078 4.49321 14.3607C4.60375 14.6102 4.71348 14.8196 4.79687 14.9689C4.83898 15.0444 4.87547 15.1065 4.9035 15.1529C4.91754 15.1762 4.92954 15.1957 4.93916 15.2111L4.94662 15.223L4.95178 15.2312ZM35.9868 18.996L24 38.22L12.0131 18.996C12.4661 19.1391 12.9179 19.2658 13.3617 19.3718C16.4281 20.1039 20.0901 20.5217 24 20.5217C27.9099 20.5217 31.5719 20.1039 34.6383 19.3718C35.082 19.2658 35.5339 19.1391 35.9868 18.996Z" fill="currentColor" fill-rule="evenodd"></path>
-          </svg>
-        </div>
-        <h2 class="text-[#137fec] text-xl font-black leading-tight tracking-tight font-['Lexend']">ExamsGraph</h2>
-      </div>
-    </div>
+<div class="min-h-screen bg-gray-50">
+  <%= render 'shared/navbar' %>
 
-    <!-- Navigation -->
-    <nav class="flex items-center gap-8">
-      <a class="text-[#0d141b] text-sm font-medium leading-normal hover:text-[#137fec] transition-colors flex items-center gap-2" href="<%= root_path %>">
-        <span class="material-symbols-outlined text-base">home</span>
-        홈
-      </a>
-      <a class="text-[#137fec] text-sm font-medium leading-normal flex items-center gap-2" href="<%= study_sets_path %>">
-        <span class="material-symbols-outlined text-base">library_books</span>
-        내 서재
-      </a>
-      <a class="text-[#0d141b] text-sm font-medium leading-normal hover:text-[#137fec] transition-colors flex items-center gap-2" href="#">
-        <span class="material-symbols-outlined text-base">leaderboard</span>
-        리더보드
-      </a>
-    </nav>
-
-    <!-- User Menu -->
-    <div class="flex items-center gap-4">
-      <% if current_user %>
-        <div class="flex items-center gap-3">
-          <span class="text-sm text-[#4c739a]"><%= current_user.email %></span>
-          <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-[#137fec]/20 bg-gradient-to-br from-[#137fec] to-[#0968d3] flex items-center justify-center text-white font-semibold">
-            <%= current_user.email[0].upcase %>
+  <!-- Hero Section with Gradient -->
+  <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="flex items-center space-x-3 mb-2">
+            <%= link_to study_sets_path, class: "text-white/80 hover:text-white transition" do %>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+              </svg>
+            <% end %>
+            <span class="text-white/60">문제집</span>
           </div>
-          <%= link_to destroy_user_session_path, method: :delete, data: { turbo_method: :delete }, class: "flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-bold leading-normal tracking-[0.015em] transition-colors" do %>
-            <span class="material-symbols-outlined text-base mr-2">logout</span>
-            로그아웃
+          <h1 class="text-3xl font-bold mb-2"><%= @study_set.title %></h1>
+          <p class="text-white/90"><%= @study_set.description || "시험 준비를 위한 학습 세트" %></p>
+
+          <% if @study_set.exam_date.present? %>
+            <div class="mt-4 inline-flex items-center px-4 py-2 bg-white/20 rounded-lg backdrop-blur">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              <span class="font-semibold">D-<%= (@study_set.exam_date - Date.today).to_i %></span>
+              <span class="ml-2 text-sm">(<%= @study_set.exam_date.strftime("%Y년 %m월 %d일") %>)</span>
+            </div>
           <% end %>
         </div>
-      <% else %>
-        <%= link_to new_user_session_path, class: "btn-primary rounded-lg px-4 py-2 text-sm font-semibold" do %>
-          로그인
-        <% end %>
-      <% end %>
-    </div>
-  </header>
 
-  <!-- Breadcrumb -->
-  <div class="max-w-7xl mx-auto px-6 lg:px-8 py-4">
-    <div class="flex flex-wrap gap-2">
-      <a class="text-[#4c739a] text-sm font-medium leading-normal flex items-center gap-1 hover:text-[#137fec]" href="<%= root_path %>">
-        <span class="material-symbols-outlined text-base">home</span> 홈
-      </a>
-      <span class="text-[#4c739a] text-sm font-medium leading-normal">/</span>
-      <a class="text-[#4c739a] text-sm font-medium leading-normal hover:text-[#137fec]" href="<%= study_sets_path %>">내 서재</a>
-      <span class="text-[#4c739a] text-sm font-medium leading-normal">/</span>
-      <span class="text-[#0d141b] text-sm font-medium leading-normal"><%= @study_set.title %></span>
+        <div class="flex space-x-3">
+          <%= link_to edit_study_set_path(@study_set), class: "p-2 bg-white/20 hover:bg-white/30 rounded-lg transition" do %>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+            </svg>
+          <% end %>
+          <%= button_to study_set_path(@study_set), method: :delete,
+              data: { confirm: "정말 삭제하시겠습니까?" },
+              class: "p-2 bg-red-500/20 hover:bg-red-500/30 rounded-lg transition" do %>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+          <% end %>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Main Content -->
-  <div class="max-w-7xl mx-auto px-6 lg:px-8 pb-12">
-    <!-- Study Set Header -->
-    <div class="bg-white rounded-xl shadow-sm border border-[#e7edf3] p-8 mb-6">
-      <div class="flex items-start justify-between">
-        <div class="flex-1">
-          <h1 class="text-3xl font-bold text-[#0d141b] mb-2 font-['Lexend']"><%= @study_set.title %></h1>
-          <p class="text-[#4c739a] text-base mb-4"><%= @study_set.description || "AI가 자동으로 문제를 분석하고 약점을 파악합니다" %></p>
-
-          <!-- Stats -->
-          <div class="flex items-center gap-6 mt-6">
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-[#137fec]">quiz</span>
-              <span class="text-sm text-[#4c739a]">총 문제</span>
-              <span class="text-lg font-semibold text-[#0d141b]"><%= @study_set.questions.count %></span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-green-500">check_circle</span>
-              <span class="text-sm text-[#4c739a]">학습 완료</span>
-              <span class="text-lg font-semibold text-[#0d141b]">
-                <%= @study_set.exam_sessions.completed.count %>
-              </span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-amber-500">star</span>
-              <span class="text-sm text-[#4c739a]">평균 점수</span>
-              <span class="text-lg font-semibold text-[#0d141b]">
-                <%= @study_set.exam_sessions.completed.average(:score)&.round(1) || 0 %>%
-              </span>
-            </div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Stats Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600">총 문제</p>
+            <p class="text-3xl font-bold text-gray-900 mt-1">
+              <%= @study_set.questions.count %>
+            </p>
+          </div>
+          <div class="p-3 bg-purple-100 rounded-lg">
+            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
           </div>
         </div>
+      </div>
 
-        <!-- Settings Button -->
-        <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-          <span class="material-symbols-outlined text-[#4c739a]">settings</span>
-        </button>
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600">학습 완료</p>
+            <p class="text-3xl font-bold text-gray-900 mt-1">0</p>
+          </div>
+          <div class="p-3 bg-green-100 rounded-lg">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600">정답률</p>
+            <p class="text-3xl font-bold text-gray-900 mt-1">-%</p>
+          </div>
+          <div class="p-3 bg-blue-100 rounded-lg">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600">학습 시간</p>
+            <p class="text-3xl font-bold text-gray-900 mt-1">0h</p>
+          </div>
+          <div class="p-3 bg-yellow-100 rounded-lg">
+            <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Ultra Modern Action Cards -->
+    <!-- Main Action Buttons -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <!-- Mock Exam 3D Card -->
-      <%= render 'shared/3d_flip_card',
-        title: "모의고사",
-        description: "실제 시험과 동일한 환경에서 전체 문제를 풀어보세요",
-        icon: "school",
-        badge: "EXAM",
-        back_title: "모의고사 정보",
-        stats: [
-          {label: "총 문제", value: "#{@study_set.questions.count}개"},
-          {label: "제한 시간", value: "60분"},
-          {label: "준비 상태", value: @study_set.questions.count >= 5 ? "시작 가능" : "문제 부족"}
-        ],
-        action_path: @study_set.questions.count >= 5 ? new_study_set_exam_session_path(@study_set) : nil,
-        action_text: "모의고사 시작"
-      %>
-
-      <!-- Practice Mode Glass Card -->
-      <%= render 'shared/glass_card',
-        title: "연습 모드",
-        description: "시간 제한 없이 차근차근 문제를 풀며 학습하세요",
-        icon: "fitness_center",
-        badge: "PRACTICE",
-        action_path: @study_set.questions.any? ? new_study_set_exam_session_path(@study_set, exam_type: 'practice') : nil,
-        action_text: "연습 시작"
-      %>
-
-      <!-- Wrong Answers Glass Card -->
-      <% # Temporarily disabled - need to fix exam_answers relationship
-         wrong_questions = [] # @study_set.questions.joins(:exam_answers).where(exam_answers: { is_correct: false }).distinct
-      %>
-      <%= render 'shared/glass_card',
-        title: "오답 노트",
-        description: "틀린 문제만 모아서 집중적으로 복습하세요",
-        icon: "edit_note",
-        badge: wrong_questions.any? ? "#{wrong_questions.count}문제" : "READY",
-        action_path: wrong_questions.any? ? new_study_set_exam_session_path(@study_set, exam_type: 'wrong_answers') : nil,
-        action_text: wrong_questions.any? ? "오답 복습" : "오답 없음"
-      %>
-    </div>
-
-    <!-- Study Materials Section -->
-    <div class="bg-white rounded-xl shadow-sm border border-[#e7edf3] p-6 mb-6">
-      <div class="flex items-center justify-between mb-6">
-        <div class="flex items-center gap-3">
-          <span class="material-symbols-outlined text-[#137fec]">folder_open</span>
-          <h2 class="text-xl font-semibold text-[#0d141b]">학습 자료</h2>
-          <span class="badge-primary">
-            <%= @study_set.study_materials.count %> 파일
-          </span>
-        </div>
-
-        <!-- Upload Button -->
-        <%= form_with model: [@study_set, @study_set.study_materials.build],
-                      local: false,
-                      html: { class: "inline-block" },
-                      data: { controller: "file-upload" } do |f| %>
-          <label class="btn-primary cursor-pointer inline-flex items-center gap-2">
-            <span class="material-symbols-outlined text-sm">upload_file</span>
-            PDF 업로드
-            <%= f.file_field :pdf_file,
-                           accept: ".pdf",
-                           class: "hidden",
-                           data: { action: "change->file-upload#submit" },
-                           direct_upload: true %>
-          </label>
-        <% end %>
-      </div>
-
-      <!-- Materials List -->
-      <div class="space-y-3" id="study_materials">
-        <% @study_set.study_materials.order(created_at: :desc).each do |material| %>
-          <%= render partial: 'study_materials/study_material', locals: { study_material: material, study_set: @study_set } %>
-        <% end %>
-
-        <% if @study_set.study_materials.empty? %>
-          <div class="text-center py-12">
-            <span class="material-symbols-outlined text-6xl text-gray-300 mb-4">upload_file</span>
-            <p class="text-gray-500 text-base mb-2">아직 학습 자료가 없습니다</p>
-            <p class="text-gray-400 text-sm">PDF 파일을 업로드하면 AI가 자동으로 문제를 추출합니다</p>
+      <!-- Start Test Button -->
+      <% if @study_set.questions.any? %>
+        <%= link_to new_study_set_exam_session_path(@study_set),
+            class: "group relative overflow-hidden bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl p-8 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all" do %>
+          <div class="relative z-10">
+            <svg class="w-12 h-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <h3 class="text-2xl font-bold mb-2">모의고사 시작</h3>
+            <p class="text-green-100">실전과 같은 환경에서 테스트</p>
+            <p class="text-green-200 text-sm mt-2"><%= @study_set.questions.count %>개 문제 준비됨</p>
           </div>
+          <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></div>
         <% end %>
-      </div>
+      <% else %>
+        <div class="group relative overflow-hidden bg-gradient-to-r from-gray-400 to-gray-500 text-white rounded-xl p-8 shadow-lg">
+          <div class="relative z-10">
+            <svg class="w-12 h-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <h3 class="text-2xl font-bold mb-2">모의고사 시작</h3>
+            <p class="text-gray-200">문제를 먼저 추가해주세요</p>
+            <p class="text-yellow-300 text-sm mt-2">⚠️ PDF 파일을 처리하면 활성화됩니다</p>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Practice Mode -->
+      <% if @study_set.questions.any? %>
+        <%= link_to new_study_set_exam_session_path(@study_set, exam_type: 'practice'),
+            class: "group relative overflow-hidden bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl p-8 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all" do %>
+          <div class="relative z-10">
+            <svg class="w-12 h-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+            <h3 class="text-2xl font-bold mb-2">연습 모드</h3>
+            <p class="text-blue-100">시간 제한 없이 차근차근 학습</p>
+          </div>
+          <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></div>
+        <% end %>
+      <% else %>
+        <div class="group relative overflow-hidden bg-gradient-to-r from-gray-400 to-gray-500 text-white rounded-xl p-8 shadow-lg">
+          <div class="relative z-10">
+            <svg class="w-12 h-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+            <h3 class="text-2xl font-bold mb-2">연습 모드</h3>
+            <p class="text-gray-200">문제를 먼저 추가해주세요</p>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Review Wrong Answers -->
+      <% if current_user.wrong_answers.where(study_set: @study_set).any? %>
+        <%= link_to new_study_set_exam_session_path(@study_set, exam_type: ExamSession::EXAM_TYPE_WRONG_ANSWER),
+            class: "group relative overflow-hidden bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl p-8 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all" do %>
+          <div class="relative z-10">
+            <svg class="w-12 h-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <h3 class="text-2xl font-bold mb-2">오답노트</h3>
+            <p class="text-red-100">틀린 문제만 집중 복습</p>
+            <p class="text-red-200 text-sm mt-2"><%= current_user.wrong_answers.where(study_set: @study_set).count %>개 오답</p>
+          </div>
+          <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></div>
+        <% end %>
+      <% else %>
+        <div class="group relative overflow-hidden bg-gradient-to-r from-gray-400 to-gray-500 text-white rounded-xl p-8 shadow-lg">
+          <div class="relative z-10">
+            <svg class="w-12 h-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <h3 class="text-2xl font-bold mb-2">오답노트</h3>
+            <p class="text-gray-200">아직 틀린 문제가 없습니다</p>
+            <p class="text-yellow-300 text-sm mt-2">💡 시험을 보면 오답이 자동으로 저장됩니다</p>
+          </div>
+        </div>
+      <% end %>
     </div>
 
-    <!-- Recent Activity -->
-    <% if @study_set.exam_sessions.any? %>
-      <div class="bg-white rounded-xl shadow-sm border border-[#e7edf3] p-6">
-        <div class="flex items-center gap-3 mb-6">
-          <span class="material-symbols-outlined text-[#137fec]">history</span>
-          <h2 class="text-xl font-semibold text-[#0d141b]">최근 학습 기록</h2>
+    <!-- PDF Upload Section -->
+    <div id="upload-section" class="<%= @study_set.study_materials.any? ? 'hidden' : '' %> bg-white rounded-xl shadow-lg p-8 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">PDF 업로드</h2>
+      <%= form_with(model: [@study_set, @study_set.study_materials.build],
+                    local: true,
+                    html: { multipart: true, class: "space-y-6" }) do |form| %>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <%= form.label :name, "파일 이름", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_field :name,
+                                placeholder: "예: 2024년 기출문제",
+                                class: "w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+                                required: true %>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">PDF 파일</label>
+            <div class="flex items-center space-x-4">
+              <%= form.file_field :pdf_file,
+                                  accept: ".pdf",
+                                  required: true,
+                                  class: "flex-1 px-4 py-3 border border-gray-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100",
+                                  onchange: "updateFileName(this)" %>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">최대 50MB PDF 파일</p>
+          </div>
         </div>
 
+        <div class="flex justify-end space-x-4">
+          <button type="button"
+                  onclick="document.getElementById('upload-section').classList.add('hidden')"
+                  class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium">
+            취소
+          </button>
+          <%= form.submit "업로드 및 문제 추출",
+                          class: "px-8 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 shadow-md cursor-pointer" %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Study Materials List -->
+    <% if @study_set.study_materials.any? %>
+      <div class="bg-white rounded-xl shadow-sm p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-semibold text-gray-900">업로드된 학습 자료</h2>
+          <button onclick="document.getElementById('upload-section').classList.toggle('hidden')"
+                  class="text-blue-600 hover:text-blue-700 font-medium">
+            + 추가 업로드
+          </button>
+        </div>
         <div class="space-y-3">
-          <% @study_set.exam_sessions.order(created_at: :desc).limit(5).each do |session| %>
-            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-              <div class="flex items-center gap-4">
-                <% icon_class = case session.exam_type
-                   when 'mock_exam' then 'school'
-                   when 'practice' then 'fitness_center'
-                   when 'wrong_answers' then 'edit_note'
-                   else 'quiz'
-                   end %>
-                <span class="material-symbols-outlined text-[#137fec]"><%= icon_class %></span>
-
-                <div>
-                  <p class="font-medium text-[#0d141b]">
-                    <%= session.exam_type == 'mock_exam' ? '모의고사' : session.exam_type == 'practice' ? '연습 모드' : '오답 복습' %>
-                  </p>
-                  <p class="text-sm text-[#4c739a]">
-                    <%= session.created_at.strftime("%Y년 %m월 %d일 %H:%M") %>
-                  </p>
-                </div>
-              </div>
-
-              <div class="flex items-center gap-4">
-                <% if session.completed? %>
-                  <div class="text-right">
-                    <p class="text-2xl font-bold text-[#0d141b]"><%= session.score&.round(1) || 0 %>%</p>
-                    <p class="text-sm text-[#4c739a]">
-                      <%= session.correct_answers %> / <%= session.total_questions %> 정답
+          <% @study_set.study_materials.each do |material| %>
+            <% if material.persisted? %>
+              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                <div class="flex items-center space-x-4">
+                  <div class="p-2 bg-red-100 rounded-lg">
+                    <svg class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="font-medium text-gray-900"><%= material.name || "Untitled" %></p>
+                    <p class="text-sm text-gray-500">
+                      <% if material.status == 'completed' %>
+                        <span class="text-green-600">✓ <%= material.questions.count %> 문제 추출됨</span>
+                      <% elsif material.status == 'processing' %>
+                        <span class="text-blue-600 animate-pulse">처리 중...</span>
+                      <% elsif material.status == 'failed' %>
+                        <span class="text-red-600">처리 실패</span>
+                      <% else %>
+                        <span class="text-gray-600">대기 중</span>
+                      <% end %>
                     </p>
                   </div>
-                  <%= link_to result_exam_session_path(session), class: "p-2 hover:bg-gray-200 rounded-lg transition-colors" do %>
-                    <span class="material-symbols-outlined text-[#4c739a]">visibility</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <% if material.status == 'pending' %>
+                    <%= button_to "처리 시작",
+                                  process_study_set_study_material_path(@study_set, material),
+                                  method: :post,
+                                  class: "px-4 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium" %>
                   <% end %>
-                <% else %>
-                  <span class="badge-warning">진행 중</span>
-                  <%= link_to exam_session_path(session), class: "btn-primary text-sm px-4 py-2" do %>
-                    계속하기
-                  <% end %>
-                <% end %>
+                  <%= button_to "삭제",
+                                study_set_study_material_path(@study_set, material),
+                                method: :delete,
+                                data: { confirm: "정말 삭제하시겠습니까?" },
+                                class: "px-4 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-medium" %>
+                </div>
               </div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Questions Preview (if any) -->
+    <% if @study_set.questions.any? %>
+      <div class="mt-8 bg-white rounded-xl shadow-sm p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">문제 미리보기</h2>
+        <div class="space-y-4">
+          <% @study_set.questions.limit(3).each_with_index do |question, index| %>
+            <div class="p-4 bg-gray-50 rounded-lg">
+              <p class="font-medium text-gray-900 mb-2">
+                <%= index + 1 %>. <%= question.content %>
+              </p>
+              <% if question.options.present? %>
+                <div class="space-y-1 ml-4">
+                  <% question.options.each do |key, value| %>
+                    <p class="text-sm text-gray-600"><%= key %> <%= value %></p>
+                  <% end %>
+                </div>
+              <% end %>
             </div>
+          <% end %>
+          <% if @study_set.questions.count > 3 %>
+            <p class="text-center text-gray-500">
+              ... 그리고 <%= @study_set.questions.count - 3 %>개의 문제가 더 있습니다
+            </p>
           <% end %>
         </div>
       </div>
@@ -248,17 +315,14 @@
   </div>
 </div>
 
-<!-- File Upload JavaScript -->
 <script>
-  document.addEventListener("DOMContentLoaded", function() {
-    const fileInputs = document.querySelectorAll('[data-controller="file-upload"] input[type="file"]');
-
-    fileInputs.forEach(input => {
-      input.addEventListener("change", function() {
-        if (this.files.length > 0) {
-          this.closest('form').submit();
-        }
-      });
-    });
-  });
+  function updateFileName(input) {
+    if (input.files && input.files[0]) {
+      const fileName = input.files[0].name;
+      const nameField = document.querySelector('input[name="study_material[name]"]');
+      if (nameField && !nameField.value) {
+        nameField.value = fileName.replace('.pdf', '');
+      }
+    }
+  }
 </script>

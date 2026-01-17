@@ -148,12 +148,27 @@ export default defineConfig({
         viewport: { width: 1280, height: 720 },
       },
     },
+
+    // Group 8: Rails Best Practices 테스트
+    {
+      name: 'rails-best-practices',
+      testMatch: [
+        '**/e2e/rails-e2e-comprehensive.spec.ts',
+        '**/e2e/rails-realistic-scenarios.spec.ts',
+      ],
+      fullyParallel: false,
+      workers: 2,
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 720 },
+      },
+    },
   ],
 
-  // 개발 서버 설정
+  // 개발 서버 설정 - Rails 서버 사용
   webServer: process.env.SKIP_SERVER ? undefined : {
-    command: 'cd frontend && npm run dev',
-    url: 'http://localhost:3030',
+    command: 'cd rails-api && bundle exec rails server -p 3000',
+    url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
   },

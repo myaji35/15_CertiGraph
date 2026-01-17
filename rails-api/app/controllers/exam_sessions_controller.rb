@@ -10,7 +10,8 @@ class ExamSessionsController < ApplicationController
 
   def create
     # Check if there are questions to test
-    unless @study_set.questions.any?
+    # rails-best-practices: db-exists-vs-present - Use exists? for faster existence checks
+    unless @study_set.questions.exists?
       redirect_to @study_set, alert: '테스트할 문제가 없습니다. 먼저 PDF를 업로드하고 처리해주세요.'
       return
     end
@@ -28,14 +29,18 @@ class ExamSessionsController < ApplicationController
     @exam_session.correct_answers = 0
 
     if @exam_session.save
-      # Create empty answer records for each question
-      questions.each do |question|
-        @exam_session.exam_answers.create!(
-          question: question,
+      # rails-best-practices: ar-bulk-insert - Use insert_all for bulk inserts
+      exam_answers_data = questions.map do |question|
+        {
+          exam_session_id: @exam_session.id,
+          question_id: question.id,
           selected_answer: nil,
-          is_correct: false
-        )
+          is_correct: false,
+          created_at: Time.current,
+          updated_at: Time.current
+        }
       end
+      ExamAnswer.insert_all(exam_answers_data) if exam_answers_data.any?
       redirect_to exam_session_path(@exam_session)
     else
       render :new
@@ -96,23 +101,16 @@ class ExamSessionsController < ApplicationController
   end
 
   def complete
-    @exam_session.complete!
+    # Use ExamGradingService to grade the exam
+    grading_service = ExamGradingService.new(@exam_session)
+    result = grading_service.grade
 
-    # Mark wrong answers for review
-    wrong_answers = @exam_session.exam_answers.where(is_correct: false)
-    wrong_answers.each do |answer|
-      # Add to wrong answer collection for later review
-      WrongAnswer.find_or_create_by(
-        user: current_user,
-        question: answer.question,
-        study_set: @exam_session.study_set
-      ) do |wa|
-        wa.selected_answer = answer.selected_answer
-        wa.attempt_count = 1
-      end
+    if result[:success]
+      @exam_session.update!(status: ExamSession::STATUS_COMPLETED)
+      redirect_to result_exam_session_path(@exam_session), notice: '시험이 완료되었습니다'
+    else
+      redirect_to exam_session_path(@exam_session), alert: result[:error]
     end
-
-    redirect_to result_exam_session_path(@exam_session)
   end
 
   def abandon
@@ -121,7 +119,8 @@ class ExamSessionsController < ApplicationController
   end
 
   def result
-    @exam_answers = @exam_session.exam_answers.includes(:question).order(:id)
+    # rails-best-practices: ar-readonly - Use readonly for display-only records
+    @exam_answers = @exam_session.exam_answers.includes(:question).readonly.order(:id)
     @correct_count = @exam_answers.where(is_correct: true).count
     @wrong_count = @exam_answers.where(is_correct: false).count
     @score = @exam_session.score

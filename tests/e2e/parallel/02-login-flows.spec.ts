@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { skipIfPageNotExists, safeGoto } from '../../helpers/page-checker';
+import { loginAsUser, logout } from '../../helpers/rails-auth-helper';
 
 /**
  * P4 Group: Independent E2E Tests - Login Flows
@@ -7,6 +8,7 @@ import { skipIfPageNotExists, safeGoto } from '../../helpers/page-checker';
  *
  * Tests various login scenarios independently
  *
+ * NOTE: Updated for Rails/Devise authentication on localhost:3000
  * NOTE: These tests require the application's sign-in and dashboard pages to be implemented.
  * Tests will skip gracefully if pages return 404 or are not available.
  */
@@ -26,21 +28,21 @@ test.describe('P4: Login Flows E2E Tests', () => {
       // Wait for navigation to complete
       await page.waitForLoadState('domcontentloaded');
     } else {
-      // Navigate directly to sign-in page
-      const signInResult = await skipIfPageNotExists(page, '/sign-in', 'E2E-PAR-005');
+      // Navigate directly to sign-in page - Rails/Devise route
+      const signInResult = await skipIfPageNotExists(page, '/users/sign_in', 'E2E-PAR-005');
       if (!signInResult.exists) {
         test.skip(true, signInResult.message);
       }
     }
 
-    // Wait for Clerk form to be ready - look for email input field
-    const emailInput = page.locator('input[type="email"], input[name="identifier"], input[name="email"]');
-    const passwordInput = page.locator('input[type="password"], input[name="password"]');
+    // Wait for Rails/Devise form to be ready - look for email input field
+    const emailInput = page.locator('input[type="email"], input[name="user[email]"], input[id="user_email"]');
+    const passwordInput = page.locator('input[type="password"], input[name="user[password]"], input[id="user_password"]');
 
     try {
       await emailInput.first().waitFor({ state: 'visible', timeout: 10000 });
     } catch (error) {
-      test.skip(true, 'Sign-in form not found - Clerk may not be loaded');
+      test.skip(true, 'Sign-in form not found - Devise form may not be loaded');
     }
 
     if (await emailInput.count() === 0 || await passwordInput.count() === 0) {
@@ -73,19 +75,19 @@ test.describe('P4: Login Flows E2E Tests', () => {
   });
 
   test('E2E-PAR-006: Should show error for invalid credentials', async ({ page }) => {
-    const result = await skipIfPageNotExists(page, '/sign-in', 'E2E-PAR-006');
+    const result = await skipIfPageNotExists(page, '/users/sign_in', 'E2E-PAR-006');
     if (!result.exists) {
       test.skip(true, result.message);
     }
 
     // Wait for Clerk form to be ready
-    const emailInput = page.locator('input[type="email"], input[name="identifier"], input[name="email"]');
+    const emailInput = page.locator('input[type="email"], input[name="user[email]"], input[name="email"]');
     const passwordInput = page.locator('input[type="password"], input[name="password"]');
 
     try {
       await emailInput.first().waitFor({ state: 'visible', timeout: 10000 });
     } catch (error) {
-      test.skip(true, 'Sign-in form not found - Clerk may not be loaded');
+      test.skip(true, 'Sign-in form not found - Devise form may not be loaded');
     }
 
     if (await emailInput.count() === 0 || await passwordInput.count() === 0) {
@@ -112,19 +114,19 @@ test.describe('P4: Login Flows E2E Tests', () => {
 
   test('E2E-PAR-007: Should successfully log out', async ({ page }) => {
     // First, log in
-    const result = await skipIfPageNotExists(page, '/sign-in', 'E2E-PAR-007');
+    const result = await skipIfPageNotExists(page, '/users/sign_in', 'E2E-PAR-007');
     if (!result.exists) {
       test.skip(true, result.message);
     }
 
     // Wait for Clerk form to be ready
-    const emailInput = page.locator('input[type="email"], input[name="identifier"], input[name="email"]');
+    const emailInput = page.locator('input[type="email"], input[name="user[email]"], input[name="email"]');
     const passwordInput = page.locator('input[type="password"], input[name="password"]');
 
     try {
       await emailInput.first().waitFor({ state: 'visible', timeout: 10000 });
     } catch (error) {
-      test.skip(true, 'Sign-in form not found - Clerk may not be loaded');
+      test.skip(true, 'Sign-in form not found - Devise form may not be loaded');
     }
 
     if (await emailInput.count() === 0 || await passwordInput.count() === 0) {
@@ -171,25 +173,25 @@ test.describe('P4: Login Flows E2E Tests', () => {
 
     // Should redirect to homepage or login page
     const currentUrl = page.url();
-    expect(currentUrl).toMatch(/^http:\/\/localhost:3030\/?$|sign-in|login/i);
+    expect(currentUrl).toMatch(/^http:\/\/localhost:3000\/?$|sign-in|login/i);
 
     await page.screenshot({ path: 'test-results/e2e-par-007-logout.png' });
   });
 
   test('E2E-PAR-008: Should support "Remember Me" functionality', async ({ page, context }) => {
-    const result = await skipIfPageNotExists(page, '/sign-in', 'E2E-PAR-008');
+    const result = await skipIfPageNotExists(page, '/users/sign_in', 'E2E-PAR-008');
     if (!result.exists) {
       test.skip(true, result.message);
     }
 
     // Wait for Clerk form to be ready
-    const emailInput = page.locator('input[type="email"], input[name="identifier"], input[name="email"]');
+    const emailInput = page.locator('input[type="email"], input[name="user[email]"], input[name="email"]');
     const passwordInput = page.locator('input[type="password"], input[name="password"]');
 
     try {
       await emailInput.first().waitFor({ state: 'visible', timeout: 10000 });
     } catch (error) {
-      test.skip(true, 'Sign-in form not found - Clerk may not be loaded');
+      test.skip(true, 'Sign-in form not found - Devise form may not be loaded');
     }
 
     if (await emailInput.count() === 0 || await passwordInput.count() === 0) {

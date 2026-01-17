@@ -5,8 +5,8 @@
   <!-- Hero Section -->
   <section class="pt-20 pb-32">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <div class="inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-full mb-6">
-        🚀 PDF 업로드만으로 지능 문제 분석
+      <div class="inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-full mb-6 text-sm">
+        📄 PDF 업로드만으로 자동 문제 분석
       </div>
 
       <h2 class="text-5xl font-bold text-gray-900 mb-6">
@@ -24,8 +24,8 @@
       </div>
 
       <div class="flex justify-center gap-4">
-        <%= link_to "무료로 시작하기 →", new_user_registration_path, class: "bg-blue-600 text-white px-8 py-3 rounded-lg text-lg hover:bg-blue-700 transition" %>
-        <button class="bg-gray-100 text-gray-700 px-8 py-3 rounded-lg text-lg hover:bg-gray-200 transition">들어보기</button>
+        <%= link_to "무료로 시작하기 →", new_user_registration_path, class: "bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition shadow-lg" %>
+        <button class="bg-white border-2 border-gray-300 text-gray-700 px-8 py-3 rounded-lg text-lg hover:border-gray-400 transition">들어보기</button>
       </div>
 
       <div class="flex justify-center gap-12 mt-12">
@@ -49,18 +49,30 @@
   <section class="py-20 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="text-center">
-          <div class="text-4xl mb-4">📄</div>
+        <div class="text-center p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition">
+          <div class="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
+            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+          </div>
           <h3 class="text-xl font-semibold mb-2">PDF 자동 파싱</h3>
           <p class="text-gray-600">기출문제 PDF를 업로드하면 AI가 문제, 보기, 해설을 자동으로 분리합니다.</p>
         </div>
-        <div class="text-center">
-          <div class="text-4xl mb-4">📊</div>
+        <div class="text-center p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition">
+          <div class="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
+            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+          </div>
           <h3 class="text-xl font-semibold mb-2">CBT 모의고사</h3>
-          <p class="text-gray-600">실제 시험과 동시한 환경에서 연습하고, 점수와 해설 받아보세요 바랍니다.</p>
+          <p class="text-gray-600">실제 시험과 동일한 환경에서 연습하고, 점수와 해설을 받아보세요.</p>
         </div>
-        <div class="text-center">
-          <div class="text-4xl mb-4">📈</div>
+        <div class="text-center p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition">
+          <div class="w-16 h-16 mx-auto mb-4 bg-purple-100 rounded-full flex items-center justify-center">
+            <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+          </div>
           <h3 class="text-xl font-semibold mb-2">AI 취약점 분석</h3>
           <p class="text-gray-600">GraphRAG 기반 AI가 취약한 개념을 분석하고 학습 경로를 제공합니다.</p>
         </div>

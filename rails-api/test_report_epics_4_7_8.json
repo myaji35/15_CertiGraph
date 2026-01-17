@@ -1,0 +1,91 @@
+{
+  "total_tests": 0,
+  "passed": 0,
+  "failed": 0,
+  "pass_rate": 0,
+  "bugs": [],
+  "recommendations": [
+    "Ensure all study materials have questions before testing question extraction",
+    "Verify authentication middleware is properly configured for API routes",
+    "Add more comprehensive error messages for failed validations",
+    "Consider implementing batch operations for better performance",
+    "Add rate limiting to prevent abuse of AI-powered endpoints"
+  ],
+  "detailed_results": [
+    {
+      "test": "Extract questions",
+      "status": "SKIP",
+      "message": "No study material ID"
+    },
+    {
+      "test": "GET /questions/:id",
+      "status": "SKIP",
+      "message": "No question ID"
+    },
+    {
+      "test": "PUT /questions/:id",
+      "status": "SKIP",
+      "message": "No question ID"
+    },
+    {
+      "test": "POST /questions/:id/validate",
+      "status": "SKIP",
+      "message": "No question ID"
+    },
+    {
+      "test": "GET /study_materials/:id/questions",
+      "status": "SKIP",
+      "message": "No study material ID"
+    },
+    {
+      "test": "POST /api/v1/study_materials/:id/concepts/extract_all",
+      "status": "SKIP",
+      "message": "No study material ID"
+    },
+    {
+      "test": "GET /api/v1/concepts/:id",
+      "status": "SKIP",
+      "message": "No study material ID"
+    },
+    {
+      "test": "PATCH /api/v1/concepts/:id",
+      "status": "SKIP",
+      "message": "No concept ID"
+    },
+    {
+      "test": "GET /api/v1/study_materials/:id/concepts/hierarchy",
+      "status": "SKIP",
+      "message": "No study material ID"
+    },
+    {
+      "test": "GET /api/v1/study_materials/:id/concepts/cluster",
+      "status": "SKIP",
+      "message": "No study material ID"
+    },
+    {
+      "test": "POST /api/v1/study_materials/:id/prerequisites/analyze_all",
+      "status": "SKIP",
+      "message": "No study material ID"
+    },
+    {
+      "test": "GET /api/v1/study_materials/:id/nodes/:node_id/prerequisites",
+      "status": "SKIP",
+      "message": "No node ID"
+    },
+    {
+      "test": "POST /api/v1/study_materials/:id/prerequisites/paths",
+      "status": "SKIP",
+      "message": "No node ID"
+    },
+    {
+      "test": "GET /api/v1/study_materials/:id/prerequisites/nodes/:node_id/generate_paths",
+      "status": "SKIP",
+      "message": "No node ID"
+    },
+    {
+      "test": "GET /api/v1/learning_paths/:id",
+      "status": "SKIP",
+      "message": "No learning path ID"
+    }
+  ]
+}

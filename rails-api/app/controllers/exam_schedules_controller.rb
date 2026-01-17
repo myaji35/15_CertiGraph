@@ -155,7 +155,7 @@ class ExamSchedulesController < ApplicationController
   # GET /exam_schedules/years
   # 사용 가능한 연도 목록
   def years
-    years = ExamSchedule.distinct.pluck(:year).sort
+    years = ExamSchedule.distinct.pluck(:year).compact.sort
     current_year = Date.current.year
 
     # 현재 연도와 다음 연도가 없으면 추가

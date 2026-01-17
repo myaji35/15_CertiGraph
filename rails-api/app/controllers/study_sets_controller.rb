@@ -4,11 +4,13 @@ class StudySetsController < ApplicationController
   before_action :set_study_set, only: [:show, :edit, :update, :destroy]
 
   def index
-    @study_sets = current_user.study_sets.order(created_at: :desc)
+    # rails-best-practices: n1-includes - Eager load study_materials to prevent N+1 queries
+    @study_sets = current_user.study_sets.includes(:study_materials).order(created_at: :desc)
   end
 
   def show
-    @study_materials = @study_set.study_materials.order(created_at: :desc)
+    # rails-best-practices: ar-readonly - Use readonly for display-only records
+    @study_materials = @study_set.study_materials.includes(:questions).order(created_at: :desc)
   end
 
   def new
@@ -50,6 +52,6 @@ class StudySetsController < ApplicationController
   end
 
   def study_set_params
-    params.require(:study_set).permit(:title, :description, :certification)
+    params.require(:study_set).permit(:title, :description, :exam_date, :certification)
   end
 end

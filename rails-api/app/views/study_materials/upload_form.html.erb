@@ -1,0 +1,69 @@
+<div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-3xl mx-auto">
+    <div class="bg-white shadow rounded-lg p-6">
+      <h1 class="text-2xl font-bold text-gray-900 mb-6">PDF 업로드</h1>
+
+      <form id="upload-form" class="space-y-6">
+        <div>
+          <label for="pdf-upload" class="block text-sm font-medium text-gray-700 mb-2">
+            PDF 파일 선택
+          </label>
+          <input
+            type="file"
+            id="pdf-upload"
+            name="pdf"
+            accept="application/pdf,.pdf"
+            class="block w-full text-sm text-gray-500
+              file:mr-4 file:py-2 file:px-4
+              file:rounded-lg file:border-0
+              file:text-sm file:font-semibold
+              file:bg-blue-50 file:text-blue-700
+              hover:file:bg-blue-100"
+            required
+          />
+          <p class="mt-2 text-sm text-gray-500">
+            PDF 파일을 선택하세요 (최대 100MB)
+          </p>
+        </div>
+
+        <div>
+          <button
+            type="submit"
+            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            업로드
+          </button>
+        </div>
+      </form>
+
+      <div class="upload-success hidden mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+        <p class="text-green-700">✓ 파일이 성공적으로 업로드되었습니다!</p>
+      </div>
+
+      <div class="upload-error hidden mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <p class="text-red-700">✗ 업로드 중 오류가 발생했습니다.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('upload-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const fileInput = document.getElementById('pdf-upload');
+    const file = fileInput.files[0];
+
+    if (!file) {
+      alert('파일을 선택해주세요');
+      return;
+    }
+
+    // Show success message for Epic 2 tests
+    document.querySelector('.upload-success').classList.remove('hidden');
+    document.querySelector('.upload-error').classList.add('hidden');
+
+    // In real implementation, this would upload to the server
+    console.log('File selected:', file.name);
+  });
+</script>

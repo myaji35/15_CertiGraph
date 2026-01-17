@@ -1,0 +1,66 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-6xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-3xl font-bold">내 모의고사</h1>
+      <%= link_to "새 모의고사 만들기", new_form_exams_path,
+          class: "px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" %>
+    </div>
+
+    <% if @exam_sessions.any? %>
+      <div class="grid gap-4">
+        <% @exam_sessions.each do |exam| %>
+          <div class="exam-card bg-white rounded-lg shadow p-6 hover:shadow-lg transition">
+            <div class="flex justify-between items-start">
+              <div class="flex-1">
+                <h3 class="text-xl font-semibold mb-2"><%= exam.study_set.title %></h3>
+                <div class="text-gray-600 space-y-1">
+                  <p>문제 수: <%= exam.total_questions %>문제</p>
+                  <p>시간: <%= exam.time_limit %>분</p>
+                  <p>생성일: <%= exam.created_at.strftime('%Y-%m-%d %H:%M') %></p>
+                  <p>
+                    상태:
+                    <span class="px-2 py-1 rounded text-sm
+                      <%= exam.status == 'completed' ? 'bg-green-100 text-green-800' :
+                          exam.status == 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                          'bg-gray-100 text-gray-800' %>">
+                      <%= exam.status == 'completed' ? '완료' :
+                          exam.status == 'in_progress' ? '진행중' : '중단됨' %>
+                    </span>
+                  </p>
+                  <% if exam.status == 'completed' %>
+                    <p class="font-semibold text-lg">점수: <%= exam.score.round(1) %>점</p>
+                  <% end %>
+                </div>
+              </div>
+              <div class="flex flex-col space-y-2">
+                <% if exam.status == 'in_progress' %>
+                  <%= link_to "계속하기", exam_session_path(exam),
+                      class: "px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-center" %>
+                <% elsif exam.status == 'completed' %>
+                  <%= link_to "결과 보기", result_exam_path(exam),
+                      class: "px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-center" %>
+                  <%= button_to "재응시", retake_exam_path(exam),
+                      method: :post,
+                      class: "px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-center" %>
+                <% else %>
+                  <%= link_to "다시 시작", exam_path(exam),
+                      class: "px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 text-center" %>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="mt-8">
+        <%= paginate @exam_sessions if @exam_sessions.respond_to?(:current_page) %>
+      </div>
+    <% else %>
+      <div class="text-center py-16">
+        <p class="text-gray-500 text-lg mb-4">아직 생성된 모의고사가 없습니다</p>
+        <%= link_to "첫 모의고사 만들기", new_form_exams_path,
+            class: "px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700" %>
+      </div>
+    <% end %>
+  </div>
+</div>

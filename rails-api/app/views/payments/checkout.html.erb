@@ -1,92 +1,102 @@
-<div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-  <div class="max-w-3xl mx-auto">
-    <div class="text-center mb-8">
-      <h1 class="text-3xl font-bold text-gray-900">결제하기</h1>
-      <p class="mt-2 text-gray-600">AI 자격증 마스터 시즌 패스</p>
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-16 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-12">
+      <h1 class="text-5xl font-bold text-gray-900 mb-3">결제하기</h1>
+      <p class="text-xl text-gray-600">ExamsGraph AI 학습 플랜</p>
     </div>
 
     <!-- Pricing Cards -->
-    <div class="grid md:grid-cols-2 gap-6 mb-8">
+    <div class="grid md:grid-cols-2 gap-8 mb-10">
       <!-- Season Pass -->
-      <div class="bg-white rounded-lg shadow-md p-6 border-2 border-blue-500" id="season-pass-card">
+      <div class="card card-hover border-2 border-primary-blue" id="season-pass-card">
         <div class="text-center">
-          <h3 class="text-xl font-bold text-gray-900">시즌 패스</h3>
-          <div class="mt-4">
-            <span class="text-4xl font-bold text-blue-600">₩10,000</span>
-            <span class="text-gray-600">/90일</span>
+          <div class="feature-icon feature-icon-blue mx-auto mb-4">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
           </div>
-          <ul class="mt-6 space-y-3 text-left">
+          <h3 class="card-title text-2xl mb-4">시즌 패스</h3>
+          <div class="mb-6">
+            <span class="text-5xl font-bold text-primary-blue">₩10,000</span>
+            <span class="text-gray-600 text-lg">/90일</span>
+          </div>
+          <ul class="space-y-4 text-left mb-8">
             <li class="flex items-center">
-              <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <svg class="w-6 h-6 text-accent-green mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
               </svg>
-              <span>모든 학습 자료 무제한 업로드</span>
+              <span class="text-gray-700">모든 학습 자료 무제한 업로드</span>
             </li>
             <li class="flex items-center">
-              <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <svg class="w-6 h-6 text-accent-green mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
               </svg>
-              <span>AI 기반 오답노트</span>
+              <span class="text-gray-700">AI 기반 오답노트</span>
             </li>
             <li class="flex items-center">
-              <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <svg class="w-6 h-6 text-accent-green mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
               </svg>
-              <span>3D 지식 그래프 시각화</span>
+              <span class="text-gray-700">3D 지식 그래프 시각화</span>
             </li>
             <li class="flex items-center">
-              <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <svg class="w-6 h-6 text-accent-green mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
               </svg>
-              <span>맞춤형 학습 추천</span>
+              <span class="text-gray-700">맞춤형 학습 추천</span>
             </li>
           </ul>
           <button onclick="selectPlan('season_pass')"
-                  class="mt-6 w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition">
+                  class="btn btn-primary btn-lg w-full">
             선택하기
           </button>
         </div>
       </div>
 
       <!-- VIP Pass -->
-      <div class="bg-white rounded-lg shadow-md p-6 border-2 border-purple-500" id="vip-pass-card">
-        <div class="absolute top-4 right-4">
-          <span class="bg-purple-600 text-white text-xs px-3 py-1 rounded-full">PREMIUM</span>
+      <div class="card card-hover border-2 border-accent-purple relative" id="vip-pass-card">
+        <div class="absolute -top-3 -right-3">
+          <span class="badge badge-primary text-sm px-4 py-2 shadow-lg">PREMIUM</span>
         </div>
         <div class="text-center">
-          <h3 class="text-xl font-bold text-gray-900">VIP 패스</h3>
-          <div class="mt-4">
-            <span class="text-4xl font-bold text-purple-600">₩50,000</span>
-            <span class="text-gray-600">/365일</span>
+          <div class="feature-icon feature-icon-purple mx-auto mb-4">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+            </svg>
           </div>
-          <ul class="mt-6 space-y-3 text-left">
+          <h3 class="card-title text-2xl mb-4">VIP 패스</h3>
+          <div class="mb-6">
+            <span class="text-5xl font-bold text-accent-purple">₩50,000</span>
+            <span class="text-gray-600 text-lg">/365일</span>
+          </div>
+          <ul class="space-y-4 text-left mb-8">
             <li class="flex items-center">
-              <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <svg class="w-6 h-6 text-accent-green mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
               </svg>
-              <span>시즌 패스 모든 기능</span>
+              <span class="text-gray-700">시즌 패스 모든 기능</span>
             </li>
             <li class="flex items-center">
-              <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <svg class="w-6 h-6 text-accent-green mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
               </svg>
-              <span>우선 고객 지원</span>
+              <span class="text-gray-700">우선 고객 지원</span>
             </li>
             <li class="flex items-center">
-              <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <svg class="w-6 h-6 text-accent-green mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
               </svg>
-              <span>베타 기능 우선 체험</span>
+              <span class="text-gray-700">베타 기능 우선 체험</span>
             </li>
             <li class="flex items-center">
-              <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <svg class="w-6 h-6 text-accent-green mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
               </svg>
-              <span>1년 이용권</span>
+              <span class="text-gray-700">1년 이용권</span>
             </li>
           </ul>
           <button onclick="selectPlan('vip_pass')"
-                  class="mt-6 w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition">
+                  class="btn btn-accent btn-lg w-full">
             선택하기
           </button>
         </div>
@@ -94,11 +104,11 @@
     </div>
 
     <!-- Payment Widget Container -->
-    <div id="payment-widget" class="bg-white rounded-lg shadow-md p-6 hidden">
-      <h2 class="text-xl font-bold mb-4">결제 정보</h2>
+    <div id="payment-widget" class="card hidden">
+      <h2 class="card-title text-2xl mb-6">결제 정보</h2>
       <div id="payment-method"></div>
       <div id="agreement"></div>
-      <button id="payment-button" class="mt-6 w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition">
+      <button id="payment-button" class="btn btn-accent btn-lg w-full mt-8">
         결제하기
       </button>
     </div>

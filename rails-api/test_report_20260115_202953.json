@@ -1,0 +1,21 @@
+{
+  "total_tests": 0,
+  "passed": 0,
+  "failed": 0,
+  "skipped": 0,
+  "bugs": [
+    {
+      "epic": "Setup",
+      "endpoint": "Authentication",
+      "severity": "critical",
+      "description": "Cannot authenticate - all tests require authentication",
+      "error": "Login failed with status 422"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "critical",
+      "recommendation": "Fix 1 critical bug(s) immediately - these prevent core functionality from working"
+    }
+  ]
+}

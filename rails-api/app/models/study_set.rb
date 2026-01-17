@@ -1,5 +1,6 @@
 class StudySet < ApplicationRecord
-  belongs_to :user
+  # rails-best-practices: db-counter-cache
+  belongs_to :user, counter_cache: true
   has_many :study_materials, dependent: :destroy
   has_many :questions, through: :study_materials
   has_many :exam_sessions, dependent: :destroy

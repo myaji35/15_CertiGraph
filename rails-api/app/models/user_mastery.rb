@@ -20,17 +20,37 @@ class UserMastery < ApplicationRecord
   end
 
   # 상태 업데이트
-  def update_with_attempt(correct:, time_minutes: 0)
+  def update_with_attempt(correct:, time_minutes: 0, time_seconds: nil)
     self.attempts += 1
     self.correct_attempts += 1 if correct
     self.total_time_minutes += time_minutes
     self.last_tested_at = Time.current
+
+    # Update streaks
+    update_streak(correct: correct)
+
+    # Update solve times if provided
+    update_solve_time(time_seconds) if time_seconds
+
+    # Update study streak
+    if last_review_date != Date.today
+      self.study_streak_days = (study_streak_days || 0) + 1
+    end
+
+    # Update best time of day
+    self.time_of_day_best_performance = best_time_of_day
 
     # 숙달도 계산
     calculate_mastery_level
 
     # 색상 업데이트
     update_color
+
+    # Update review schedule
+    update_review_schedule
+
+    # Calculate retention score
+    calculate_retention_score
 
     # 이력 기록
     add_to_history(correct, time_minutes)
@@ -117,6 +137,111 @@ class UserMastery < ApplicationRecord
 
     correct_count = recent.count { |entry| entry['correct'] }
     (correct_count.to_f / recent.length * 100).round(2)
+  end
+
+  # Enhanced performance tracking methods
+  def update_streak(correct:)
+    if correct
+      self.consecutive_correct = (consecutive_correct || 0) + 1
+      self.consecutive_incorrect = 0
+    else
+      self.consecutive_incorrect = (consecutive_incorrect || 0) + 1
+      self.consecutive_correct = 0
+    end
+  end
+
+  def update_solve_time(seconds)
+    self.fastest_solve_seconds = [fastest_solve_seconds || seconds, seconds].min
+
+    # Calculate running average
+    if avg_solve_seconds.nil?
+      self.avg_solve_seconds = seconds
+    else
+      # Weighted average: 80% old, 20% new
+      self.avg_solve_seconds = (avg_solve_seconds * 0.8 + seconds * 0.2).round
+    end
+  end
+
+  def update_review_schedule
+    self.last_review_date = Date.today
+
+    # Spaced repetition algorithm (simplified)
+    interval = case mastery_level
+    when 0.9..1.0 then 30.days
+    when 0.8..0.9 then 14.days
+    when 0.6..0.8 then 7.days
+    when 0.4..0.6 then 3.days
+    else 1.day
+    end
+
+    self.next_review_date = Date.today + interval
+  end
+
+  def calculate_retention_score
+    return 0.0 if last_tested_at.nil?
+
+    days_since = days_since_last_test
+    decay_factor = Math.exp(-days_since / 30.0) # Exponential decay
+
+    self.retention_score = (mastery_level * decay_factor).round(3)
+  end
+
+  def best_time_of_day
+    return nil unless history.present?
+
+    time_performance = Hash.new { |h, k| h[k] = { correct: 0, total: 0 } }
+
+    history.each do |entry|
+      hour = Time.parse(entry['timestamp']).hour
+      period = case hour
+      when 6..11 then 'morning'
+      when 12..17 then 'afternoon'
+      when 18..23 then 'evening'
+      else 'night'
+      end
+
+      time_performance[period][:total] += 1
+      time_performance[period][:correct] += 1 if entry['correct']
+    end
+
+    best = time_performance.max_by do |_period, stats|
+      stats[:total] > 0 ? stats[:correct].to_f / stats[:total] : 0
+    end
+
+    best ? best[0] : nil
+  end
+
+  def performance_trend(days: 14)
+    recent = recent_performance(days: days)
+    return 'insufficient_data' if recent.length < 3
+
+    first_half = recent.first(recent.length / 2)
+    second_half = recent.last(recent.length / 2)
+
+    first_accuracy = first_half.count { |e| e['correct'] }.to_f / first_half.length
+    second_accuracy = second_half.count { |e| e['correct'] }.to_f / second_half.length
+
+    if second_accuracy > first_accuracy + 0.1
+      'improving'
+    elsif second_accuracy < first_accuracy - 0.1
+      'declining'
+    else
+      'stable'
+    end
+  end
+
+  def needs_review?
+    return true if attempts.zero?
+    return true if next_review_date && next_review_date <= Date.today
+    return true if last_tested_at && last_tested_at < 7.days.ago && mastery_level < 0.8
+    false
+  end
+
+  def learning_efficiency
+    return 0.0 if total_time_minutes.zero?
+
+    # Mastery gained per hour of study
+    (mastery_level / (total_time_minutes / 60.0)).round(3)
   end
 
   def to_json(*args)

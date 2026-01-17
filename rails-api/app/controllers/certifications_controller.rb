@@ -1,5 +1,5 @@
 class CertificationsController < ApplicationController
-  before_action :set_certification, only: [:show, :exam_schedules, :upcoming_exams]
+  before_action :set_certification, only: [:show, :exam_schedules, :upcoming_exams, :years]
 
   # GET /certifications
   def index
@@ -134,6 +134,52 @@ class CertificationsController < ApplicationController
     render json: {
       query: query,
       results: @certifications.map(&:to_json_summary)
+    }
+  end
+
+  # GET /certifications/upcoming
+  def upcoming
+    year = params[:year]&.to_i || Date.current.year
+    @upcoming_schedules = ExamSchedule.upcoming.by_year(year)
+                                     .includes(:certification)
+                                     .order(exam_date: :asc)
+
+    render json: {
+      year: year,
+      count: @upcoming_schedules.count,
+      schedules: @upcoming_schedules.map do |schedule|
+        schedule.to_json_summary.merge(
+          certification: schedule.certification.to_json_summary
+        )
+      end
+    }
+  end
+
+  # GET /certifications/open_registrations
+  def open_registrations
+    @open_schedules = ExamSchedule.open_registration
+                                  .includes(:certification)
+                                  .order(registration_start_date: :asc)
+
+    render json: {
+      count: @open_schedules.count,
+      schedules: @open_schedules.map do |schedule|
+        schedule.to_json_summary.merge(
+          certification: schedule.certification.to_json_summary,
+          days_until_deadline: (schedule.registration_end_date - Date.current).to_i
+        )
+      end
+    }
+  end
+
+  # GET /certifications/:id/years
+  def years
+    @years = @certification.exam_schedules.select(:year).distinct.pluck(:year).sort.reverse
+
+    render json: {
+      certification: @certification.to_json_summary,
+      years: @years,
+      count: @years.count
     }
   end
 

@@ -1,0 +1,155 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold mb-8">모의고사 생성</h1>
+
+    <%= form_with(model: @exam, url: exams_path, method: :post, local: true, html: { class: "space-y-6" }) do |f| %>
+      <!-- Study Set Selection -->
+      <div class="form-group">
+        <label for="exam_study_set_id" class="block text-sm font-medium mb-2">스터디 세트 선택</label>
+        <select name="exam[study_set_id]" id="exam_study_set_id" class="w-full px-4 py-2 border rounded-lg">
+          <option value="">스터디 세트를 선택하세요</option>
+          <% @study_sets.each do |study_set| %>
+            <option value="<%= study_set.id %>">
+              <%= study_set.title %> (<%= study_set.study_materials.sum { |sm| sm.questions.count } %>문제)
+            </option>
+          <% end %>
+        </select>
+      </div>
+
+      <!-- Exam Title -->
+      <div class="form-group">
+        <label for="exam_exam_title" class="block text-sm font-medium mb-2">시험 제목</label>
+        <input type="text" name="exam[exam_title]" id="exam_exam_title"
+               class="w-full px-4 py-2 border rounded-lg"
+               placeholder="예: 정보처리기사 모의고사 #1">
+      </div>
+
+      <!-- Category -->
+      <div class="form-group">
+        <label for="exam_category" class="block text-sm font-medium mb-2">카테고리</label>
+        <select name="exam[category]" id="exam_category" class="w-full px-4 py-2 border rounded-lg">
+          <option value="information-processing">정보처리기사</option>
+          <option value="network-engineer">네트워크관리사</option>
+          <option value="security">정보보안기사</option>
+          <option value="other">기타</option>
+        </select>
+      </div>
+
+      <!-- Question Count -->
+      <div class="form-group">
+        <label for="exam_question_count" class="block text-sm font-medium mb-2">문제 수</label>
+        <input type="number" name="exam[question_count]" id="exam_question_count"
+               value="100" min="1" max="200"
+               class="w-full px-4 py-2 border rounded-lg">
+      </div>
+
+      <!-- Time Limit -->
+      <div class="form-group">
+        <label for="exam_time_limit" class="block text-sm font-medium mb-2">시간 제한 (분)</label>
+        <input type="number" name="exam[time_limit]" id="exam_time_limit"
+               value="150" min="1" max="300"
+               class="w-full px-4 py-2 border rounded-lg">
+      </div>
+
+      <!-- Chapter Distribution (Advanced) -->
+      <div class="border rounded-lg p-4 bg-gray-50">
+        <button type="button"
+                class="w-full flex justify-between items-center text-left font-medium"
+                onclick="document.getElementById('chapter-settings').classList.toggle('hidden')">
+          <span>챕터별 설정</span>
+          <span>▼</span>
+        </button>
+        <div id="chapter-settings" class="hidden mt-4 space-y-3">
+          <% (1..4).each do |chapter| %>
+            <div class="flex items-center space-x-4">
+              <label class="w-32">챕터 <%= chapter %>:</label>
+              <input type="number"
+                     name="exam[chapter_distribution][<%= chapter %>]"
+                     data-chapter="<%= chapter %>"
+                     min="0" max="100"
+                     class="px-3 py-1 border rounded"
+                     placeholder="문제 수">
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Difficulty Distribution (Advanced) -->
+      <div class="border rounded-lg p-4 bg-gray-50">
+        <button type="button"
+                class="w-full flex justify-between items-center text-left font-medium"
+                onclick="document.getElementById('difficulty-settings').classList.toggle('hidden')">
+          <span>난이도 설정</span>
+          <span>▼</span>
+        </button>
+        <div id="difficulty-settings" class="hidden mt-4 space-y-3">
+          <div class="flex items-center space-x-4">
+            <label class="w-32">쉬움 (%):</label>
+            <input type="number" name="exam[difficulty_easy]" data-difficulty="easy"
+                   min="0" max="100" value="30"
+                   class="px-3 py-1 border rounded">
+          </div>
+          <div class="flex items-center space-x-4">
+            <label class="w-32">보통 (%):</label>
+            <input type="number" name="exam[difficulty_medium]" data-difficulty="medium"
+                   min="0" max="100" value="50"
+                   class="px-3 py-1 border rounded">
+          </div>
+          <div class="flex items-center space-x-4">
+            <label class="w-32">어려움 (%):</label>
+            <input type="number" name="exam[difficulty_hard]" data-difficulty="hard"
+                   min="0" max="100" value="20"
+                   class="px-3 py-1 border rounded">
+          </div>
+        </div>
+      </div>
+
+      <!-- Past Questions Priority -->
+      <div class="border rounded-lg p-4 bg-gray-50">
+        <div class="flex items-center space-x-3">
+          <input type="checkbox" name="exam[prioritize_past_questions]" id="exam_prioritize_past_questions"
+                 class="w-4 h-4"
+                 onchange="document.getElementById('past-questions-ratio-container').classList.toggle('hidden', !this.checked)">
+          <label for="exam_prioritize_past_questions" class="font-medium">기출문제 우선</label>
+        </div>
+        <div id="past-questions-ratio-container" class="hidden mt-3">
+          <label class="block text-sm mb-2">기출문제 비율 (%):</label>
+          <input type="number" name="exam[past_questions_ratio]"
+                 min="0" max="100" value="70"
+                 class="px-3 py-1 border rounded w-32">
+        </div>
+      </div>
+
+      <!-- Duplicate Prevention -->
+      <div class="border rounded-lg p-4 bg-gray-50">
+        <div class="flex items-center space-x-3">
+          <input type="checkbox" name="exam[prevent_duplicates]" id="exam_prevent_duplicates"
+                 class="w-4 h-4"
+                 onchange="document.getElementById('days-to-check-container').classList.toggle('hidden', !this.checked)">
+          <label for="exam_prevent_duplicates" class="font-medium">중복 문제 방지</label>
+        </div>
+        <div id="days-to-check-container" class="hidden mt-3">
+          <label class="block text-sm mb-2">최근 며칠 내 문제 제외:</label>
+          <input type="number" name="exam[days_to_check]"
+                 min="1" max="365" value="30"
+                 class="px-3 py-1 border rounded w-32">
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="flex justify-end space-x-4">
+        <%= link_to "취소", exams_path, class: "px-6 py-2 border rounded-lg hover:bg-gray-50" %>
+        <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          생성
+        </button>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<% if flash[:alert] %>
+  <div class="success-message hidden"><%= flash[:alert] %></div>
+<% end %>
+<% if flash[:notice] %>
+  <div class="success-message"><%= flash[:notice] %></div>
+<% end %>

@@ -1,0 +1,156 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-6xl mx-auto">
+    <h1 class="text-3xl font-bold mb-8 text-center">시험 결과</h1>
+
+    <!-- Score Summary -->
+    <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg shadow-lg p-8 mb-8">
+      <div class="text-center">
+        <h2 class="text-6xl font-bold text-blue-600 mb-4"><%= @score.round(1) %>점</h2>
+        <p class="text-xl text-gray-700">
+          <%= @correct_count %>문제 정답 / <%= @exam_answers.size %>문제 중
+        </p>
+        <p class="text-lg text-gray-600 mt-2">시간: <%= @time_elapsed %></p>
+      </div>
+    </div>
+
+    <!-- Statistics Grid -->
+    <div class="grid md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-green-50 border-2 border-green-200 rounded-lg p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600">정답</p>
+            <p class="text-3xl font-bold text-green-600"><%= @correct_count %></p>
+          </div>
+          <svg class="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+      </div>
+
+      <div class="bg-red-50 border-2 border-red-200 rounded-lg p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600">오답</p>
+            <p class="text-3xl font-bold text-red-600"><%= @wrong_count %></p>
+          </div>
+          <svg class="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+      </div>
+
+      <div class="bg-gray-50 border-2 border-gray-200 rounded-lg p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600">정답률</p>
+            <p class="text-3xl font-bold text-gray-700">
+              <%= (@correct_count.to_f / @exam_answers.size * 100).round(1) %>%
+            </p>
+          </div>
+          <svg class="w-12 h-12 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chapter Analysis -->
+    <% chapter_stats = {} %>
+    <% @exam_answers.group_by { |a| a.question.chapter }.each do |chapter, answers| %>
+      <% next unless chapter.present? %>
+      <% total = answers.size %>
+      <% correct = answers.count(&:is_correct) %>
+      <% accuracy = (correct.to_f / total * 100).round(1) %>
+      <% chapter_stats[chapter] = { total: total, correct: correct, accuracy: accuracy } %>
+    <% end %>
+
+    <% if chapter_stats.any? %>
+      <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <h3 class="text-xl font-bold mb-4">챕터별 성적 분석</h3>
+        <div class="space-y-4">
+          <% chapter_stats.sort_by { |k, v| k.to_i }.each do |chapter, stats| %>
+            <div>
+              <div class="flex justify-between mb-2">
+                <span class="font-medium">챕터 <%= chapter %></span>
+                <span class="text-sm text-gray-600">
+                  <%= stats[:correct] %> / <%= stats[:total] %> (<%= stats[:accuracy] %>%)
+                </span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-3">
+                <div class="h-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"
+                     style="width: <%= stats[:accuracy] %>%"></div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Difficulty Analysis -->
+    <% difficulty_stats = {} %>
+    <% @exam_answers.group_by { |a| a.question.difficulty }.each do |difficulty, answers| %>
+      <% next unless difficulty.present? %>
+      <% total = answers.size %>
+      <% correct = answers.count(&:is_correct) %>
+      <% accuracy = (correct.to_f / total * 100).round(1) %>
+      <% difficulty_stats[difficulty] = { total: total, correct: correct, accuracy: accuracy } %>
+    <% end %>
+
+    <% if difficulty_stats.any? %>
+      <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <h3 class="text-xl font-bold mb-4">난이도별 정답률</h3>
+        <div class="grid md:grid-cols-3 gap-4">
+          <% difficulty_stats.each do |difficulty, stats| %>
+            <div class="border-2 rounded-lg p-4">
+              <p class="font-medium mb-2"><%= difficulty %></p>
+              <p class="text-2xl font-bold text-blue-600"><%= stats[:accuracy] %>%</p>
+              <p class="text-sm text-gray-600"><%= stats[:correct] %> / <%= stats[:total] %></p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Question-by-Question Review -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+      <h3 class="text-xl font-bold mb-4">문제별 정답/오답</h3>
+      <div class="space-y-3">
+        <% @exam_answers.each_with_index do |answer, index| %>
+          <div class="flex items-center justify-between p-4 border-2 rounded-lg
+                      <%= answer.is_correct ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200' %>">
+            <div class="flex items-center space-x-4">
+              <span class="font-bold text-lg"><%= index + 1 %>.</span>
+              <span class="text-gray-700"><%= answer.question.question_text.truncate(80) %></span>
+            </div>
+            <div class="flex items-center space-x-3">
+              <span class="text-sm <%= answer.is_correct ? 'text-green-600' : 'text-red-600' %>">
+                선택: <%= answer.selected_answer || '미응답' %>
+              </span>
+              <% if !answer.is_correct %>
+                <span class="text-sm text-gray-600">
+                  정답: <%= answer.question.answer %>
+                </span>
+              <% end %>
+              <% if answer.is_correct %>
+                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+              <% else %>
+                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-center space-x-4">
+      <%= link_to "모의고사 목록", exams_path, class: "px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700" %>
+      <%= link_to "오답노트 보기", "#", class: "px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700" %>
+      <%= link_to "새 모의고사", new_form_exams_path, class: "px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700" %>
+    </div>
+  </div>
+</div>

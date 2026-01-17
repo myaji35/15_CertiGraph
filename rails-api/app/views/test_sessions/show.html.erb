@@ -1,36 +1,36 @@
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
   <!-- Top Navigation Bar -->
-  <div class="bg-white border-b sticky top-0 z-40 shadow-sm">
+  <div class="bg-white border-b-2 border-primary-blue sticky top-0 z-50 shadow-lg">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center py-4">
+      <div class="flex justify-between items-center py-5">
         <!-- Test Info -->
         <div class="flex items-center space-x-4">
-          <h2 class="text-xl font-bold text-gray-900"><%= @test_session.study_set.title %></h2>
-          <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+          <h2 class="text-2xl font-bold text-gray-900"><%= @test_session.study_set.title %></h2>
+          <span class="badge badge-primary text-sm px-4 py-2">
             <%= @test_session.test_type == 'practice' ? '연습 모드' : '모의고사' %>
           </span>
         </div>
 
         <!-- Timer and Progress -->
-        <div class="flex items-center space-x-6">
+        <div class="flex items-center space-x-8">
           <!-- Progress -->
-          <div id="progress-bar" class="flex items-center space-x-2">
-            <span class="text-sm font-medium text-gray-600">진행률</span>
-            <div class="w-32 bg-gray-200 rounded-full h-2">
-              <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: <%= @progress %>%"></div>
+          <div id="progress-bar" class="flex items-center space-x-3">
+            <span class="text-sm font-semibold text-gray-700">진행률</span>
+            <div class="w-40 bg-gray-200 rounded-full h-3 shadow-inner">
+              <div class="bg-gradient-to-r from-primary-blue to-accent-purple h-3 rounded-full transition-all duration-500" style="width: <%= @progress %>%"></div>
             </div>
-            <span class="text-sm font-bold text-gray-900">
+            <span class="text-base font-bold text-gray-900">
               <%= @test_session.total_answered %>/<%= @test_session.question_count %>
             </span>
           </div>
 
           <!-- Timer -->
           <% if @test_session.time_limit.present? %>
-            <div class="flex items-center space-x-2 px-4 py-2 bg-red-50 rounded-lg">
-              <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="flex items-center space-x-3 px-5 py-2 bg-red-50 rounded-xl border-2 border-red-200">
+              <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
-              <span id="timer" class="font-mono text-lg font-bold text-red-600" data-time-remaining="<%= @time_remaining %>">
+              <span id="timer" class="font-mono text-xl font-bold text-red-600" data-time-remaining="<%= @time_remaining %>">
                 <%= Time.at(@time_remaining).utc.strftime("%H:%M:%S") %>
               </span>
             </div>
@@ -39,7 +39,7 @@
           <!-- Exit Button -->
           <%= link_to abandon_test_session_path(@test_session), method: :post,
               data: { confirm: '시험을 중단하시겠습니까? 진행사항이 저장되지 않습니다.' },
-              class: 'px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium' do %>
+              class: 'btn btn-secondary' do %>
             나가기
           <% end %>
         </div>
@@ -48,45 +48,50 @@
   </div>
 
   <!-- Main Content -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="grid grid-cols-12 gap-6">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="grid grid-cols-12 gap-8">
       <!-- Question Navigation Sidebar -->
       <div class="col-span-3">
-        <div class="bg-white rounded-xl shadow-lg p-6 sticky top-24">
-          <h3 class="font-bold text-gray-900 mb-4">문제 목록</h3>
-          <div class="grid grid-cols-5 gap-2">
+        <div class="card sticky top-28">
+          <h3 class="card-title mb-6 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-primary-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+            문제 목록
+          </h3>
+          <div class="grid grid-cols-5 gap-2.5 mb-6">
             <% @test_session.test_questions.ordered.each do |q| %>
               <%= link_to test_session_path(@test_session, question_id: q.id),
-                  class: "relative aspect-square flex items-center justify-center rounded-lg text-sm font-medium transition-all
-                         #{q.answered? ? 'bg-green-100 text-green-700 hover:bg-green-200' :
-                           (q == @current_question ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200')}
+                  class: "relative aspect-square flex items-center justify-center rounded-xl text-sm font-bold transition-all duration-200 hover:scale-110
+                         #{q.answered? ? 'bg-green-100 text-green-800 border-2 border-green-400' :
+                           (q == @current_question ? 'bg-gradient-to-br from-primary-blue to-accent-purple text-white shadow-lg' : 'bg-white text-gray-600 border-2 border-gray-300 hover:border-primary-blue')}
                          #{q.is_marked ? 'ring-2 ring-orange-400' : ''}" do %>
                 <%= q.question_number %>
                 <% if q.is_marked %>
-                  <span class="absolute -top-1 -right-1 w-2 h-2 bg-orange-400 rounded-full"></span>
+                  <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-orange-400 rounded-full shadow"></span>
                 <% end %>
               <% end %>
             <% end %>
           </div>
 
-          <div class="mt-6 space-y-2 text-sm">
+          <div class="pt-6 border-t-2 border-gray-200 space-y-3 text-sm">
             <div class="flex items-center justify-between">
-              <span class="flex items-center">
-                <span class="w-4 h-4 bg-green-100 rounded mr-2"></span> 완료
+              <span class="flex items-center font-medium">
+                <span class="w-5 h-5 bg-green-100 border-2 border-green-400 rounded-lg mr-2"></span> 완료
               </span>
-              <span class="font-semibold"><%= @test_session.test_questions.answered.count %></span>
+              <span class="font-bold text-gray-900"><%= @test_session.test_questions.answered.count %></span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="flex items-center">
-                <span class="w-4 h-4 bg-gray-100 rounded mr-2"></span> 미답변
+              <span class="flex items-center font-medium">
+                <span class="w-5 h-5 bg-white border-2 border-gray-300 rounded-lg mr-2"></span> 미답변
               </span>
-              <span class="font-semibold"><%= @test_session.test_questions.unanswered.count %></span>
+              <span class="font-bold text-gray-900"><%= @test_session.test_questions.unanswered.count %></span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="flex items-center">
-                <span class="w-4 h-4 bg-orange-100 rounded mr-2 ring-2 ring-orange-400"></span> 표시
+              <span class="flex items-center font-medium">
+                <span class="w-5 h-5 bg-orange-100 rounded-lg mr-2 ring-2 ring-orange-400"></span> 표시
               </span>
-              <span class="font-semibold"><%= @test_session.test_questions.marked.count %></span>
+              <span class="font-bold text-gray-900"><%= @test_session.test_questions.marked.count %></span>
             </div>
           </div>
         </div>
@@ -95,7 +100,7 @@
       <!-- Question Display Area -->
       <div class="col-span-9">
         <div id="test-content">
-          <div id="question-display" class="bg-white rounded-xl shadow-lg p-8">
+          <div id="question-display" class="card p-10">
             <%= render 'question', question: @current_question, test_session: @test_session %>
           </div>
         </div>

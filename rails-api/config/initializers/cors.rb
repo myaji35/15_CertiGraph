@@ -14,4 +14,19 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
       methods: [:get, :post, :put, :patch, :delete, :options, :head],
       credentials: true
   end
+
+  # Epic 2: Direct Upload to S3 - Allow presigned URL requests
+  allow do
+    origins '*' # S3 direct uploads can come from any origin with presigned URLs
+
+    resource '/rails/active_storage/direct_uploads',
+      headers: :any,
+      methods: [:post, :options],
+      credentials: false
+
+    resource '/study_sets/*/uploads/*',
+      headers: :any,
+      methods: [:get, :post, :put, :patch, :delete, :options],
+      credentials: false
+  end
 end

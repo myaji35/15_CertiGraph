@@ -17,6 +17,7 @@ gem "stimulus-rails"
 gem "tailwindcss-rails", "~> 2.0"
 # Use Redis adapter to run Action Cable in production
 gem "redis", ">= 4.0.1"
+gem "connection_pool", "~> 2.4"
 
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem "kredis"
@@ -43,8 +44,13 @@ gem "rack-cors"
 gem "devise"
 gem "omniauth"
 gem "omniauth-google-oauth2"
+gem "omniauth-naver"
 gem "omniauth-rails_csrf_protection"
 gem "jwt"
+
+# Two-Factor Authentication
+gem "devise-two-factor"
+gem "rqrcode"
 
 # Background Jobs (Rails 7.2+ built-in)
 gem "solid_queue"
@@ -52,9 +58,6 @@ gem "solid_queue"
 # HTTP requests
 gem "httparty"
 gem "solid_cache"
-
-# External API calls
-gem "httparty"
 
 # OpenAI integration for embeddings
 gem "ruby-openai", "~> 7.0"

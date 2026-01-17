@@ -1,0 +1,307 @@
+{
+  "test_execution_date": "2026-01-15",
+  "rails_server_status": "running_on_port_3000",
+  "critical_blocker": {
+    "type": "duplicate_migration_timestamps",
+    "severity": "CRITICAL",
+    "impact": "Server cannot process ANY requests - 500 Internal Server Error on all endpoints",
+    "description": "Multiple migrations have the same version number 20260115200001",
+    "affected_files": [
+      "db/migrate/20260115200001_add_two_factor_to_users.rb",
+      "db/migrate/20260115200001_enhance_learning_recommendations.rb",
+      "db/migrate/20260115200001_add_randomization_to_exam_sessions.rb"
+    ],
+    "error_message": "ActiveRecord::DuplicateMigrationVersionError: Multiple migrations have the version number 20260115200001",
+    "fix_required": "Rename migration files with unique timestamps using: rails db:migrate:redo VERSION=20260115200001 or manually rename files",
+    "test_status": "BLOCKED - Cannot test any endpoints until this is fixed"
+  },
+  "summary": {
+    "total_tests_planned": 23,
+    "total_tests_executed": 0,
+    "passed": 0,
+    "failed": 0,
+    "blocked": 23,
+    "blocker_reason": "Duplicate migration timestamps prevent server from responding to ANY API requests"
+  },
+  "epic_2_upload_storage": {
+    "status": "BLOCKED",
+    "endpoints_planned": 11,
+    "endpoints_tested": 0,
+    "tests": [
+      {
+        "endpoint": "POST /study_sets/:study_set_id/uploads/prepare",
+        "description": "Prepare upload and get presigned URLs",
+        "status": "BLOCKED",
+        "http_status": null,
+        "error": "Cannot test - server returns 500 on all requests due to migration issue"
+      },
+      {
+        "endpoint": "POST /study_sets/:study_set_id/uploads/validate",
+        "description": "Validate file before upload",
+        "status": "BLOCKED",
+        "http_status": null,
+        "error": "Cannot test - server returns 500 on all requests due to migration issue"
+      },
+      {
+        "endpoint": "POST /study_sets/:study_set_id/uploads/:id/complete",
+        "description": "Complete Direct Upload (single file)",
+        "status": "BLOCKED",
+        "http_status": null,
+        "error": "Cannot test - server returns 500 on all requests due to migration issue"
+      },
+      {
+        "endpoint": "POST /study_sets/:study_set_id/uploads/:id/upload_chunk",
+        "description": "Upload a chunk (for chunked uploads)",
+        "status": "BLOCKED",
+        "http_status": null,
+        "error": "Cannot test - server returns 500 on all requests due to migration issue"
+      },
+      {
+        "endpoint": "POST /study_sets/:study_set_id/uploads/:id/complete_multipart",
+        "description": "Complete multipart upload (S3 multipart)",
+        "status": "BLOCKED",
+        "http_status": null,
+        "error": "Cannot test - server returns 500 on all requests due to migration issue"
+      },
+      {
+        "endpoint": "GET /study_sets/:study_set_id/uploads/:id/upload_status",
+        "description": "Get upload status",
+        "status": "BLOCKED",
+        "http_status": null,
+        "error": "Cannot test - server returns 500 on all requests due to migration issue"
+      },
+      {
+        "endpoint": "POST /study_sets/:study_set_id/uploads/:id/pause_upload",
+        "description": "Pause upload",
+        "status": "BLOCKED",
+        "http_status": null,
+        "error": "Cannot test - server returns 500 on all requests due to migration issue"
+      },
+      {
+        "endpoint": "POST /study_sets/:study_set_id/uploads/:id/resume_upload",
+        "description": "Resume upload",
+        "status": "BLOCKED",
+        "http_status": null,
+        "error": "Cannot test - server returns 500 on all requests due to migration issue"
+      },
+      {
+        "endpoint": "DELETE /study_sets/:study_set_id/uploads/:id/cancel_upload",
+        "description": "Cancel upload",
+        "status": "BLOCKED",
+        "http_status": null,
+        "error": "Cannot test - server returns 500 on all requests due to migration issue"
+      },
+      {
+        "endpoint": "GET /uploads/storage_stats",
+        "description": "Get storage statistics (admin only)",
+        "status": "BLOCKED",
+        "http_status": null,
+        "error": "Cannot test - server returns 500 on all requests due to migration issue"
+      },
+      {
+        "endpoint": "POST /uploads/cleanup_storage",
+        "description": "Trigger storage cleanup (admin only)",
+        "status": "BLOCKED",
+        "http_status": null,
+        "error": "Cannot test - server returns 500 on all requests due to migration issue"
+      }
+    ]
+  },
+  "epic_3_pdf_processing": {
+    "status": "BLOCKED",
+    "endpoints_planned": 6,
+    "endpoints_tested": 0,
+    "tests": [
+      {
+        "endpoint": "POST /api/v1/pdf_processing",
+        "description": "Upload PDF and start processing",
+        "status": "BLOCKED",
+        "http_status": null,
+        "error": "Cannot test - server returns 500 on all requests due to migration issue"
+      },
+      {
+        "endpoint": "GET /api/v1/pdf_processing/:id",
+        "description": "Get PDF processing status",
+        "status": "BLOCKED",
+        "http_status": null,
+        "error": "Cannot test - server returns 500 on all requests due to migration issue"
+      },
+      {
+        "endpoint": "POST /api/v1/pdf_processing/:id/retry",
+        "description": "Retry failed PDF processing",
+        "status": "BLOCKED",
+        "http_status": null,
+        "error": "Cannot test - server returns 500 on all requests due to migration issue"
+      },
+      {
+        "endpoint": "DELETE /api/v1/pdf_processing/:id/cancel",
+        "description": "Cancel PDF processing",
+        "status": "BLOCKED",
+        "http_status": null,
+        "error": "Cannot test - server returns 500 on all requests due to migration issue"
+      },
+      {
+        "endpoint": "GET /api/v1/pdf_processing",
+        "description": "Get all PDF processing jobs for user",
+        "status": "BLOCKED",
+        "http_status": null,
+        "error": "Cannot test - server returns 500 on all requests due to migration issue"
+      },
+      {
+        "endpoint": "GET /api/v1/pdf_processing/stats",
+        "description": "Get PDF processing statistics",
+        "status": "BLOCKED",
+        "http_status": null,
+        "error": "Cannot test - server returns 500 on all requests due to migration issue"
+      }
+    ]
+  },
+  "epic_6_knowledge_graph": {
+    "status": "BLOCKED",
+    "endpoints_planned": 6,
+    "endpoints_tested": 0,
+    "note": "Based on documentation, Epic 6 should have embeddings endpoints, but actual implementation shows Knowledge Graph endpoints instead",
+    "tests": [
+      {
+        "endpoint": "POST /api/v1/study_materials/:id/knowledge_graph/build",
+        "description": "Build knowledge graph for study material",
+        "status": "BLOCKED",
+        "http_status": null,
+        "error": "Cannot test - server returns 500 on all requests due to migration issue"
+      },
+      {
+        "endpoint": "GET /api/v1/study_materials/:id/knowledge_graph",
+        "description": "Get knowledge graph data",
+        "status": "BLOCKED",
+        "http_status": null,
+        "error": "Cannot test - server returns 500 on all requests due to migration issue"
+      },
+      {
+        "endpoint": "GET /api/v1/study_materials/:id/knowledge_graph/stats",
+        "description": "Get knowledge graph statistics",
+        "status": "BLOCKED",
+        "http_status": null,
+        "error": "Cannot test - server returns 500 on all requests due to migration issue"
+      },
+      {
+        "endpoint": "GET /api/v1/study_materials/:id/knowledge_graph/nodes",
+        "description": "Get all knowledge graph nodes",
+        "status": "BLOCKED",
+        "http_status": null,
+        "error": "Cannot test - server returns 500 on all requests due to migration issue"
+      },
+      {
+        "endpoint": "GET /api/v1/study_materials/:id/knowledge_graph/weak_concepts",
+        "description": "Get weak concepts from knowledge graph",
+        "status": "BLOCKED",
+        "http_status": null,
+        "error": "Cannot test - server returns 500 on all requests due to migration issue"
+      },
+      {
+        "endpoint": "GET /api/v1/study_materials/:id/knowledge_graph/mastered_concepts",
+        "description": "Get mastered concepts from knowledge graph",
+        "status": "BLOCKED",
+        "http_status": null,
+        "error": "Cannot test - server returns 500 on all requests due to migration issue"
+      }
+    ]
+  },
+  "embeddings_endpoints_note": {
+    "status": "NOT_FOUND",
+    "description": "User requested testing of embeddings endpoints (POST /embeddings/generate, GET /embeddings/:id/status, etc.) but these endpoints do NOT exist in the current implementation",
+    "actual_implementation": "Epic 6 implements Knowledge Graph endpoints, not standalone Embeddings API",
+    "embedding_service_exists": true,
+    "embedding_service_location": "app/services/embedding_service.rb",
+    "embedding_usage": "Embeddings are generated internally as part of PDF processing pipeline, not exposed as separate API endpoints"
+  },
+  "bugs_found": [
+    {
+      "bug_id": "BUG-001",
+      "severity": "CRITICAL",
+      "category": "Database Migration",
+      "title": "Duplicate Migration Timestamps",
+      "description": "Three migration files share the same timestamp (20260115200001), causing ActiveRecord::DuplicateMigrationVersionError",
+      "impact": "Complete application failure - ALL API endpoints return 500 Internal Server Error",
+      "affected_files": [
+        "db/migrate/20260115200001_add_two_factor_to_users.rb",
+        "db/migrate/20260115200001_enhance_learning_recommendations.rb",
+        "db/migrate/20260115200001_add_randomization_to_exam_sessions.rb"
+      ],
+      "reproduction_steps": [
+        "Start Rails server",
+        "Make ANY HTTP request to ANY endpoint",
+        "Observe 500 error with duplicate migration message"
+      ],
+      "recommended_fix": "Rename migration files with unique timestamps. Use rails generate migration command to create migrations with unique timestamps, or manually update the timestamp in filename and class name"
+    },
+    {
+      "bug_id": "BUG-002",
+      "severity": "MEDIUM",
+      "category": "API Documentation Mismatch",
+      "title": "Embeddings API Endpoints Not Implemented",
+      "description": "User documentation/requirements mention embeddings API endpoints (POST /embeddings/generate, GET /embeddings/:id/status, etc.) but these are not implemented or exposed as API endpoints",
+      "impact": "User expectations don't match actual implementation. Embeddings functionality exists but is not accessible via dedicated API endpoints",
+      "actual_behavior": "Embeddings are generated internally via EmbeddingService during PDF processing, not exposed as standalone API",
+      "recommended_fix": "Either: (1) Create dedicated EmbeddingsController with the expected endpoints, or (2) Update documentation to clarify that embeddings are handled internally"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "CRITICAL",
+      "action": "Fix duplicate migration timestamps immediately",
+      "details": "Rename the three conflicting migration files with unique timestamps. This must be done before any testing can proceed.",
+      "command": "rails generate migration FixDuplicateTimestamps && manually move content from duplicate files"
+    },
+    {
+      "priority": "HIGH",
+      "action": "Run database migrations",
+      "details": "After fixing migration timestamps, run: rails db:migrate",
+      "command": "rails db:migrate"
+    },
+    {
+      "priority": "HIGH",
+      "action": "Restart Rails server",
+      "details": "After migrations are fixed, restart server for changes to take effect",
+      "command": "pkill -f 'rails server' && rails server"
+    },
+    {
+      "priority": "MEDIUM",
+      "action": "Create EmbeddingsController if embeddings API is required",
+      "details": "If standalone embeddings API is needed per requirements, create controller with endpoints: generate, status, search, stats",
+      "estimated_effort": "2-4 hours"
+    },
+    {
+      "priority": "MEDIUM",
+      "action": "Update API documentation",
+      "details": "Ensure documentation accurately reflects actual implemented endpoints vs planned endpoints",
+      "files_to_update": [
+        "docs/api-documentation.md",
+        "README.md",
+        "prd.md"
+      ]
+    },
+    {
+      "priority": "LOW",
+      "action": "Add integration tests",
+      "details": "Create comprehensive integration tests for all Epic 2, 3, and 6 endpoints",
+      "test_framework": "RSpec or Minitest"
+    }
+  ],
+  "environment_info": {
+    "rails_version": "8.0+",
+    "ruby_version": "3.3.0+",
+    "server": "Puma",
+    "port": 3000,
+    "database": "PostgreSQL (based on config)",
+    "working_directory": "/Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/rails-api"
+  },
+  "next_steps": [
+    "1. Fix duplicate migration timestamps (CRITICAL)",
+    "2. Run rails db:migrate",
+    "3. Restart Rails server",
+    "4. Re-run this test suite",
+    "5. Verify all endpoints are functional",
+    "6. Address embeddings API discrepancy",
+    "7. Create integration test suite"
+  ]
+}

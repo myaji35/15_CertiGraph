@@ -6,6 +6,9 @@ class KnowledgeNode < ApplicationRecord
   has_many :dependent_nodes, through: :incoming_edges, source: :knowledge_node
   has_many :user_masteries, dependent: :destroy
   has_many :users, through: :user_masteries
+  has_many :concept_synonyms, dependent: :destroy
+  has_many :question_concepts, dependent: :destroy
+  has_many :questions, through: :question_concepts
 
   validates :name, presence: true, uniqueness: { scope: :study_material_id }
   validates :level, inclusion: { in: %w(subject chapter concept detail) }
@@ -18,6 +21,10 @@ class KnowledgeNode < ApplicationRecord
   scope :for_subject, ->(subject_name) { where(name: subject_name, level: 'subject') }
   scope :for_chapter, ->(chapter_name) { where(name: chapter_name, level: 'chapter') }
   scope :by_parent, ->(parent_name) { where(parent_name: parent_name) }
+  scope :primary_concepts, -> { where(is_primary: true) }
+  scope :by_category, ->(category) { where(concept_category: category) }
+  scope :frequently_tested, -> { where('frequency >= ?', 5).order(frequency: :desc) }
+  scope :high_confidence, -> { where('extraction_confidence >= ?', 0.8) }
 
   # 온톨로지 계층 구조
   # Subject -> Chapter -> Concept -> Detail
@@ -99,17 +106,55 @@ class KnowledgeNode < ApplicationRecord
     end
   end
 
-  # JSON 직렬화
+  # Find by synonym or normalized name
+  def self.find_by_term(term, study_material_id)
+    normalized = normalize_term(term)
+    where(study_material_id: study_material_id)
+      .where('LOWER(normalized_name) = ? OR LOWER(name) = ?', normalized, term.downcase)
+      .first || ConceptSynonym.find_concept_by_synonym(term, study_material_id)
+  end
+
+  # Normalize concept name
+  def self.normalize_term(term)
+    term.downcase.strip.gsub(/[[:space:]]+/, ' ')
+  end
+
+  # Add synonym
+  def add_synonym(synonym_name, type: 'synonym', similarity: 1.0, source: 'manual')
+    concept_synonyms.create(
+      synonym_name: synonym_name,
+      synonym_type: type,
+      similarity_score: similarity,
+      source: source
+    )
+  end
+
+  # Get all synonyms
+  def all_names
+    [name, normalized_name].compact + concept_synonyms.active.pluck(:synonym_name)
+  end
+
+  # Update frequency based on question count
+  def update_frequency!
+    update(frequency: question_concepts.count)
+  end
+
+  # JSON 直列化
   def to_graph_json(user = nil)
     {
       id: id,
       name: name,
       level: level,
       description: description,
+      definition: definition,
       difficulty: difficulty,
       importance: importance,
       parent_name: parent_name,
       active: active,
+      frequency: frequency,
+      concept_category: concept_category,
+      synonyms: concept_synonyms.active.pluck(:synonym_name),
+      question_count: question_concepts.count,
       color: user ? calculate_color(user) : 'gray',
       mastery_level: user ? (user_masteries.find_by(user_id: user.id)&.mastery_level || 0.0) : 0.0,
       metadata: metadata

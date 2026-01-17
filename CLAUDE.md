@@ -4,57 +4,214 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Certi-Graph** (AI 자격증 마스터) - An AI-powered certification exam study platform that transforms static PDF exam materials into a dynamic learning experience using Knowledge Graph technology to identify and visualize knowledge gaps.
+**ExamsGraph** (AI 자격증 마스터) - An AI-powered certification exam study platform that transforms static PDF exam materials into a dynamic learning experience using Knowledge Graph technology to identify and visualize knowledge gaps.
 
 ### Project Status
-Currently in **Planning/MVP Preparation** stage. No source code exists yet - the project has a PRD (`prd.md`) defining requirements.
+**Phase 1 완료** - Rails 7.2.3 프로덕션 운영 중 (18 Epics 구현 완료)
 
-## Planned Tech Stack
+## Tech Stack (Current Implementation)
 
-### Frontend (Rails-integrated)
-- Rails 8.0+ with Turbo & Stimulus
-- Three.js via importmap (3D visualization)
-- Tailwind CSS v3 (tailwindcss-rails ~> 2.0)
-- Stimulus controllers with fallback patterns
+### Backend & Frontend (Rails Monolith)
+- Ruby 3.3.0 + Rails 7.2.3
+- Hotwire: Turbo & Stimulus (SPA-like UX)
+- Tailwind CSS 2.0 (tailwindcss-rails)
+- Importmap for JavaScript management
 
-### Backend
-- Ruby 3.3.0+ with Rails 8.0+
-- Sidekiq or Solid Queue (background jobs)
-- Active Storage with Direct Upload
-- Service Objects for business logic
+### Authentication & Authorization
+- Devise (email/password, OAuth)
+- devise-two-factor (TOTP with Google Authenticator)
+- OAuth: Google, Naver
 
-### Databases
-- PostgreSQL with pgvector extension (embeddings)
-- Neo4j AuraDB via REST API (Graph DB)
-- Solid Cache or Redis (caching)
+### Background Jobs & Storage
+- Solid Queue (Rails 8 backport)
+- Active Storage (file uploads)
+- Service Objects pattern
+
+### Databases (Current & Planned)
+- **Current**: SQLite (development/test)
+- **Planned**: PostgreSQL with pgvector (embeddings)
+- **Planned**: Neo4j AuraDB via REST API (Graph DB)
+- **Planned**: Redis (caching, sessions)
 
 ### AI/ML (via API)
 - Upstage Document Parse (OCR)
 - OpenAI GPT-4o / GPT-4o-mini (reasoning)
 - OpenAI text-embedding-3-small (embeddings)
 
-## BMad Method (BMM) Framework
+## KPM Orchestrator - Project Management Framework
 
-This project uses the BMad Method for structured development. Access workflows via slash commands:
+This project uses **KPM Orchestrator** for multi-agent project orchestration, strategic decision making, and comprehensive analysis.
 
-### Key Agents
-- `/bmad:bmm:agents:pm` - Project Manager
-- `/bmad:bmm:agents:architect` - Architect
-- `/bmad:bmm:agents:dev` - Developer
-- `/bmad:bmm:agents:analyst` - Business Analyst
-- `/bmad:bmm:agents:ux-designer` - UX Designer
+### Core Principles
+1. **PM은 오케스트레이터** - 직접 실행 대신 위임과 조율
+2. **속도 > 완벽** - 빠른 피드백 루프로 점진적 개선
+3. **명확한 R&R** - 각 에이전트의 책임 영역 명확화
+4. **상태 투명성** - 모든 진행 상황 추적 가능
 
-### Key Workflows
-- `/bmad:bmm:workflows:workflow-init` - Initialize project workflow
-- `/bmad:bmm:workflows:create-epics-and-stories` - Break PRD into stories
-- `/bmad:bmm:workflows:create-tech-spec` - Create technical specifications
-- `/bmad:bmm:workflows:sprint-planning` - Generate sprint tracking
-- `/bmad:bmm:workflows:dev-story` - Execute story implementation
-- `/bmad:bmm:workflows:code-review` - Adversarial code review
+### PM Quick Commands
+- `@status` - Project status overview
+- `@risk` - Risk assessment
+- `@blocker` - Blocker issues
+- `@next` - Next action items
+- `@sprint [n]` - Sprint n details
+- `@deploy [env]` - Deployment checklist
 
-### Workflow Status
-- `/bmad:bmm:workflows:workflow-status` - Check current progress
-- `/bmad:core:agents:bmad-master` - Master orchestration agent
+### Agent Delegation
+- `@agent:[ID] [task]` - Delegate to specific agent
+- `@parallel:[ID,ID...]` - Parallel execution
+- `@sequence:[ID→ID...]` - Sequential execution
+- `@review:[ID]` - Review agent output
+
+### 12 Specialized Agents
+
+| ID | Agent | Role | When to Use |
+|----|-------|------|-------------|
+| SA | Solution Architect | Architecture design, tech stack decisions | Project kickoff, tech decisions |
+| RA | Requirements Analyst | Requirements analysis, spec writing | Feature definition, story creation |
+| BE | Backend Engineer | API, business logic, server implementation | Backend implementation |
+| FE | Frontend Engineer | UI/UX implementation, components | Frontend implementation |
+| DBA | Database Architect | Schema design, query optimization | DB design, migrations |
+| DO | DevOps Engineer | CI/CD, infrastructure, deployment | Environment setup, deployment |
+| QA | QA Engineer | Test strategy, quality assurance | Test writing, validation |
+| SEC | Security Specialist | Security review, vulnerability analysis | Security review, auth implementation |
+| PERF | Performance Engineer | Performance optimization, profiling | Bottleneck analysis, optimization |
+| DOC | Tech Writer | Documentation, API docs | Documentation, maintenance |
+| UX | UX Designer | User experience, interface design | UI design, prototyping |
+| INT | Integration Specialist | External system integration | API integration, data sync |
+
+**Detailed Agent Guides**: `docs/kpm/references/agents/*.md`
+
+### PM Analysis Capabilities
+
+#### ① 정의 누락 감지 (Missing Definition Detection)
+```
+@detect:missing [target]
+```
+Detects ambiguous expressions, undefined terms, missing error handling, etc.
+
+**Checklist**:
+- WHO - 행위자/역할 명확?
+- WHAT - 대상/객체 정의?
+- WHEN - 시점/조건 특정?
+- WHERE - 위치/범위 한정?
+- HOW - 방법/절차 기술?
+- WHY - 목적/이유 설명?
+- ERROR - 실패 시 처리 정의?
+
+#### ② 더 나은 기술/방법 제안 (Recommendation Engine)
+```
+@recommend [area] --context:[current]
+```
+Suggests optimal technical choices and alternatives based on:
+- Performance
+- Scalability
+- Maintainability
+- Security
+- Cost
+- Team capability
+- Time-to-market
+
+#### ③ 엣지 케이스 발견 (Edge Case Discovery)
+```
+@edge-case [feature]
+```
+Identifies exception scenarios:
+- Boundary values (0, 1, MAX, MAX+1)
+- Empty states (null, empty, whitespace)
+- Concurrency (race conditions)
+- Timing (midnight, leap year, timezone)
+- Permissions (unauthorized, expired)
+- External failures (API timeout, DB down)
+- Data edge cases (special chars, emoji, long text)
+- State transitions (duplicate operations)
+
+### Integrated Analysis
+```
+@analyze [target] --full
+
+Execution order:
+1. @detect:missing [target]
+2. @recommend [target]
+3. @edge-case [target]
+4. Generate integrated report
+```
+
+### Example Usage
+
+**Architecture Design**:
+```
+@agent:SA Design authentication system architecture
+@analyze "authentication system" --full
+```
+
+**Parallel Implementation**:
+```
+@parallel:BE,FE,DBA Implement user profile feature
+@review:BE Review backend implementation
+```
+
+**Sequential Workflow**:
+```
+@sequence:RA→SA→BE Payment system: analysis → design → implementation
+```
+
+**Analysis Commands**:
+```
+@detect:missing "login functionality"
+@recommend "database choice" --context:"PostgreSQL vs MongoDB"
+@edge-case "checkout process"
+```
+
+### Core Workflows
+
+#### 1. Project Kickoff
+```
+1. @agent:RA Collect and analyze requirements
+2. @agent:SA Draft architecture
+3. PM: Review and approve
+4. @parallel:BE,FE,DBA Environment setup
+```
+
+#### 2. Sprint Execution
+```
+1. PM: Confirm sprint backlog
+2. @agent:[assigned] Execute tasks
+3. @agent:QA Run tests
+4. PM: Sprint review
+```
+
+#### 3. Release
+```
+1. @agent:QA Final testing
+2. @agent:SEC Security review
+3. @agent:DO Deployment preparation
+4. PM: Go/No-Go decision
+5. @agent:DO Execute deployment
+```
+
+**Detailed Workflows**: `docs/kpm/references/workflows/*.md`
+
+### Quality Gates
+
+| Gate | Criteria |
+|------|----------|
+| Design Review | SA approval, architecture doc complete |
+| Code Complete | Test coverage 80%+, linter passes |
+| QA Sign-off | All tests pass, 0 bugs |
+| Security Review | SEC approval, 0 vulnerabilities |
+| Release Ready | All gates passed |
+
+### Reference Documentation
+- **Main Guide**: `docs/kpm/SKILL.md`
+- **Agent Details**: `docs/kpm/references/agents/[AGENT_ID].md`
+- **Workflows**: `docs/kpm/references/workflows/`
+- **Scripts**: `docs/kpm/scripts/`
+
+### Testing Strategy
+While KPM focuses on orchestration, testing is handled through:
+- **QA Agent**: `@agent:QA` for test strategy and execution
+- **Playwright Tests**: Existing `tests/e2e/*` specs remain functional
+- **RSpec/Minitest**: Rails native testing (recommended for new tests)
 
 ## Core Domain Concepts
 

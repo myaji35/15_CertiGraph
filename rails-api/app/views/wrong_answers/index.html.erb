@@ -1,0 +1,140 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-6xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-3xl font-bold">오답노트</h1>
+      <div class="flex space-x-4">
+        <%= link_to "모의고사 목록", exams_path, class: "px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700" %>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white rounded-lg shadow p-4 mb-6">
+      <%= form_with url: wrong_answers_path, method: :get, class: "flex items-center space-x-4" do |f| %>
+        <div class="flex-1">
+          <label class="block text-sm font-medium mb-1">스터디 세트</label>
+          <%= f.select :study_set_id,
+                       options_from_collection_for_select(current_user.study_sets, :id, :title, params[:study_set_id]),
+                       { include_blank: '전체' },
+                       class: "w-full px-3 py-2 border rounded-lg" %>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1">복습 상태</label>
+          <%= f.select :reviewed,
+                       [['전체', ''], ['미복습', 'false'], ['복습 완료', 'true']],
+                       { selected: params[:reviewed] },
+                       class: "px-3 py-2 border rounded-lg" %>
+        </div>
+
+        <%= f.submit "필터 적용", class: "mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" %>
+      <% end %>
+    </div>
+
+    <!-- Statistics -->
+    <div class="grid md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-red-50 border-2 border-red-200 rounded-lg p-6">
+        <p class="text-sm text-gray-600">총 오답</p>
+        <p class="text-3xl font-bold text-red-600"><%= @wrong_answers.total_count rescue @wrong_answers.size %></p>
+      </div>
+
+      <div class="bg-orange-50 border-2 border-orange-200 rounded-lg p-6">
+        <p class="text-sm text-gray-600">미복습</p>
+        <% unreviewed_count = @wrong_answers.where(reviewed: false).count rescue @wrong_answers.count { |wa| !wa.reviewed } %>
+        <p class="text-3xl font-bold text-orange-600"><%= unreviewed_count %></p>
+      </div>
+
+      <div class="bg-green-50 border-2 border-green-200 rounded-lg p-6">
+        <p class="text-sm text-gray-600">복습 완료</p>
+        <% reviewed_count = @wrong_answers.where(reviewed: true).count rescue @wrong_answers.count { |wa| wa.reviewed } %>
+        <p class="text-3xl font-bold text-green-600"><%= reviewed_count %></p>
+      </div>
+    </div>
+
+    <!-- Wrong Answers List -->
+    <% if @wrong_answers.any? %>
+      <div class="space-y-4">
+        <% @wrong_answers.each do |wrong_answer| %>
+          <div class="bg-white rounded-lg shadow p-6 <%= wrong_answer.reviewed ? 'opacity-60' : '' %>">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <div class="flex items-center space-x-3 mb-3">
+                  <span class="px-3 py-1 bg-gray-100 rounded text-sm font-medium">
+                    <%= wrong_answer.study_set.title %>
+                  </span>
+                  <span class="text-sm text-gray-500">
+                    <%= wrong_answer.attempt_count %>회 오답
+                  </span>
+                  <span class="text-sm text-gray-500">
+                    <%= time_ago_in_words(wrong_answer.last_attempted_at) %> 전
+                  </span>
+                  <% if wrong_answer.reviewed %>
+                    <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">복습 완료</span>
+                  <% end %>
+                </div>
+
+                <p class="text-gray-900 text-lg mb-3">
+                  <%= wrong_answer.question.question_text.truncate(120) %>
+                </p>
+
+                <div class="flex items-center space-x-4 text-sm">
+                  <span class="text-red-600">
+                    내 답: <%= wrong_answer.selected_answer %>
+                  </span>
+                  <span class="text-green-600">
+                    정답: <%= wrong_answer.question.answer %>
+                  </span>
+                </div>
+
+                <% if wrong_answer.tags.present? %>
+                  <div class="mt-3 flex flex-wrap gap-2">
+                    <% wrong_answer.tags.each do |tag| %>
+                      <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+                        <%= tag %>
+                      </span>
+                    <% end %>
+                  </div>
+                <% end %>
+
+                <% if wrong_answer.notes.present? %>
+                  <div class="mt-3 p-3 bg-yellow-50 border-l-4 border-yellow-400 text-sm">
+                    <%= wrong_answer.notes %>
+                  </div>
+                <% end %>
+              </div>
+
+              <div class="flex flex-col space-y-2">
+                <%= link_to "자세히 보기", wrong_answer_path(wrong_answer),
+                    class: "px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-center text-sm" %>
+
+                <% unless wrong_answer.reviewed %>
+                  <%= button_to "복습 완료", mark_reviewed_wrong_answer_path(wrong_answer),
+                      method: :post,
+                      class: "px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm" %>
+                <% end %>
+
+                <%= link_to "삭제", wrong_answer_path(wrong_answer),
+                    method: :delete,
+                    data: { confirm: '정말 삭제하시겠습니까?' },
+                    class: "px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 text-center text-sm" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="mt-8">
+        <%= paginate @wrong_answers if @wrong_answers.respond_to?(:current_page) %>
+      </div>
+    <% else %>
+      <div class="text-center py-16 bg-white rounded-lg shadow">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <h3 class="mt-4 text-lg font-medium text-gray-900">오답이 없습니다</h3>
+        <p class="mt-2 text-sm text-gray-500">모든 문제를 맞추셨습니다!</p>
+        <%= link_to "새 모의고사 만들기", new_form_exams_path,
+            class: "mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700" %>
+      </div>
+    <% end %>
+  </div>
+</div>

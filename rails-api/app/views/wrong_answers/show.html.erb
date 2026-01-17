@@ -1,0 +1,117 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-4xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-2xl font-bold">오답 복습</h1>
+      <%= link_to "← 오답노트로 돌아가기", wrong_answers_path, class: "text-blue-600 hover:underline" %>
+    </div>
+
+    <!-- Question Card -->
+    <div class="bg-white rounded-lg shadow-lg p-8 mb-6">
+      <div class="mb-6">
+        <div class="flex items-center space-x-3 mb-4">
+          <span class="px-3 py-1 bg-gray-100 rounded text-sm font-medium">
+            <%= @study_set.title %>
+          </span>
+          <span class="px-3 py-1 bg-red-100 text-red-800 rounded text-sm font-medium">
+            <%= @wrong_answer.attempt_count %>회 오답
+          </span>
+        </div>
+
+        <div class="prose max-w-none">
+          <h3 class="text-xl font-semibold mb-4">문제</h3>
+          <p class="text-lg leading-relaxed whitespace-pre-wrap">
+            <%= @question.question_text %>
+          </p>
+        </div>
+      </div>
+
+      <!-- Answer Options -->
+      <div class="space-y-3 mb-6">
+        <h4 class="font-semibold text-lg mb-3">선택지</h4>
+        <% options = @question.options || {} %>
+        <% ['①', '②', '③', '④', '⑤'].each do |num| %>
+          <% if options[num].present? %>
+            <% is_correct = num == @question.answer %>
+            <% is_selected = num == @wrong_answer.selected_answer %>
+            <div class="flex items-start p-4 rounded-lg border-2 <%= is_correct ? 'bg-green-50 border-green-400' : is_selected ? 'bg-red-50 border-red-400' : 'border-gray-200' %>">
+              <div class="flex-1">
+                <span class="font-bold text-lg"><%= num %></span>
+                <span class="ml-3 text-base"><%= options[num] %></span>
+              </div>
+              <% if is_correct %>
+                <span class="px-2 py-1 bg-green-600 text-white rounded text-sm font-medium">정답</span>
+              <% elsif is_selected %>
+                <span class="px-2 py-1 bg-red-600 text-white rounded text-sm font-medium">내 답</span>
+              <% end %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <!-- Explanation -->
+      <% if @question.explanation.present? %>
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+          <h4 class="font-semibold text-lg mb-2">해설</h4>
+          <p class="text-gray-700 whitespace-pre-wrap"><%= @question.explanation %></p>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Notes Section -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+      <h3 class="text-lg font-bold mb-4">내 메모</h3>
+
+      <%= form_with model: @wrong_answer, url: wrong_answer_path(@wrong_answer), method: :patch, local: true do |f| %>
+        <%= f.text_area :notes,
+            rows: 4,
+            placeholder: "이 문제에 대한 메모를 작성하세요...",
+            class: "w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500" %>
+
+        <div class="mt-4">
+          <%= f.submit "메모 저장", class: "px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Tags Section -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+      <h3 class="text-lg font-bold mb-4">태그</h3>
+
+      <div class="flex flex-wrap gap-2 mb-4">
+        <% (@wrong_answer.tags || []).each do |tag| %>
+          <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm flex items-center space-x-2">
+            <span><%= tag %></span>
+            <%= button_to "×", remove_tag_wrong_answer_path(@wrong_answer, tag: tag),
+                method: :delete,
+                class: "text-blue-600 hover:text-blue-800 font-bold" %>
+          </span>
+        <% end %>
+      </div>
+
+      <%= form_with url: add_tag_wrong_answer_path(@wrong_answer), method: :post, class: "flex space-x-2" do |f| %>
+        <%= f.text_field :tag,
+            placeholder: "태그 추가...",
+            class: "flex-1 px-4 py-2 border rounded-lg" %>
+        <%= f.submit "추가", class: "px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700" %>
+      <% end %>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex justify-between">
+      <div class="space-x-4">
+        <% unless @wrong_answer.reviewed %>
+          <%= button_to "복습 완료", mark_reviewed_wrong_answer_path(@wrong_answer),
+              method: :post,
+              class: "px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700" %>
+        <% end %>
+
+        <%= link_to "삭제", wrong_answer_path(@wrong_answer),
+            method: :delete,
+            data: { confirm: '정말 삭제하시겠습니까?' },
+            class: "px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700" %>
+      </div>
+
+      <%= link_to "다음 오답 →", wrong_answers_path, class: "px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700" %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,56 @@
+{
+  "session_id": "mock-session-123",
+  "study_set_id": "mock-set-456",
+  "study_set_name": "Mock 사회복지사 1급",
+  "mode": "all",
+  "total_questions": 3,
+  "time_limit_minutes": 60,
+  "started_at": "2026-01-15T10:00:00Z",
+  "questions": [
+    {
+      "id": "q_mock_001",
+      "sequence": 1,
+      "passage": "다음 사례를 읽고 물음에 답하시오. 사회복지사 A는 알코올 의존 문제가 있는 클라이언트 B를 만났다. B는 직장을 잃고 가족과의 관계도 악화된 상태이다.",
+      "question_text": "위 사례에서 사회복지사 A가 클라이언트 B에게 가장 먼저 적용해야 할 실천 기술은 무엇인가?",
+      "options": [
+        "① 위기 개입",
+        "② 동기 강화 상담",
+        "③ 인지 행동 치료",
+        "④ 사례 관리",
+        "⑤ 가족 치료"
+      ],
+      "correct_option_index": 1,
+      "study_material_name": "Mock 1회차 1교시"
+    },
+    {
+      "id": "q_mock_002",
+      "sequence": 2,
+      "passage": null,
+      "question_text": "사회복지조사론에서 '신뢰도'에 대한 설명으로 옳지 않은 것은?",
+      "options": [
+        "① 반복적으로 측정했을 때 일관된 결과를 얻는 정도를 의미한다.",
+        "② 검사-재검사법은 신뢰도를 측정하는 방법 중 하나이다.",
+        "③ 신뢰도가 높으면 항상 타당도도 높다.",
+        "④ 내적 일관성 신뢰도는 문항들이 동일한 개념을 측정하는지 확인한다.",
+        "⑤ 측정 도구의 길이가 길어질수록 일반적으로 신뢰도는 높아진다."
+      ],
+      "correct_option_index": 2,
+      "study_material_name": "Mock 1회차 1교시"
+    },
+    {
+      "id": "q_mock_003",
+      "sequence": 3,
+      "passage": null,
+      "question_text": "다음 중 '매슬로우의 욕구단계이론'에 해당하지 않는 욕구는?",
+      "options": [
+        "① 생리적 욕구",
+        "② 안전의 욕구",
+        "③ 소속과 애정의 욕구",
+        "④ 자기실현의 욕구",
+        "⑤ 학습과 성장의 욕구"
+      ],
+      "correct_option_index": 4,
+      "study_material_name": "Mock 1회차 2교시"
+    }
+  ]
+}

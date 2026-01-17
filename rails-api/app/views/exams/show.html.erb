@@ -1,0 +1,75 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold mb-8">모의고사 준비</h1>
+
+    <div class="exam-details bg-white rounded-lg shadow p-6 space-y-4">
+      <div class="exam-info">
+        <h2 class="text-2xl font-semibold mb-4"><%= @study_set.title %></h2>
+
+        <div class="grid grid-cols-2 gap-4 text-lg">
+          <div class="flex items-center">
+            <span class="font-medium mr-2">문제 수:</span>
+            <span><%= @questions_count %>문제</span>
+          </div>
+
+          <div class="flex items-center">
+            <span class="font-medium mr-2">시간 제한:</span>
+            <span><%= @time_limit %>분</span>
+          </div>
+
+          <div class="flex items-center">
+            <span class="font-medium mr-2">시험 유형:</span>
+            <span>
+              <%= @exam_type == 'mock_exam' ? '모의고사' :
+                  @exam_type == 'practice' ? '연습' : '오답노트' %>
+            </span>
+          </div>
+        </div>
+
+        <% if @exam_session.metadata.present? %>
+          <% metadata = JSON.parse(@exam_session.metadata) rescue {} %>
+
+          <% if metadata['difficulty_distribution'].present? %>
+            <div class="difficulty-distribution mt-4 p-4 bg-gray-50 rounded">
+              <h3 class="font-medium mb-2">난이도 분포:</h3>
+              <div class="flex space-x-4">
+                <span>쉬움: <%= metadata['difficulty_distribution']['easy'] %>%</span>
+                <span>보통: <%= metadata['difficulty_distribution']['medium'] %>%</span>
+                <span>어려움: <%= metadata['difficulty_distribution']['hard'] %>%</span>
+              </div>
+            </div>
+          <% end %>
+
+          <% if metadata['chapter_distribution'].present? %>
+            <div class="mt-4 p-4 bg-gray-50 rounded">
+              <h3 class="font-medium mb-2">챕터별 문제 수:</h3>
+              <div class="grid grid-cols-2 gap-2">
+                <% metadata['chapter_distribution'].each do |chapter, count| %>
+                  <span>챕터 <%= chapter %>: <%= count %>문제</span>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+
+          <% if metadata['past_questions_ratio'].present? %>
+            <div class="mt-4 p-4 bg-blue-50 rounded">
+              <span>기출문제 비율: <%= metadata['past_questions_ratio'] %>%</span>
+            </div>
+          <% end %>
+
+          <% if metadata['prevent_duplicates'] %>
+            <div class="exam-settings mt-4 p-4 bg-green-50 rounded">
+              <span>중복 방지: 최근 <%= metadata['days_to_check'] %>일 내 문제 제외</span>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <div class="mt-8 flex justify-center space-x-4">
+        <%= link_to "취소", exams_path, class: "px-6 py-3 border rounded-lg hover:bg-gray-50" %>
+        <%= button_to "시작", start_exam_path(@exam_session), method: :post,
+            class: "px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold" %>
+      </div>
+    </div>
+  </div>
+</div>
