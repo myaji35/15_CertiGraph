@@ -147,6 +147,9 @@ Rails.application.routes.draw do
   get '/study-materials/upload', to: 'study_materials#upload_form', as: :upload_study_materials
 
   resources :study_sets do
+    # Questions collection route
+    resources :questions, only: [:index]
+    
     # Epic 2: Enhanced Upload Routes
     resources :uploads, only: [] do
       collection do

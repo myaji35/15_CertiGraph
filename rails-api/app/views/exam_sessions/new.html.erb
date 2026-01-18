@@ -7,7 +7,7 @@
     </div>
 
     <!-- Test Configuration Form -->
-    <%= form_with url: study_set_exam_sessions_path(@study_set), local: true, class: "space-y-6" do |form| %>
+    <%= form_with model: @exam_session, url: study_set_exam_sessions_path(@study_set), local: true, class: "space-y-6" do |form| %>
 
       <!-- Exam Type Selection -->
       <div class="bg-white shadow-sm rounded-lg p-6">

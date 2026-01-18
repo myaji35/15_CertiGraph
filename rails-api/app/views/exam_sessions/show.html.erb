@@ -42,53 +42,6 @@
 
   <!-- Main Content Area -->
   <div class="flex-1 flex">
-    <!-- Left Sidebar - Question Navigation -->
-    <div class="w-72 bg-white border-r-2 border-gray-200 overflow-y-auto shadow-lg">
-      <div class="p-6">
-        <h3 class="text-base font-bold text-gray-900 mb-6 flex items-center">
-          <svg class="w-5 h-5 mr-2 text-primary-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-          </svg>
-          문제 목록
-        </h3>
-        <div class="grid grid-cols-5 gap-2.5">
-          <% @exam_answers.each_with_index do |answer, index| %>
-            <%
-              button_class = if index == @current_question_index
-                "bg-gradient-to-br from-primary-blue to-accent-purple text-white shadow-lg"
-              elsif answer.selected_answer.present?
-                "bg-green-100 text-green-800 border-2 border-green-400"
-              else
-                "bg-white text-gray-600 border-2 border-gray-300 hover:border-primary-blue"
-              end
-            %>
-            <%= link_to (index + 1).to_s,
-                        exam_session_path(@exam_session, question: index),
-                        class: "#{button_class} w-11 h-11 flex items-center justify-center rounded-xl font-bold text-sm hover:scale-110 transition-all duration-200" %>
-          <% end %>
-        </div>
-      </div>
-
-      <!-- Legend -->
-      <div class="p-6 border-t-2 border-gray-200 bg-gray-50">
-        <h4 class="text-xs font-bold text-gray-700 uppercase tracking-wider mb-3">범례</h4>
-        <div class="space-y-3 text-sm">
-          <div class="flex items-center space-x-3">
-            <div class="w-5 h-5 bg-gradient-to-br from-primary-blue to-accent-purple rounded-lg shadow"></div>
-            <span class="text-gray-700 font-medium">현재 문제</span>
-          </div>
-          <div class="flex items-center space-x-3">
-            <div class="w-5 h-5 bg-green-100 border-2 border-green-400 rounded-lg"></div>
-            <span class="text-gray-700 font-medium">답변 완료</span>
-          </div>
-          <div class="flex items-center space-x-3">
-            <div class="w-5 h-5 bg-white border-2 border-gray-300 rounded-lg"></div>
-            <span class="text-gray-700 font-medium">미답변</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Main Question Area -->
     <div class="flex-1 flex flex-col">
       <% if @current_question %>
@@ -110,7 +63,7 @@
                   </span>
                 </div>
                 <div class="card bg-gradient-to-br from-white to-blue-50 p-8">
-                  <p class="text-gray-900 text-lg leading-relaxed whitespace-pre-wrap"><%= @current_question.question_text %></p>
+                  <p class="text-gray-900 text-lg leading-relaxed whitespace-pre-wrap"><%= @current_question.content %></p>
                 </div>
               </div>
 
@@ -201,6 +154,53 @@
           </div>
         </div>
       <% end %>
+    </div>
+
+    <!-- Right Sidebar - Question Navigation -->
+    <div class="w-72 bg-white border-l-2 border-gray-200 overflow-y-auto shadow-lg">
+      <div class="p-6">
+        <h3 class="text-base font-bold text-gray-900 mb-6 flex items-center">
+          <svg class="w-5 h-5 mr-2 text-primary-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+          문제 목록
+        </h3>
+        <div class="grid grid-cols-5 gap-2.5">
+          <% @exam_answers.each_with_index do |answer, index| %>
+            <%
+              button_class = if index == @current_question_index
+                "bg-gradient-to-br from-primary-blue to-accent-purple text-white shadow-lg"
+              elsif answer.selected_answer.present?
+                "bg-green-100 text-green-800 border-2 border-green-400"
+              else
+                "bg-white text-gray-600 border-2 border-gray-300 hover:border-primary-blue"
+              end
+            %>
+            <%= link_to (index + 1).to_s,
+                        exam_session_path(@exam_session, question: index),
+                        class: "#{button_class} w-11 h-11 flex items-center justify-center rounded-xl font-bold text-sm hover:scale-110 transition-all duration-200" %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="p-6 border-t-2 border-gray-200 bg-gray-50">
+        <h4 class="text-xs font-bold text-gray-700 uppercase tracking-wider mb-3">범례</h4>
+        <div class="space-y-3 text-sm">
+          <div class="flex items-center space-x-3">
+            <div class="w-5 h-5 bg-gradient-to-br from-primary-blue to-accent-purple rounded-lg shadow"></div>
+            <span class="text-gray-700 font-medium">현재 문제</span>
+          </div>
+          <div class="flex items-center space-x-3">
+            <div class="w-5 h-5 bg-green-100 border-2 border-green-400 rounded-lg"></div>
+            <span class="text-gray-700 font-medium">답변 완료</span>
+          </div>
+          <div class="flex items-center space-x-3">
+            <div class="w-5 h-5 bg-white border-2 border-gray-300 rounded-lg"></div>
+            <span class="text-gray-700 font-medium">미답변</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

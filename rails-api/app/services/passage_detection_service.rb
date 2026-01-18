@@ -1,144 +1,99 @@
 # Passage Detection Service
-# Automatically detects passages (reading comprehension sections) in markdown content
+# Detects and extracts passages (지문) from markdown content
 class PassageDetectionService
-  PASSAGE_MARKERS = [
-    /<!-- PASSAGE (\d+) START -->/,
-    /\[지문 (\d+)\]/,
-    /\[보기\]/,
-    /\[문제 상황\]/,
-    /\[Case Study\]/i
-  ].freeze
-
-  attr_reader :markdown_content
+  attr_reader :markdown_content, :passages
 
   def initialize(markdown_content)
     @markdown_content = markdown_content
+    @passages = []
   end
 
-  # Detect all passages in the content
+  # Detect and extract all passages
   # @return [Hash] { passages: Array, stats: Hash }
   def detect_passages
     return { passages: [], stats: {} } if @markdown_content.blank?
 
-    lines = @markdown_content.split("\n")
-    passages = []
-    current_passage = nil
-    passage_id_counter = 1
+    # Method 1: HTML comment-based detection (<!-- PASSAGE n START/END -->)
+    html_passages = extract_html_comment_passages
 
-    lines.each_with_index do |line, index|
-      # Check for passage start markers
-      if passage_start?(line)
-        # Save previous passage if exists
-        if current_passage
-          passages << finalize_passage(current_passage, passage_id_counter)
-          passage_id_counter += 1
-        end
+    # Method 2: Pattern-based detection ("다음을 읽고", "아래 글을 읽고")
+    pattern_passages = extract_pattern_based_passages
 
-        # Start new passage
-        current_passage = {
-          start_line: index,
-          content_lines: [],
-          type: detect_passage_type(line)
-        }
-      elsif passage_end?(line)
-        # End current passage
-        if current_passage
-          passages << finalize_passage(current_passage, passage_id_counter)
-          passage_id_counter += 1
-          current_passage = nil
-        end
-      elsif current_passage
-        # Add line to current passage
-        current_passage[:content_lines] << line unless line.strip.empty?
-      else
-        # Check for implicit passages (large text blocks before questions)
-        if implicit_passage_indicator?(line, lines, index)
-          current_passage = {
-            start_line: index,
-            content_lines: [line],
-            type: 'implicit'
-          }
-        end
-      end
+    # Combine and deduplicate
+    all_passages = (html_passages + pattern_passages).uniq { |p| p[:content] }
+
+    # Assign unique IDs
+    all_passages.each_with_index do |passage, index|
+      passage[:id] = index + 1
     end
 
-    # Finalize last passage if exists
-    if current_passage
-      passages << finalize_passage(current_passage, passage_id_counter)
-    end
+    @passages = all_passages
 
     {
-      passages: passages,
-      stats: generate_passage_stats(passages)
-    }
-  end
-
-  # Detect passage type based on content
-  # @param line [String] The line to analyze
-  # @return [String] Passage type
-  def detect_passage_type(line)
-    return 'case_study' if line.match?(/case study/i)
-    return 'situation' if line.match?(/문제 상황|시나리오/)
-    return 'reading' if line.match?(/지문|보기/)
-    'text'
-  end
-
-  private
-
-  def passage_start?(line)
-    PASSAGE_MARKERS.any? { |pattern| line.match?(pattern) }
-  end
-
-  def passage_end?(line)
-    line.match?(/<!-- PASSAGE \d+ END -->/) || line.match?(/\[\/지문\]/)
-  end
-
-  def implicit_passage_indicator?(line, lines, index)
-    # Heuristics for detecting implicit passages:
-    # 1. Paragraph is longer than 200 characters
-    # 2. Followed by multiple questions within next 20 lines
-    # 3. Contains narrative or descriptive content
-
-    return false if line.length < 200
-
-    # Look ahead for question patterns
-    next_20_lines = lines[index + 1...[index + 21, lines.length].min] || []
-    question_count = next_20_lines.count { |l| question_pattern?(l) }
-
-    question_count >= 2
-  end
-
-  def question_pattern?(line)
-    line.match?(/^\d{1,3}[\.)]\s+/) || line.match?(/^\(\d{1,3}\)\s+/)
-  end
-
-  def finalize_passage(passage_data, id)
-    content = passage_data[:content_lines].join("\n")
-
-    {
-      id: id,
-      content: content,
-      type: passage_data[:type] || 'text',
-      position: passage_data[:start_line],
-      has_image: content.include?('![') || content.include?('[image'),
-      has_table: content.include?('|') || content.match?(/\(\s*[ㄱ-ㅎ]\s*\)/),
-      character_count: content.length,
-      metadata: {
-        line_count: passage_data[:content_lines].size,
-        start_line: passage_data[:start_line]
+      passages: @passages,
+      stats: {
+        total_passages: @passages.size,
+        html_comment_based: html_passages.size,
+        pattern_based: pattern_passages.size,
+        has_images: @passages.count { |p| p[:has_image] },
+        has_tables: @passages.count { |p| p[:has_table] }
       }
     }
   end
 
-  def generate_passage_stats(passages)
-    return {} if passages.empty?
+  private
 
-    {
-      total_passages: passages.size,
-      passages_with_images: passages.count { |p| p[:has_image] },
-      passages_with_tables: passages.count { |p| p[:has_table] },
-      avg_character_count: passages.sum { |p| p[:character_count] } / passages.size,
-      passage_types: passages.group_by { |p| p[:type] }.transform_values(&:count)
-    }
+  # Extract passages marked with HTML comments
+  def extract_html_comment_passages
+    passages = []
+    pattern = /<!-- PASSAGE (\d+) START -->\s*(.*?)\s*<!-- PASSAGE \1 END -->/m
+
+    @markdown_content.scan(pattern) do |passage_num, content|
+      passages << {
+        content: content.strip,
+        type: 'text',
+        position: passage_num.to_i,
+        has_image: content.include?('!['),
+        has_table: content.include?('|') && content.include?('---'),
+        metadata: {
+          source: 'html_comment',
+          passage_number: passage_num.to_i
+        }
+      }
+    end
+
+    passages
+  end
+
+  # Extract passages based on Korean patterns
+  def extract_pattern_based_passages
+    passages = []
+
+    patterns = [
+      /(?:다음|아래)\s*(?:을|를)?\s*읽고.+?(?=\n\n|\d+\.|①|$)/m,
+      /(?:다음|아래)\s*글을\s*읽고.+?(?=\n\n|\d+\.|①|$)/m
+    ]
+
+    position = 1000
+
+    patterns.each do |pattern|
+      @markdown_content.scan(pattern) do |match|
+        content = match.is_a?(Array) ? match[0] : match
+        next if content.blank?
+
+        passages << {
+          content: content.strip,
+          type: 'text',
+          position: position,
+          has_image: content.include?('!['),
+          has_table: content.include?('|') && content.include?('---'),
+          metadata: { source: 'pattern_based' }
+        }
+
+        position += 1
+      end
+    end
+
+    passages
   end
 end

@@ -1,0 +1,435 @@
+<!-- BEGIN app/views/layouts/application.html.erb --><!DOCTYPE html>
+<html class="light" lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <title>ExamsGraph - AI 자격증 마스터</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="기출문제 PDF를 업로드하면 AI가 문제, 보기, 해설을 자동으로 분리합니다">
+
+    <!-- ExamsGraph Logo -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M13.8261 17.4264C16.7203 18.1174 20.2244 18.5217 24 18.5217C27.7756 18.5217 31.2797 18.1174 34.1739 17.4264C36.9144 16.7722 39.9967 15.2331 41.3563 14.1648L24.8486 40.6391C24.4571 41.267 23.5429 41.267 23.1514 40.6391L6.64374 14.1648C8.00331 15.2331 11.0856 16.7722 13.8261 17.4264Z' fill='%23137fec'></path></svg>">
+
+    <!-- ExamsGraph Fonts: Lexend + Noto Sans KR -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+    <meta name="csrf-param" content="authenticity_token" />
+<meta name="csrf-token" content="vvSQTwkHFJiKV6WKxYeLtWIeXdWjpF-lDQQGJog6gGLPhhzeXJAPhrlgUcei0Manf3a0kSPzNgjxtkrlxUSSYg" />
+    
+
+    <link rel="stylesheet" href="/assets/tailwind-24b319fa234faf0596d436a45711325946a4ced7dc3137581f59c554de3fa61f.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/inter-font-c2ddab218623d7492890cfad22b9b8365df63dc39799a4d72a04c1b6a9ba0f73.css" data-turbo-track="reload" />
+    <link rel="stylesheet" href="/assets/application-9f51cd75b5652fa34514d22f2d40793da514446d7c362ef788df77c02ccf8bad.css" data-turbo-track="reload" />
+    <script type="importmap" data-turbo-track="reload">{
+  "imports": {
+    "application": "/assets/application-9025e8a188d579691d02ff8715181159edcb7ab948299ddee4f6e0ecb710be45.js",
+    "@hotwired/turbo-rails": "/assets/turbo.min-0fcee41a602f484204dc13113693a92c2ce8d8c0e14ff0f51892d5523f90b8bc.js",
+    "@hotwired/stimulus": "/assets/stimulus.min-9ee583d7d64bfaf202b0cf48971a673d9ed18952ae7927c50015649aebe535b6.js",
+    "@hotwired/stimulus-loading": "/assets/stimulus-loading-d80f0feea68692981b568bbfef0ed4370b56927ae5c663421e8461a466f0618f.js",
+    "@rails/activestorage": "/assets/activestorage.esm-b2d9aa45888a540d7e6969e484dbdb0a0a501ff56542ce737db6599b311e3385.js",
+    "controllers/application": "/assets/controllers/application-f72b4b4dc43a99ef6a247d3de06025f15a3b4c6f37d35327ae42c5ac7c00cd08.js",
+    "controllers/chunked_upload_controller": "/assets/controllers/chunked_upload_controller-7cbb29bbbe81553f8d8e7b134bea6622620823da1792ae86f642722d8d6ca1fe.js",
+    "controllers/dashboard_controller": "/assets/controllers/dashboard_controller-741726b5dc04333dea6e1f95f055d547b1205243e18de39502b0a1693ab63add.js",
+    "controllers/exam_bookmark_controller": "/assets/controllers/exam_bookmark_controller-c75940b156181c362c60e3e0b5a1c8ae0d4f757a81c4589d99b1fa5e1f65fbab.js",
+    "controllers/exam_controller": "/assets/controllers/exam_controller-64d84cb5bc1db88f2cd96f15dc35c2929f9c944e094ad61e2cd55103e5dae059.js",
+    "controllers/exam_timer_controller": "/assets/controllers/exam_timer_controller-3e90479e4dda9fc71fcaaa4d0bcba588edc5b9d73bd7da2eca04f6153b00f38b.js",
+    "controllers/hello_controller": "/assets/controllers/hello_controller-88c9da00e8c549bbad7147478d6fbc4a321e205c03fe7ba1be97ae1e9e7ae678.js",
+    "controllers": "/assets/controllers/index-81f238650da35ac15c2b3cc1acfcf1db2f5c8f26b2c0d9ebde1a2b050c589f81.js",
+    "controllers/keyboard_shortcuts_controller": "/assets/controllers/keyboard_shortcuts_controller-5b245978d4be6edf200682668cd4c7f9f4a7d6c4cfabf41e795ef203df9fd951.js",
+    "controllers/knowledge_graph_controller": "/assets/controllers/knowledge_graph_controller-3417881fb947bef04a34af551762417a905560988ca0a1016ad43bf5f339931d.js",
+    "controllers/notification_controller": "/assets/controllers/notification_controller-5b5006d83b16f8cef94b53141a44d61edfb3f71a4a31c3c296cc7dcff40616f5.js",
+    "controllers/session_timeout_controller": "/assets/controllers/session_timeout_controller-05bfb15410d9ff3b451f8169b81e2f999e4a550d11a9e0d4af820cfc6220c8b6.js",
+    "controllers/upload_controller": "/assets/controllers/upload_controller-6512c8cc577e7d7ec84e935367cf37d815bde8248ea6fbd3fa9a02d36ecdb758.js"
+  }
+}</script>
+<link rel="modulepreload" href="/assets/application-9025e8a188d579691d02ff8715181159edcb7ab948299ddee4f6e0ecb710be45.js">
+<link rel="modulepreload" href="/assets/turbo.min-0fcee41a602f484204dc13113693a92c2ce8d8c0e14ff0f51892d5523f90b8bc.js">
+<link rel="modulepreload" href="/assets/stimulus.min-9ee583d7d64bfaf202b0cf48971a673d9ed18952ae7927c50015649aebe535b6.js">
+<link rel="modulepreload" href="/assets/stimulus-loading-d80f0feea68692981b568bbfef0ed4370b56927ae5c663421e8461a466f0618f.js">
+<link rel="modulepreload" href="/assets/activestorage.esm-b2d9aa45888a540d7e6969e484dbdb0a0a501ff56542ce737db6599b311e3385.js">
+<link rel="modulepreload" href="/assets/controllers/application-f72b4b4dc43a99ef6a247d3de06025f15a3b4c6f37d35327ae42c5ac7c00cd08.js">
+<link rel="modulepreload" href="/assets/controllers/chunked_upload_controller-7cbb29bbbe81553f8d8e7b134bea6622620823da1792ae86f642722d8d6ca1fe.js">
+<link rel="modulepreload" href="/assets/controllers/dashboard_controller-741726b5dc04333dea6e1f95f055d547b1205243e18de39502b0a1693ab63add.js">
+<link rel="modulepreload" href="/assets/controllers/exam_bookmark_controller-c75940b156181c362c60e3e0b5a1c8ae0d4f757a81c4589d99b1fa5e1f65fbab.js">
+<link rel="modulepreload" href="/assets/controllers/exam_controller-64d84cb5bc1db88f2cd96f15dc35c2929f9c944e094ad61e2cd55103e5dae059.js">
+<link rel="modulepreload" href="/assets/controllers/exam_timer_controller-3e90479e4dda9fc71fcaaa4d0bcba588edc5b9d73bd7da2eca04f6153b00f38b.js">
+<link rel="modulepreload" href="/assets/controllers/hello_controller-88c9da00e8c549bbad7147478d6fbc4a321e205c03fe7ba1be97ae1e9e7ae678.js">
+<link rel="modulepreload" href="/assets/controllers/index-81f238650da35ac15c2b3cc1acfcf1db2f5c8f26b2c0d9ebde1a2b050c589f81.js">
+<link rel="modulepreload" href="/assets/controllers/keyboard_shortcuts_controller-5b245978d4be6edf200682668cd4c7f9f4a7d6c4cfabf41e795ef203df9fd951.js">
+<link rel="modulepreload" href="/assets/controllers/knowledge_graph_controller-3417881fb947bef04a34af551762417a905560988ca0a1016ad43bf5f339931d.js">
+<link rel="modulepreload" href="/assets/controllers/notification_controller-5b5006d83b16f8cef94b53141a44d61edfb3f71a4a31c3c296cc7dcff40616f5.js">
+<link rel="modulepreload" href="/assets/controllers/session_timeout_controller-05bfb15410d9ff3b451f8169b81e2f999e4a550d11a9e0d4af820cfc6220c8b6.js">
+<link rel="modulepreload" href="/assets/controllers/upload_controller-6512c8cc577e7d7ec84e935367cf37d815bde8248ea6fbd3fa9a02d36ecdb758.js">
+<script type="module">import "application"</script>
+
+    <style>
+      /* ExamsGraph Design System */
+      :root {
+        --primary: #137fec;
+        --background-light: #f6f7f8;
+        --background-dark: #101922;
+        --text-primary: #0d141b;
+        --text-secondary: #4c739a;
+      }
+
+      body {
+        font-family: 'Noto Sans KR', 'Lexend', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* Material Icons Settings */
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+
+      /* ExamsGraph Selection */
+      ::selection {
+        background-color: rgba(19, 127, 236, 0.2);
+      }
+
+      /* ExamsGraph Scrollbar */
+      ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #f6f7f8;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 5px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af;
+      }
+
+      /* Focus Styles */
+      *:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+      }
+
+      /* Smooth transitions */
+      * {
+        transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 200ms;
+      }
+
+      /* Glass Card Effect */
+      .glass-card {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      /* Primary Button Style */
+      .btn-primary {
+        background: linear-gradient(135deg, #137fec 0%, #0968d3 100%);
+        color: white;
+        font-weight: 600;
+        padding: 0.625rem 1.5rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px rgba(19, 127, 236, 0.25);
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(19, 127, 236, 0.35);
+      }
+
+      /* Card Hover Effect */
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+
+      .card-hover:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Progress Bar Animation */
+      @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+      }
+
+      .animate-shimmer {
+        animation: shimmer 2s infinite;
+      }
+
+      /* Badge Styles */
+      .badge-primary {
+        background-color: rgba(19, 127, 236, 0.1);
+        color: #137fec;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+
+      .badge-success {
+        background-color: rgba(34, 197, 94, 0.1);
+        color: #22c55e;
+      }
+
+      .badge-warning {
+        background-color: rgba(251, 191, 36, 0.1);
+        color: #fbbf24;
+      }
+
+      .badge-danger {
+        background-color: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+      }
+    </style>
+  </head>
+
+  <body class="bg-[#f6f7f8] min-h-screen text-[#0d141b]">
+    <!-- BEGIN app/views/shared/_flash_messages.html.erb --><!-- END app/views/shared/_flash_messages.html.erb -->
+
+    <main>
+      <!-- BEGIN app/views/devise/registrations/new.html.erb --><div class="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full space-y-8">
+    <div class="text-center">
+      <div class="flex justify-center mb-6">
+        <div class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center">
+          <span class="text-white text-3xl">🧠</span>
+        </div>
+      </div>
+      <h2 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">ExamsGraph</h2>
+      <p class="mt-2 text-lg text-gray-600">회원가입</p>
+      <p class="mt-1 text-sm text-gray-500">AI 자격증 마스터와 함께 시험 준비를 시작하세요</p>
+    </div>
+
+    <div class="mt-8 bg-white py-8 px-4 shadow-xl rounded-lg sm:px-10">
+      <!-- BEGIN app/views/devise/shared/_error_messages.html.erb --><!-- END app/views/devise/shared/_error_messages.html.erb -->
+
+      <!-- Base errors (SQL Injection, XSS, etc.) -->
+
+      <!-- Flash Messages -->
+
+      <!-- Network Error Message (hidden by default) -->
+      <div id="network-error" class="mb-4 bg-red-50 border-l-4 border-red-400 p-4 rounded-lg hidden" role="alert">
+        <div class="flex items-start">
+          <span class="text-red-600 text-xl mr-2">⚠️</span>
+          <div class="flex-1">
+            <p class="text-red-700 font-medium">네트워크 오류</p>
+            <p class="text-red-600 text-sm mt-1">서버에 연결할 수 없습니다. 인터넷 연결을 확인하고 다시 시도해주세요.</p>
+            <button type="button" id="retry-button" class="mt-3 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+              다시 시도
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Google OAuth Button -->
+      <div class="mb-6">
+        <form class="button_to" method="post" action="/users/auth/google_oauth2"><button data-turbo="false" class="w-full flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50" type="submit">
+          <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Google로 계속하기
+</button><input type="hidden" name="authenticity_token" value="3rOnZ_lWclOEqonfoB-SnmkC9YlqrKKAOwFi0gUIMedxpE9WA851wZuYDeCrOdxlAuXSBno0JXq-QWoJk6sOLg" autocomplete="off" /></form>      </div>
+
+      <div class="relative mb-6">
+        <div class="absolute inset-0 flex items-center">
+          <div class="w-full border-t border-gray-300"></div>
+        </div>
+        <div class="relative flex justify-center text-sm">
+          <span class="px-2 bg-white text-gray-500">또는</span>
+        </div>
+      </div>
+
+      <form class="space-y-6" id="new_user" novalidate="novalidate" data-turbo="false" action="/signup" accept-charset="UTF-8" method="post"><input type="hidden" name="authenticity_token" value="x98WiV9l7T0vzE2mpWryb0C10oMz7n6sgYDrLMRyhC8vHuUJp4zVwYHijqchX8D4tEQKPSTdrE0AK1KFNlN0lw" autocomplete="off" />
+        <div>
+          <label class="block text-sm font-medium text-gray-700" for="user_email">이메일 주소</label>
+          <div class="mt-1">
+            <input autofocus="autofocus" autocomplete="email" class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="이메일 주소를 입력하세요" required="required" type="email" name="user[email]" id="user_email" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700" for="user_password">비밀번호</label>
+            <span class="text-xs text-gray-500">(6자 이상, 대문자, 소문자, 숫자, 특수문자 포함)</span>
+          <div class="mt-1">
+            <input autocomplete="new-password" class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="비밀번호를 입력하세요 (예: Pass123!@)" required="required" type="password" name="user[password]" id="user_password" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700" for="user_password_confirmation">비밀번호 확인</label>
+          <div class="mt-1">
+            <input autocomplete="new-password" class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="비밀번호를 다시 입력하세요" required="required" type="password" name="user[password_confirmation]" id="user_password_confirmation" />
+          </div>
+        </div>
+
+        <!-- 약관 동의 체크박스 -->
+        <div class="space-y-3 pt-4 border-t border-gray-200">
+          <div class="flex items-start">
+            <div class="flex items-center h-5">
+              <input name="user[terms_agreed]" type="hidden" value="0" autocomplete="off" /><input class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" type="checkbox" value="1" name="user[terms_agreed]" id="user_terms_agreed" />
+            </div>
+            <div class="ml-3 text-sm">
+              <label class="font-medium text-gray-700" for="user_terms_agreed">
+                서비스 약관에 동의합니다 (선택)
+</label>            </div>
+          </div>
+
+          <div class="flex items-start">
+            <div class="flex items-center h-5">
+              <input name="user[privacy_agreed]" type="hidden" value="0" autocomplete="off" /><input class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" type="checkbox" value="1" name="user[privacy_agreed]" id="user_privacy_agreed" />
+            </div>
+            <div class="ml-3 text-sm">
+              <label class="font-medium text-gray-700" for="user_privacy_agreed">
+                개인정보처리방침에 동의합니다 (선택)
+</label>            </div>
+          </div>
+
+          <div class="flex items-start">
+            <div class="flex items-center h-5">
+              <input type="checkbox" name="marketingAgreed" id="marketingAgreed" value="1" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
+            </div>
+            <div class="ml-3 text-sm">
+              <label for="marketingAgreed" class="font-medium text-gray-700">
+                마케팅 정보 수신에 동의합니다 (선택)
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <input type="submit" name="commit" value="회원가입" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 cursor-pointer transition" data-disable-with="회원가입" />
+        </div>
+</form>
+      <p class="mt-6 text-center text-sm text-gray-600">
+        이미 계정이 있으신가요?
+        <a class="font-medium text-blue-600 hover:text-blue-500" href="/signin">로그인</a>
+      </p>
+    </div>
+
+    <!-- Features -->
+    <div class="grid grid-cols-3 gap-4 text-center mt-8">
+      <div>
+        <div class="text-3xl mb-2">📚</div>
+        <div class="text-sm font-medium text-gray-900">PDF 자동 분석</div>
+        <div class="text-xs text-gray-600 mt-1">문제집을 업로드하면 AI가 자동으로 분석</div>
+      </div>
+      <div>
+        <div class="text-3xl mb-2">🎯</div>
+        <div class="text-sm font-medium text-gray-900">지식 그래프</div>
+        <div class="text-xs text-gray-600 mt-1">약점을 시각화하여 효율적인 학습</div>
+      </div>
+      <div>
+        <div class="text-3xl mb-2">🚀</div>
+        <div class="text-sm font-medium text-gray-900">맞춤형 학습</div>
+        <div class="text-xs text-gray-600 mt-1">개인별 취약점 분석 및 추천</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('form[action*="signup"]');
+  const networkError = document.getElementById('network-error');
+  const retryButton = document.getElementById('retry-button');
+  const submitButton = form.querySelector('input[type="submit"]');
+
+  let formData = null;
+
+  function hideNetworkError() {
+    if (networkError) {
+      networkError.classList.add('hidden');
+    }
+  }
+
+  function showNetworkError() {
+    if (networkError) {
+      networkError.classList.remove('hidden');
+      networkError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  function submitFormWithFetch(e) {
+    if (e) {
+      e.preventDefault();
+    }
+
+    hideNetworkError();
+
+    // Disable submit button
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.value = '처리 중...';
+    }
+
+    // Store form data
+    formData = new FormData(form);
+
+    // Submit with fetch API
+    fetch(form.action, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Accept': 'text/html'
+      },
+      redirect: 'follow'
+    })
+    .then(response => {
+      // Success - check if redirected
+      if (response.ok || response.redirected) {
+        // Navigate to the final URL (after redirects)
+        window.location.href = response.url;
+      } else {
+        // Server error - show validation errors by replacing page content
+        return response.text().then(html => {
+          document.open();
+          document.write(html);
+          document.close();
+        });
+      }
+    })
+    .catch(error => {
+      // Network error
+      console.error('Network error:', error);
+      showNetworkError();
+
+      // Re-enable submit button
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.value = '회원가입';
+      }
+    });
+  }
+
+  // Intercept form submission
+  if (form) {
+    form.addEventListener('submit', submitFormWithFetch);
+  }
+
+  // Retry button handler
+  if (retryButton) {
+    retryButton.addEventListener('click', function() {
+      submitFormWithFetch();
+    });
+  }
+});
+</script>
+<!-- END app/views/devise/registrations/new.html.erb -->
+    </main>
+  </body>
+</html><!-- END app/views/layouts/application.html.erb -->

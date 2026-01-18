@@ -1,0 +1,186 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-4xl mx-auto">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">
+        <%= @study_set.name %>
+      </h1>
+      <p class="text-gray-600">
+        <%= @study_set.certification&.name %> - <%= @study_set.exam_schedule&.exam_date&.strftime('%Y년 %m월 %d일') %>
+      </p>
+    </div>
+
+    <!-- Upload Section -->
+    <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+      <h2 class="text-2xl font-semibold mb-6">📄 학습 자료 업로드</h2>
+      
+      <%= form_with model: [@study_set, StudyMaterial.new], 
+          html: { 
+            class: 'space-y-6',
+            data: { 
+              controller: 'pdf-upload',
+              action: 'submit->pdf-upload#submit'
+            }
+          } do |f| %>
+        
+        <!-- File Upload Area -->
+        <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors"
+             data-pdf-upload-target="dropzone"
+             data-action="
+               dragover->pdf-upload#dragover
+               dragleave->pdf-upload#dragleave
+               drop->pdf-upload#drop
+             ">
+          
+          <div class="mb-4">
+            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+              <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+
+          <div class="mb-4">
+            <label for="file-upload" class="cursor-pointer">
+              <span class="mt-2 block text-sm font-medium text-gray-900">
+                PDF 파일을 드래그하거나 클릭하여 선택하세요
+              </span>
+              <span class="mt-1 block text-xs text-gray-500">
+                최대 50MB, PDF 형식만 지원
+              </span>
+            </label>
+            <%= f.file_field :pdf_file, 
+                accept: 'application/pdf',
+                class: 'hidden',
+                id: 'file-upload',
+                data: { 
+                  pdf_upload_target: 'fileInput',
+                  action: 'change->pdf-upload#fileSelected'
+                } %>
+          </div>
+
+          <!-- Selected File Info -->
+          <div data-pdf-upload-target="fileInfo" class="hidden mt-4 p-4 bg-blue-50 rounded-lg">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <svg class="h-8 w-8 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                <div class="text-left">
+                  <p class="text-sm font-medium text-gray-900" data-pdf-upload-target="fileName"></p>
+                  <p class="text-xs text-gray-500" data-pdf-upload-target="fileSize"></p>
+                </div>
+              </div>
+              <button type="button" 
+                      data-action="click->pdf-upload#removeFile"
+                      class="text-red-600 hover:text-red-800">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Material Name -->
+        <div>
+          <%= f.label :name, '자료 이름', class: 'block text-sm font-medium text-gray-700 mb-2' %>
+          <%= f.text_field :name, 
+              class: 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+              placeholder: '예: 2025년 1교시 기출문제' %>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex justify-end gap-4">
+          <%= link_to '취소', study_set_path(@study_set), class: 'px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50' %>
+          <%= f.submit '업로드 및 분석 시작', 
+              class: 'px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed',
+              data: { pdf_upload_target: 'submitButton' } %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Existing Materials -->
+    <div class="bg-white rounded-lg shadow-lg p-8">
+      <h2 class="text-2xl font-semibold mb-6">📚 업로드된 학습 자료</h2>
+      
+      <% if @study_materials.any? %>
+        <div class="space-y-4">
+          <% @study_materials.each do |material| %>
+            <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div class="flex items-center justify-between">
+                <div class="flex-1">
+                  <h3 class="font-semibold text-gray-900"><%= material.name %></h3>
+                  <div class="mt-2 flex items-center gap-4 text-sm text-gray-600">
+                    <span class="flex items-center">
+                      <%= status_badge(material.status) %>
+                    </span>
+                    <span><%= material.created_at.strftime('%Y-%m-%d %H:%M') %></span>
+                    <% if material.status == 'completed' %>
+                      <span class="text-green-600 font-medium">
+                        <%= material.questions.count %>개 문제
+                      </span>
+                    <% end %>
+                  </div>
+                  
+                  <!-- Progress Bar -->
+                  <% if material.status == 'processing' %>
+                    <div class="mt-3">
+                      <div class="flex justify-between text-xs text-gray-600 mb-1">
+                        <span>처리 중...</span>
+                        <span><%= material.parsing_progress || 0 %>%</span>
+                      </div>
+                      <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                             style="width: <%= material.parsing_progress || 0 %>%"></div>
+                      </div>
+                    </div>
+                  <% end %>
+
+                  <!-- Error Message -->
+                  <% if material.status == 'failed' %>
+                    <div class="mt-2 p-2 bg-red-50 rounded text-sm text-red-600">
+                      <%= material.error_message %>
+                    </div>
+                  <% end %>
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <% if material.status == 'completed' %>
+                    <%= link_to '문제 보기', study_set_study_material_path(@study_set, material), 
+                        class: 'px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg' %>
+                  <% elsif material.status == 'failed' %>
+                    <%= button_to '재시도', retry_study_set_study_material_path(@study_set, material), 
+                        method: :post,
+                        class: 'px-4 py-2 text-orange-600 hover:bg-orange-50 rounded-lg' %>
+                  <% end %>
+                  
+                  <%= button_to '삭제', study_set_study_material_path(@study_set, material), 
+                      method: :delete,
+                      data: { confirm: '정말 삭제하시겠습니까?' },
+                      class: 'px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg' %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="text-center py-12 text-gray-500">
+          <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <p>아직 업로드된 학습 자료가 없습니다.</p>
+          <p class="text-sm mt-2">위에서 PDF 파일을 업로드하여 문제를 자동으로 생성하세요.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<% content_for :javascript do %>
+  <script>
+    // Auto-refresh for processing materials
+    <% if @study_materials.any? { |m| m.status == 'processing' } %>
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000); // Refresh every 3 seconds
+    <% end %>
+  </script>
+<% end %>

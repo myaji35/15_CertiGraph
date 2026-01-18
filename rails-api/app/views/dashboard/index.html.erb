@@ -109,20 +109,22 @@
       <% end %>
     </div>
 
-    <!-- Charts Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-      <!-- Weekly Performance Chart -->
-      <div class="card">
-        <h2 class="card-title">주간 학습 성과</h2>
-        <canvas id="weeklyPerformanceChart" height="250"></canvas>
-      </div>
+    <!-- Charts Section - Only show if there's data -->
+    <% if @analytics[:completed_tests] > 0 %>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        <!-- Weekly Performance Chart -->
+        <div class="card">
+          <h2 class="card-title">주간 학습 성과</h2>
+          <canvas id="weeklyPerformanceChart" height="250"></canvas>
+        </div>
 
-      <!-- Mastery Distribution Chart -->
-      <div class="card">
-        <h2 class="card-title">개념 숙달 현황</h2>
-        <canvas id="masteryDistributionChart" height="250"></canvas>
+        <!-- Mastery Distribution Chart -->
+        <div class="card">
+          <h2 class="card-title">개념 숙달 현황</h2>
+          <canvas id="masteryDistributionChart" height="250"></canvas>
+        </div>
       </div>
-    </div>
+    <% end %>
 
     <!-- 학습 팁 섹션 -->
     <div class="card bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200">

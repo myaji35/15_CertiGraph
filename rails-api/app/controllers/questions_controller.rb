@@ -3,10 +3,22 @@ class QuestionsController < ApplicationController
   before_action :set_question, only: [:show, :update, :destroy, :validate_question]
 
   # GET /study_materials/:study_material_id/questions
+  # GET /study_sets/:study_set_id/questions
   def index
-    @questions = @study_material.questions
-                                .includes(:passages, :question_passages)
-                                .order(:question_number)
+    # Handle both study_material and study_set contexts
+    if params[:study_set_id]
+      @study_set = StudySet.find(params[:study_set_id])
+      @questions = @study_set.questions
+                             .includes(:study_material)
+                             .order(:question_number)
+      @total_count = @questions.count
+    else
+      @study_material = StudyMaterial.find(params[:study_material_id])
+      @questions = @study_material.questions
+                                  .includes(:passages, :question_passages)
+                                  .order(:question_number)
+      @total_count = @questions.count
+    end
 
     # Apply filters
     @questions = @questions.by_type(params[:question_type]) if params[:question_type].present?
@@ -14,15 +26,36 @@ class QuestionsController < ApplicationController
     @questions = @questions.validated if params[:validated] == 'true'
     @questions = @questions.with_passages if params[:with_passages] == 'true'
 
-    # Pagination
-    page = params[:page] || 1
-    per_page = params[:per_page] || 20
-    @questions = @questions.page(page).per(per_page)
-
-    render json: {
-      questions: @questions.map { |q| question_json(q) },
-      meta: pagination_meta(@questions)
-    }
+    respond_to do |format|
+      format.html do
+        # Simple pagination for HTML
+        page = (params[:page] || 1).to_i
+        per_page = 50
+        offset = (page - 1) * per_page
+        
+        @questions = @questions.limit(per_page).offset(offset)
+        @current_page = page
+        @total_pages = (@total_count.to_f / per_page).ceil
+      end
+      format.json do
+        # Pagination for JSON
+        page = (params[:page] || 1).to_i
+        per_page = (params[:per_page] || 20).to_i
+        offset = (page - 1) * per_page
+        
+        paginated_questions = @questions.limit(per_page).offset(offset)
+        
+        render json: {
+          questions: paginated_questions.map { |q| question_json(q) },
+          meta: {
+            current_page: page,
+            per_page: per_page,
+            total_count: @total_count,
+            total_pages: (@total_count.to_f / per_page).ceil
+          }
+        }
+      end
+    end
   end
 
   # GET /questions/:id

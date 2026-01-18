@@ -10,7 +10,7 @@
 
     <!-- Form -->
     <div class="bg-white rounded-lg shadow-md p-8">
-      <%= form_with(model: @study_set, local: true) do |form| %>
+      <%= form_with(model: @study_set, local: true, data: { controller: 'study-set-form' }) do |form| %>
         <% if @study_set.errors.any? %>
           <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
             <h3 class="text-red-800 font-semibold mb-2">
@@ -42,19 +42,71 @@
               placeholder: "이 학습 세트에 대한 간단한 설명을 입력하세요" %>
         </div>
 
-        <!-- Certification Field -->
-        <div class="mb-8">
-          <%= form.label :certification, "자격증 종류", class: "block text-sm font-medium text-gray-700 mb-2" %>
-          <%= form.select :certification,
+        <!-- Certification Category -->
+        <div class="mb-6">
+          <%= form.label :certification_category, "자격증 카테고리", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.select :certification_category,
               options_for_select([
-                ["사회복지사 1급", "social_worker_1"],
-                ["사회복지사 2급", "social_worker_2"],
-                ["요양보호사", "care_worker"],
-                ["보육교사", "childcare_teacher"],
+                ["사회복지", "social_welfare"],
+                ["보건의료", "healthcare"],
+                ["교육", "education"],
+                ["IT/기술", "it_tech"],
+                ["금융/회계", "finance"],
                 ["기타", "other"]
               ]),
+              { prompt: "카테고리를 선택하세요" },
+              class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+              data: { 
+                study_set_form_target: 'category',
+                action: 'change->study-set-form#updateCertifications'
+              } %>
+        </div>
+
+        <!-- Certification Selection (Dynamic) -->
+        <div class="mb-6">
+          <%= form.label :certification_id, "자격증 선택", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.select :certification_id,
+              options_from_collection_for_select(
+                @certifications || Certification.where(is_active: true).order(:name),
+                :id,
+                :name,
+                @study_set.certification_id
+              ),
               { prompt: "자격증을 선택하세요" },
-              class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+              class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+              data: { 
+                study_set_form_target: 'certification',
+                action: 'change->study-set-form#updateExamSchedules'
+              } %>
+        </div>
+
+        <!-- Exam Schedule Selection -->
+        <div class="mb-6">
+          <%= form.label :exam_schedule_id, "시험 일정", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.select :exam_schedule_id,
+              options_from_collection_for_select(
+                @exam_schedules || ExamSchedule.where('exam_date >= ?', Date.today).order(:exam_date),
+                :id,
+                ->(schedule) { "#{schedule.year}년 #{schedule.round}회 - #{schedule.exam_date&.strftime('%Y년 %m월 %d일')}" },
+                @study_set.exam_schedule_id
+              ),
+              { prompt: "시험 일정을 선택하세요 (선택사항)" },
+              class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+              data: { study_set_form_target: 'examSchedule' } %>
+          <p class="mt-2 text-sm text-gray-500">
+            시험 일정을 선택하면 D-Day 카운터와 학습 계획을 제공합니다
+          </p>
+        </div>
+
+        <!-- Manual Exam Date (if no schedule selected) -->
+        <div class="mb-8" data-study-set-form-target="manualDateField">
+          <%= form.label :target_exam_date, "목표 시험일 (직접 입력)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.date_field :target_exam_date,
+              class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+              min: Date.today %>
+          <p class="mt-2 text-sm text-gray-500">
+            시험 일정이 없는 경우 직접 목표일을 설정하세요
+          </p>
         </div>
 
         <!-- Information Box -->
@@ -67,8 +119,9 @@
               <p class="font-semibold mb-1">학습 세트 생성 후:</p>
               <ul class="list-disc list-inside space-y-1">
                 <li>PDF 파일을 업로드하여 학습 자료를 추가할 수 있습니다</li>
-                <li>AI가 자동으로 문제와 답을 분석합니다</li>
+                <li>Python 알고리즘이 자동으로 문제를 추출합니다 (무료)</li>
                 <li>모의고사 기능으로 실전 연습이 가능합니다</li>
+                <li>시험일까지 D-Day와 학습 진도를 확인할 수 있습니다</li>
               </ul>
             </div>
           </div>

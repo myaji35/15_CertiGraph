@@ -1,0 +1,101 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">
+      <%= @question.new_record? ? '새 문제 추가' : '문제 수정' %>
+    </h1>
+
+    <%= form_with model: [:admin, @question], class: 'space-y-6' do |f| %>
+      <%= render 'shared/error_messages', object: @question %>
+
+      <!-- Question Content -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibold mb-4">문제 내용</h2>
+        
+        <div class="mb-4">
+          <%= f.label :content, '문제', class: 'block text-sm font-medium text-gray-700 mb-2' %>
+          <%= f.text_area :content, rows: 6, 
+              class: 'w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500',
+              placeholder: '문제를 입력하세요...' %>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <%= f.label :question_type, '문제 유형', class: 'block text-sm font-medium text-gray-700 mb-2' %>
+            <%= f.select :question_type, 
+                options_for_select([
+                  ['객관식', 'multiple_choice'],
+                  ['O/X', 'true_false'],
+                  ['단답형', 'short_answer']
+                ], @question.question_type),
+                {},
+                class: 'w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500' %>
+          </div>
+
+          <div>
+            <%= f.label :difficulty, '난이도', class: 'block text-sm font-medium text-gray-700 mb-2' %>
+            <%= f.select :difficulty,
+                options_for_select((1..5).map { |i| [i, i] }, @question.difficulty),
+                { include_blank: '선택' },
+                class: 'w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500' %>
+          </div>
+
+          <div>
+            <%= f.label :topic, '주제', class: 'block text-sm font-medium text-gray-700 mb-2' %>
+            <%= f.text_field :topic,
+                class: 'w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500',
+                placeholder: '예: 사회복지실천' %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Options -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibold mb-4">선택지</h2>
+        
+        <div id="options-container" class="space-y-3">
+          <%= f.fields_for :options do |option_form| %>
+            <div class="flex items-center gap-3 option-field">
+              <div class="flex-shrink-0">
+                <%= option_form.check_box :is_correct, 
+                    class: 'w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500' %>
+              </div>
+              <div class="flex-grow">
+                <%= option_form.text_field :content,
+                    class: 'w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500',
+                    placeholder: "선택지 #{option_form.index + 1}" %>
+              </div>
+              <div class="flex-shrink-0">
+                <%= option_form.check_box :_destroy, class: 'hidden' %>
+                <button type="button" onclick="this.previousElementSibling.checked = true; this.closest('.option-field').style.display = 'none';"
+                        class="text-red-600 hover:text-red-900">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
+        <p class="mt-2 text-sm text-gray-600">
+          ✓ 체크박스를 선택하여 정답을 표시하세요
+        </p>
+      </div>
+
+      <!-- Explanation -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibold mb-4">해설 (선택사항)</h2>
+        
+        <%= f.text_area :explanation, rows: 4,
+            class: 'w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500',
+            placeholder: '문제에 대한 해설을 입력하세요...' %>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex justify-end gap-4">
+        <%= link_to '취소', admin_questions_path, class: 'btn btn-secondary' %>
+        <%= f.submit @question.new_record? ? '문제 추가' : '문제 수정', class: 'btn btn-primary' %>
+      </div>
+    <% end %>
+  </div>
+</div>

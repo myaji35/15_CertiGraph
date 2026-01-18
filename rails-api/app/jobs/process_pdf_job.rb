@@ -11,62 +11,23 @@ class ProcessPdfJob < ApplicationJob
 
     begin
       # 상태를 처리중으로 업데이트
-      study_material.update(status: 'processing')
+      study_material.update(status: 'processing', parsing_progress: 10)
 
       # PDF 파일을 임시 파일로 다운로드
       pdf_file = study_material.pdf_file
 
       pdf_file.open do |file|
-        # 1. PDF 처리 서비스로 마크다운 변환 및 문제 추출
-        processing_service = PdfProcessingService.new(file.path)
-        processing_result = processing_service.process
-
-        unless processing_result[:success]
-          raise "PDF processing failed: #{processing_result[:error]}"
+        # Phase 2: Upstage OCR + GPT-4o (AI-powered extraction)
+        if use_ai_extraction?
+          Rails.logger.info "🤖 Using AI Extraction (Upstage OCR + GPT-4o)"
+          process_with_ai(study_material, file.path)
+        else
+          # Fallback: Python Algorithm (Option C)
+          Rails.logger.info "🐍 Using Python Algorithm Parser (NO AI, NO API Cost)"
+          process_with_python(study_material, file.path)
         end
 
-        questions = processing_result[:questions]
-        markdown = processing_result[:markdown]
-
-        # 2. 이미지 추출 및 캡션 생성 (선택적)
-        image_result = extract_images_with_captions(file.path)
-
-        # 3. 문제들을 청킹 (10개씩)
-        chunks = chunk_questions(questions, 10)
-
-        # 4. 결과를 JSON으로 저장
-        study_material.update(
-          status: 'completed',
-          extracted_data: {
-            total_questions: questions.length,
-            chunks: chunks.length,
-            questions: questions,
-            markdown: markdown,
-            images: image_result[:images] || [],
-            metadata: processing_result[:metadata] || {},
-            processed_at: Time.current
-          }
-        )
-
-        # 각 문제를 Question 모델로 저장
-        questions.each do |q|
-          question = Question.create!(
-            study_material: study_material,
-            content: q[:question_text],
-            options: convert_options_to_hash(q[:options]),
-            answer: q[:correct_answer],
-            explanation: q[:explanation],
-            passage: q[:passage],
-            question_number: q[:question_number],
-            topic: extract_topic_from_question(q[:question_text]),
-            difficulty: estimate_difficulty(q)
-          )
-
-          # 각 문제에 대해 임베딩 생성 작업 큐에 추가
-          GenerateEmbeddingJob.perform_later(question.id)
-        end
-
-        Rails.logger.info "Successfully processed PDF: #{study_material.id}, Questions: #{questions.length}"
+        Rails.logger.info "Successfully processed PDF: #{study_material.id}"
       end
     rescue => e
       Rails.logger.error "Failed to process PDF: #{e.message}"
@@ -74,12 +35,124 @@ class ProcessPdfJob < ApplicationJob
 
       study_material.update(
         status: 'failed',
-        error_message: e.message
+        error_message: e.message,
+        parsing_progress: 0
       )
     end
   end
 
   private
+
+  def use_ai_extraction?
+    # Use AI if API keys are configured
+    ENV['UPSTAGE_API_KEY'].present? && ENV['OPENAI_API_KEY'].present?
+  end
+
+  def process_with_ai(study_material, pdf_path)
+    # Step 1: Extract text with Upstage OCR
+    Rails.logger.info "Step 1/3: Extracting text with Upstage OCR"
+    ocr_service = UpstageOcrService.new
+    ocr_result = ocr_service.extract_text_from_pdf(pdf_path)
+    
+    extracted_text = ocr_result[:text]
+    study_material.update!(
+      extracted_data: extracted_text,
+      parsing_progress: 50,
+      content_metadata: ocr_result[:metadata]
+    )
+
+    # Step 2: Extract questions with GPT-4o
+    Rails.logger.info "Step 2/3: Extracting questions with GPT-4o"
+    extractor_service = QuestionExtractorService.new
+    questions = extractor_service.extract_questions_from_text(extracted_text, study_material.id)
+    
+    study_material.update!(parsing_progress: 80)
+
+    # Step 3: Build Knowledge Graph (optional)
+    if ENV['ENABLE_KNOWLEDGE_GRAPH'] == 'true'
+      Rails.logger.info "Step 3/3: Building Knowledge Graph"
+      # Knowledge Graph building will be implemented in Week 2
+    end
+
+    # Mark as completed
+    study_material.update!(
+      status: 'completed',
+      parsing_progress: 100,
+      graph_built: false
+    )
+
+    Rails.logger.info "✅ AI Extraction complete: #{questions.count} questions created"
+  end
+
+  def process_with_python(study_material, pdf_path)
+    python_parser = PythonParserBridge.new(pdf_path)
+    processing_result = python_parser.parse
+
+    unless processing_result[:success]
+      raise "Python parser failed: #{processing_result[:error]}"
+    end
+
+    questions = processing_result[:questions]
+
+    # 청킹 (10개씩)
+    chunks = chunk_questions(questions, 10)
+
+    # 결과를 JSON으로 저장
+    study_material.update(
+      status: 'completed',
+      extracted_data: {
+        total_questions: questions.length,
+        chunks: chunks.length,
+        questions: questions,
+        markdown: nil,
+        images: [],
+        metadata: processing_result[:metadata] || {},
+        processed_at: Time.current,
+        parser_version: 'python_algorithm_v2'
+      }
+    )
+
+    # Question 모델로 저장 및 검증
+    validator = QuestionValidationService.new
+    created_count = 0
+    failed_count = 0
+
+    questions.each do |q|
+      # Validate before creating
+      validation = validator.validate_question_data(q)
+
+      unless validation[:valid]
+        Rails.logger.warn "Question #{q[:question_number]} validation failed: #{validation[:errors]}"
+        failed_count += 1
+        next
+      end
+
+      begin
+        question = Question.create!(
+          study_material: study_material,
+          content: q[:content],
+          options: q[:options],
+          answer: q[:answer],  # Will be nil (manual entry required)
+          explanation: q[:explanation],  # Will be nil
+          passage: q[:passage],
+          question_number: q[:question_number],
+          topic: q[:topic] || extract_topic_from_question(q[:content]),
+          difficulty: q[:difficulty] || estimate_difficulty_from_content(q[:content]),
+          validation_status: 'validated'
+        )
+        created_count += 1
+
+        # 각 문제에 대해 임베딩 생성 작업 큐에 추가 (선택적)
+        # GenerateEmbeddingJob.perform_later(question.id)
+      rescue => e
+        Rails.logger.error "Failed to create question #{q[:question_number]}: #{e.message}"
+        failed_count += 1
+      end
+    end
+
+    Rails.logger.info "✅ Questions created: #{created_count}, failed: #{failed_count}"
+  end
+
 
   def convert_options_to_hash(options_array)
     return {} unless options_array.is_a?(Array)
@@ -127,6 +200,18 @@ class ProcessPdfJob < ApplicationJob
     if text.length > 500 || options.length > 4
       'hard'
     elsif text.length > 200
+      'medium'
+    else
+      'easy'
+    end
+  end
+
+  def estimate_difficulty_from_content(content)
+    return 'medium' if content.blank?
+
+    if content.length > 500
+      'hard'
+    elsif content.length > 200
       'medium'
     else
       'easy'

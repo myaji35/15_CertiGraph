@@ -9,6 +9,6 @@ class ExamAnswer < ApplicationRecord
   private
 
   def check_answer
-    self.is_correct = (selected_answer == question.correct_answer)
+    self.is_correct = (selected_answer == question.answer)
   end
 end

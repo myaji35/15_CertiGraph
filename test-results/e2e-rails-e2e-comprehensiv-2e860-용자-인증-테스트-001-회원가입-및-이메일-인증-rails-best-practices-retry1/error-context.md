@@ -1,0 +1,58 @@
+# Page snapshot
+
+```yaml
+- main [ref=e2]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e8]: 🧠
+      - heading "ExamsGraph" [level=2] [ref=e9]
+      - paragraph [ref=e10]: 회원가입
+      - paragraph [ref=e11]: AI 자격증 마스터와 함께 시험 준비를 시작하세요
+    - generic [ref=e12]:
+      - button "Google로 계속하기" [ref=e15] [cursor=pointer]:
+        - img [ref=e16]
+        - text: Google로 계속하기
+      - generic [ref=e25]: 또는
+      - generic [ref=e26]:
+        - generic [ref=e27]:
+          - generic [ref=e28]: 이메일 주소
+          - textbox "이메일 주소" [active] [ref=e30]:
+            - /placeholder: 이메일 주소를 입력하세요
+        - generic [ref=e31]:
+          - generic [ref=e32]: 비밀번호
+          - text: (6자 이상, 대문자, 소문자, 숫자, 특수문자 포함)
+          - textbox "비밀번호" [ref=e34]:
+            - /placeholder: "비밀번호를 입력하세요 (예: Pass123!@)"
+        - generic [ref=e35]:
+          - generic [ref=e36]: 비밀번호 확인
+          - textbox "비밀번호 확인" [ref=e38]:
+            - /placeholder: 비밀번호를 다시 입력하세요
+        - generic [ref=e39]:
+          - generic [ref=e40]:
+            - checkbox "서비스 약관에 동의합니다 (선택)" [ref=e42]
+            - generic [ref=e43]: 서비스 약관에 동의합니다 (선택)
+          - generic [ref=e44]:
+            - checkbox "개인정보처리방침에 동의합니다 (선택)" [ref=e46]
+            - generic [ref=e47]: 개인정보처리방침에 동의합니다 (선택)
+          - generic [ref=e48]:
+            - checkbox "마케팅 정보 수신에 동의합니다 (선택)" [ref=e50]
+            - generic [ref=e51]: 마케팅 정보 수신에 동의합니다 (선택)
+        - button "회원가입" [ref=e53] [cursor=pointer]
+      - paragraph [ref=e54]:
+        - text: 이미 계정이 있으신가요?
+        - link "로그인" [ref=e55] [cursor=pointer]:
+          - /url: /signin
+    - generic [ref=e56]:
+      - generic [ref=e57]:
+        - generic [ref=e58]: 📚
+        - generic [ref=e59]: PDF 자동 분석
+        - generic [ref=e60]: 문제집을 업로드하면 AI가 자동으로 분석
+      - generic [ref=e61]:
+        - generic [ref=e62]: 🎯
+        - generic [ref=e63]: 지식 그래프
+        - generic [ref=e64]: 약점을 시각화하여 효율적인 학습
+      - generic [ref=e65]:
+        - generic [ref=e66]: 🚀
+        - generic [ref=e67]: 맞춤형 학습
+        - generic [ref=e68]: 개인별 취약점 분석 및 추천
+```
