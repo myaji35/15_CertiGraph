@@ -1,0 +1,375 @@
+\u003c!-- Knowledge Graph Visualization --\u003e
+\u003c% content_for :head do %\u003e
+  \u003c!-- vis.js Network Library --\u003e
+  \u003cscript type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"\u003e\u003c/script\u003e
+  \u003clink href="https://unpkg.com/vis-network/styles/vis-network.min.css" rel="stylesheet" type="text/css" /\u003e
+\u003c% end %\u003e
+
+\u003cdiv class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50"\u003e
+  \u003c!-- Header --\u003e
+  \u003cdiv class="bg-white shadow-lg border-b-2 border-primary-blue"\u003e
+    \u003cdiv class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"\u003e
+      \u003cdiv class="flex items-center justify-between"\u003e
+        \u003cdiv\u003e
+          \u003ch1 class="text-3xl font-bold text-gray-900 flex items-center"\u003e
+            \u003csvg class="w-8 h-8 mr-3 text-primary-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"\u003e
+              \u003cpath stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /\u003e
+            \u003c/svg\u003e
+            지식 그래프 분석
+          \u003c/h1\u003e
+          \u003cp class="mt-1 text-sm text-gray-600"\u003e학습 진도를 시각화하고 약점을 분석합니다\u003c/p\u003e
+        \u003c/div\u003e
+        \u003cdiv class="flex items-center space-x-4"\u003e
+          \u003c%= link_to "돌아가기", @study_material ? study_set_study_material_path(@study_material.study_set, @study_material) : dashboard_index_path, class: "btn btn-secondary" %\u003e
+        \u003c/div\u003e
+      \u003c/div\u003e
+    \u003c/div\u003e
+  \u003c/div\u003e
+
+  \u003c!-- Main Content --\u003e
+  \u003cdiv class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"\u003e
+    \u003c!-- Statistics Cards --\u003e
+    \u003cdiv class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"\u003e
+      \u003c!-- Progress Card --\u003e
+      \u003cdiv class="card bg-gradient-to-br from-blue-500 to-blue-600 text-white"\u003e
+        \u003cdiv class="flex items-center justify-between"\u003e
+          \u003cdiv\u003e
+            \u003cp class="text-blue-100 text-sm font-medium"\u003e학습 진도\u003c/p\u003e
+            \u003cp class="text-4xl font-bold mt-2" id="progress-percentage"\u003e0%\u003c/p\u003e
+          \u003c/div\u003e
+          \u003csvg class="w-16 h-16 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"\u003e
+            \u003cpath stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /\u003e
+          \u003c/svg\u003e
+        \u003c/div\u003e
+      \u003c/div\u003e
+
+      \u003c!-- Mastered Concepts Card --\u003e
+      \u003cdiv class="card bg-gradient-to-br from-green-500 to-green-600 text-white"\u003e
+        \u003cdiv class="flex items-center justify-between"\u003e
+          \u003cdiv\u003e
+            \u003cp class="text-green-100 text-sm font-medium"\u003e숙달 개념\u003c/p\u003e
+            \u003cp class="text-4xl font-bold mt-2" id="mastered-count"\u003e0개\u003c/p\u003e
+          \u003c/div\u003e
+          \u003csvg class="w-16 h-16 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"\u003e
+            \u003cpath stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /\u003e
+          \u003c/svg\u003e
+        \u003c/div\u003e
+      \u003c/div\u003e
+
+      \u003c!-- Weak Concepts Card --\u003e
+      \u003cdiv class="card bg-gradient-to-br from-red-500 to-red-600 text-white"\u003e
+        \u003cdiv class="flex items-center justify-between"\u003e
+          \u003cdiv\u003e
+            \u003cp class="text-red-100 text-sm font-medium"\u003e약점 개념\u003c/p\u003e
+            \u003cp class="text-4xl font-bold mt-2" id="weak-count"\u003e0개\u003c/p\u003e
+          \u003c/div\u003e
+          \u003csvg class="w-16 h-16 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"\u003e
+            \u003cpath stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /\u003e
+          \u003c/svg\u003e
+        \u003c/div\u003e
+      \u003c/div\u003e
+    \u003c/div\u003e
+
+    \u003c!-- 3D Graph Container --\u003e
+    \u003cdiv class="card p-0 overflow-hidden mb-8"\u003e
+      \u003cdiv class="bg-gradient-to-r from-primary-blue to-accent-purple px-6 py-4"\u003e
+        \u003ch2 class="text-xl font-bold text-white flex items-center"\u003e
+          \u003csvg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"\u003e
+            \u003cpath stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /\u003e
+          \u003c/svg\u003e
+          개념 맵 시각화
+        \u003c/h2\u003e
+        \u003cp class="text-blue-100 text-sm mt-1"\u003e드래그로 이동, 마우스 휠로 확대/축소, 노드 클릭으로 상세 정보 확인\u003c/p\u003e
+      \u003c/div\u003e
+      \u003cdiv id="knowledge-graph" class="bg-white" style="height: 600px;"\u003e
+        \u003c!-- Graph will be rendered here --\u003e
+        \u003cdiv class="flex items-center justify-center h-full"\u003e
+          \u003cdiv class="text-center"\u003e
+            \u003cdiv class="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-blue mx-auto"\u003e\u003c/div\u003e
+            \u003cp class="mt-4 text-gray-600"\u003e그래프를 불러오는 중...\u003c/p\u003e
+          \u003c/div\u003e
+        \u003c/div\u003e
+      \u003c/div\u003e
+      \u003c!-- Legend --\u003e
+      \u003cdiv class="bg-gray-50 px-6 py-4 border-t border-gray-200"\u003e
+        \u003ch4 class="text-xs font-bold text-gray-700 uppercase tracking-wider mb-3"\u003e범례\u003c/h4\u003e
+        \u003cdiv class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm"\u003e
+          \u003cdiv class="flex items-center space-x-2"\u003e
+            \u003cdiv class="w-4 h-4 rounded-full bg-green-500"\u003e\u003c/div\u003e
+            \u003cspan class="text-gray-700"\u003e숙달 (80%+)\u003c/span\u003e
+          \u003c/div\u003e
+          \u003cdiv class="flex items-center space-x-2"\u003e
+            \u003cdiv class="w-4 h-4 rounded-full bg-yellow-500"\u003e\u003c/div\u003e
+            \u003cspan class="text-gray-700"\u003e학습중 (50-80%)\u003c/span\u003e
+          \u003c/div\u003e
+          \u003cdiv class="flex items-center space-x-2"\u003e
+            \u003cdiv class="w-4 h-4 rounded-full bg-red-500"\u003e\u003c/div\u003e
+            \u003cspan class="text-gray-700"\u003e약점 (\u003c50%)\u003c/span\u003e
+          \u003c/div\u003e
+          \u003cdiv class="flex items-center space-x-2"\u003e
+            \u003cdiv class="w-4 h-4 rounded-full bg-gray-400"\u003e\u003c/div\u003e
+            \u003cspan class="text-gray-700"\u003e미학습\u003c/span\u003e
+          \u003c/div\u003e
+        \u003c/div\u003e
+      \u003c/div\u003e
+    \u003c/div\u003e
+
+    \u003c!-- Weak Areas Section --\u003e
+    \u003cdiv class="grid grid-cols-1 lg:grid-cols-2 gap-8"\u003e
+      \u003c!-- Weak Concepts List --\u003e
+      \u003cdiv class="card"\u003e
+        \u003ch3 class="text-xl font-bold text-gray-900 mb-4 flex items-center"\u003e
+          \u003csvg class="w-6 h-6 mr-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"\u003e
+            \u003cpath stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /\u003e
+          \u003c/svg\u003e
+          취약 개념
+        \u003c/h3\u003e
+        \u003cdiv id="weak-concepts-list" class="space-y-3"\u003e
+          \u003c!-- Will be populated by JavaScript --\u003e
+          \u003cp class="text-gray-500 text-center py-8"\u003e데이터를 불러오는 중...\u003c/p\u003e
+        \u003c/div\u003e
+      \u003c/div\u003e
+
+      \u003c!-- Learning Path Recommendations --\u003e
+      \u003cdiv class="card"\u003e
+        \u003ch3 class="text-xl font-bold text-gray-900 mb-4 flex items-center"\u003e
+          \u003csvg class="w-6 h-6 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"\u003e
+            \u003cpath stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /\u003e
+          \u003c/svg\u003e
+          추천 학습 순서
+        \u003c/h3\u003e
+        \u003cdiv id="learning-path-list" class="space-y-3"\u003e
+          \u003c!-- Will be populated by JavaScript --\u003e
+          \u003cp class="text-gray-500 text-center py-8"\u003e데이터를 불러오는 중...\u003c/p\u003e
+        \u003c/div\u003e
+      \u003c/div\u003e
+    \u003c/div\u003e
+  \u003c/div\u003e
+\u003c/div\u003e
+
+\u003c!-- JavaScript for Graph Visualization --\u003e
+\u003cscript\u003e
+document.addEventListener('DOMContentLoaded', function() {
+  const studyMaterialId = \u003c%= @study_material&.id || 'null' %\u003e;
+  const studySetId = \u003c%= @study_material&.study_set_id || 'null' %\u003e;
+  
+  if (!studyMaterialId || !studySetId) {
+    showError('학습 자료 정보를 찾을 수 없습니다.');
+    return;
+  }
+
+  // Fetch graph data from API
+  const apiUrl = `/api/v1/study_sets/${studySetId}/study_materials/${studyMaterialId}/knowledge_graphs/concept_map`;
+  
+  fetch(apiUrl, {
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.success) {
+      renderGraph(data.concept_map);
+      updateStatistics(data.statistics);
+      renderWeakConcepts(data.weak_areas);
+      renderLearningPath(data.learning_path);
+    } else {
+      showError(data.message || '그래프 데이터를 불러올 수 없습니다.');
+    }
+  })
+  .catch(error => {
+    console.error('Error fetching graph data:', error);
+    showError('그래프 데이터를 불러오는 중 오류가 발생했습니다.');
+  });
+
+  function renderGraph(conceptMap) {
+    const container = document.getElementById('knowledge-graph');
+    
+    if (!conceptMap || !conceptMap.nodes || conceptMap.nodes.length === 0) {
+      container.innerHTML = `
+        \u003cdiv class="flex items-center justify-center h-full"\u003e
+          \u003cdiv class="text-center"\u003e
+            \u003csvg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"\u003e
+              \u003cpath stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /\u003e
+            \u003c/svg\u003e
+            \u003ch3 class="mt-2 text-lg font-medium text-gray-900"\u003e개념이 없습니다\u003c/h3\u003e
+            \u003cp class="mt-1 text-sm text-gray-500"\u003e문제를 풀면 자동으로 개념이 추출됩니다.\u003c/p\u003e
+          \u003c/div\u003e
+        \u003c/div\u003e
+      `;
+      return;
+    }
+
+    // Prepare nodes for vis.js
+    const nodes = conceptMap.nodes.map(node =\u003e ({
+      id: node.id,
+      label: node.name,
+      title: `${node.name}\\n숙달도: ${(node.mastery_level * 100).toFixed(0)}%`,
+      color: getNodeColor(node.mastery_level, node.status),
+      size: 20 + (node.importance || 1) * 5,
+      font: { size: 14, color: '#333' },
+      level: getLevelNumber(node.level)
+    }));
+
+    // Prepare edges for vis.js
+    const edges = conceptMap.edges.map(edge =\u003e ({
+      from: edge.from_id,
+      to: edge.to_id,
+      arrows: 'to',
+      label: edge.relationship_type,
+      color: { color: '#999', highlight: '#333' },
+      width: edge.weight * 3 || 1
+    }));
+
+    const graphData = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) };
+
+    const options = {
+      layout: {
+        hierarchical: {
+          enabled: true,
+          direction: 'UD',
+          sortMethod: 'directed',
+          levelSeparation: 150,
+          nodeSpacing: 200
+        }
+      },
+      physics: {
+        enabled: false
+      },
+      interaction: {
+        dragNodes: true,
+        dragView: true,
+        zoomView: true,
+        hover: true
+      },
+      nodes: {
+        shape: 'dot',
+        borderWidth: 2,
+        borderWidthSelected: 4
+      },
+      edges: {
+        smooth: {
+          type: 'cubicBezier',
+          forceDirection: 'vertical'
+        }
+      }
+    };
+
+    const network = new vis.Network(container, graphData, options);
+
+    // Node click event
+    network.on('click', function(params) {
+      if (params.nodes.length \u003e 0) {
+        const nodeId = params.nodes[0];
+        const node = conceptMap.nodes.find(n =\u003e n.id === nodeId);
+        if (node) {
+          showNodeDetail(node);
+        }
+      }
+    });
+  }
+
+  function getNodeColor(masteryLevel, status) {
+    if (!masteryLevel || status === 'untested') {
+      return { background: '#9CA3AF', border: '#6B7280' }; // Gray
+    } else if (masteryLevel \u003e= 0.8) {
+      return { background: '#10B981', border: '#059669' }; // Green
+    } else if (masteryLevel \u003e= 0.5) {
+      return { background: '#F59E0B', border: '#D97706' }; // Yellow
+    } else {
+      return { background: '#EF4444', border: '#DC2626' }; // Red
+    }
+  }
+
+  function getLevelNumber(level) {
+    const levels = { 'subject': 0, 'chapter': 1, 'concept': 2, 'detail': 3 };
+    return levels[level] || 2;
+  }
+
+  function updateStatistics(stats) {
+    if (!stats) return;
+    
+    document.getElementById('progress-percentage').textContent = 
+      `${(stats.progress_percentage || 0).toFixed(0)}%`;
+    document.getElementById('mastered-count').textContent = 
+      `${stats.mastered_count || 0}개`;
+    document.getElementById('weak-count').textContent = 
+      `${stats.weak_count || 0}개`;
+  }
+
+  function renderWeakConcepts(weakAreas) {
+    const container = document.getElementById('weak-concepts-list');
+    
+    if (!weakAreas || weakAreas.length === 0) {
+      container.innerHTML = '\u003cp class="text-gray-500 text-center py-4"\u003e약점 개념이 없습니다! 👍\u003c/p\u003e';
+      return;
+    }
+
+    container.innerHTML = weakAreas.slice(0, 5).map((area, index) =\u003e `
+      \u003cdiv class="flex items-start p-4 bg-red-50 border border-red-200 rounded-lg hover:shadow-md transition-shadow"\u003e
+        \u003cdiv class="flex-shrink-0 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center font-bold"\u003e
+          ${index + 1}
+        \u003c/div\u003e
+        \u003cdiv class="ml-4 flex-1"\u003e
+          \u003ch4 class="font-bold text-gray-900"\u003e${area.node.name}\u003c/h4\u003e
+          \u003cp class="text-sm text-gray-600 mt-1"\u003e정답률: ${(area.accuracy * 100).toFixed(0)}%\u003c/p\u003e
+          \u003cdiv class="mt-2 flex space-x-2"\u003e
+            \u003ca href="#" class="text-xs text-blue-600 hover:text-blue-800"\u003e복습하기\u003c/a\u003e
+            \u003ca href="#" class="text-xs text-blue-600 hover:text-blue-800"\u003e문제 풀기\u003c/a\u003e
+          \u003c/div\u003e
+        \u003c/div\u003e
+      \u003c/div\u003e
+    `).join('');
+  }
+
+  function renderLearningPath(learningPath) {
+    const container = document.getElementById('learning-path-list');
+    
+    if (!learningPath || learningPath.length === 0) {
+      container.innerHTML = '\u003cp class="text-gray-500 text-center py-4"\u003e추천 학습 경로가 없습니다.\u003c/p\u003e';
+      return;
+    }
+
+    container.innerHTML = learningPath.slice(0, 5).map((step, index) =\u003e `
+      \u003cdiv class="flex items-start p-4 bg-blue-50 border border-blue-200 rounded-lg hover:shadow-md transition-shadow"\u003e
+        \u003cdiv class="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold"\u003e
+          ${index + 1}
+        \u003c/div\u003e
+        \u003cdiv class="ml-4 flex-1"\u003e
+          \u003ch4 class="font-bold text-gray-900"\u003e${step.node.name}\u003c/h4\u003e
+          \u003cp class="text-sm text-gray-600 mt-1"\u003e${step.reason || '학습 권장'}\u003c/p\u003e
+          \u003cdiv class="mt-2"\u003e
+            \u003ca href="#" class="text-xs text-blue-600 hover:text-blue-800"\u003e학습 시작\u003c/a\u003e
+          \u003c/div\u003e
+        \u003c/div\u003e
+      \u003c/div\u003e
+    `).join('');
+  }
+
+  function showNodeDetail(node) {
+    alert(`개념: ${node.name}\\n숙달도: ${(node.mastery_level * 100).toFixed(0)}%\\n상태: ${node.status}`);
+    // TODO: Replace with modal
+  }
+
+  function showError(message) {
+    const container = document.getElementById('knowledge-graph');
+    container.innerHTML = `
+      \u003cdiv class="flex items-center justify-center h-full"\u003e
+        \u003cdiv class="text-center"\u003e
+          \u003csvg class="mx-auto h-12 w-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"\u003e
+            \u003cpath stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /\u003e
+          \u003c/svg\u003e
+          \u003ch3 class="mt-2 text-lg font-medium text-gray-900"\u003e오류 발생\u003c/h3\u003e
+          \u003cp class="mt-1 text-sm text-gray-500"\u003e${message}\u003c/p\u003e
+        \u003c/div\u003e
+      \u003c/div\u003e
+    `;
+  }
+});
+\u003c/script\u003e

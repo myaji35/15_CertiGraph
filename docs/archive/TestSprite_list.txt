@@ -1,0 +1,28 @@
+1️⃣ 환경 변수 확인
+bash
+# frontend/.env.local 파일 확인
+cat /Users/gangseungsig/Documents/02_GitHub/15_CertiGraph/frontend/.env.local
+✅ NEXT_PUBLIC_API_URL이 http://localhost:8000/api/v1로 설정되어 있는지
+✅ Clerk 관련 환경 변수들이 제대로 설정되어 있는지
+2️⃣ API 통신 확인
+브라우저 개발자 도구 (F12) → Network 탭에서 확인:
+
+✅ /api/v1/admin/users 요청이 성공하는지 (200 OK)
+✅ 응답 데이터에 사용자 정보가 포함되어 있는지
+✅ CORS 에러가 없는지
+3️⃣ 콘솔 에러 확인
+브라우저 개발자 도구 (F12) → Console 탭에서 확인:
+
+✅ JavaScript 에러가 없는지
+✅ 우리가 추가한 로그들:
+[1] Starting fetchUsers...
+[7] Users data received: ...
+데이터가 제대로 들어오는지
+4️⃣ 현재 미해결 문제
+사용자 관리 페이지 (/admin/users):
+
+❌ 
+myaji35@gmail.com
+이 표시되지 않음
+✅ Mock 사용자 3명은 표시됨
+❓ 백엔드가 실제 이메일을 반환하는지 확인 필요

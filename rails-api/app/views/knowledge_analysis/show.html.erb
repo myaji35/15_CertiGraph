@@ -1,0 +1,242 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+  <!-- Header -->
+  <div class="bg-white shadow-lg border-b-2 border-primary-blue">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">📊 학습 분석</h1>
+          <p class="text-gray-600 mt-1"><%= @study_set.title %></p>
+        </div>
+        <%= link_to "돌아가기", @study_set, class: "btn btn-secondary" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- 통계 카드 -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <!-- 학습 진도 -->
+      <div class="card bg-gradient-to-br from-blue-500 to-indigo-600 text-white">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-blue-100 text-sm font-medium">학습 진도</p>
+            <p class="text-3xl font-bold mt-2"><%= @progress.round %>%</p>
+          </div>
+          <svg class="w-12 h-12 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+        </div>
+        <div class="mt-4 bg-blue-400 bg-opacity-30 rounded-full h-2">
+          <div class="bg-white rounded-full h-2 transition-all duration-500" style="width: <%= @progress %>%"></div>
+        </div>
+      </div>
+
+      <!-- 숙달 개념 -->
+      <div class="card bg-gradient-to-br from-green-500 to-emerald-600 text-white">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-green-100 text-sm font-medium">숙달 개념</p>
+            <p class="text-3xl font-bold mt-2"><%= @strong_areas.count %>개</p>
+          </div>
+          <svg class="w-12 h-12 text-green-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- 약점 개념 -->
+      <div class="card bg-gradient-to-br from-red-500 to-pink-600 text-white">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-red-100 text-sm font-medium">약점 개념</p>
+            <p class="text-3xl font-bold mt-2"><%= @weak_areas.count %>개</p>
+          </div>
+          <svg class="w-12 h-12 text-red-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- 전체 개념 -->
+      <div class="card bg-gradient-to-br from-purple-500 to-indigo-600 text-white">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-purple-100 text-sm font-medium">전체 개념</p>
+            <p class="text-3xl font-bold mt-2"><%= @stats[:total_nodes] %>개</p>
+          </div>
+          <svg class="w-12 h-12 text-purple-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- 메인 컨텐츠 그리드 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- 약점 분석 -->
+      <div class="card">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xl font-bold text-gray-900 flex items-center">
+            <span class="text-2xl mr-2">⚠️</span>
+            취약 개념
+          </h2>
+          <span class="badge badge-danger"><%= @weak_areas.count %>개</span>
+        </div>
+
+        <% if @weak_areas.any? %>
+          <div class="space-y-4">
+            <% @weak_areas.each_with_index do |weak, index| %>
+              <div class="p-4 bg-red-50 border-l-4 border-red-500 rounded-lg hover:shadow-md transition-shadow">
+                <div class="flex items-start justify-between">
+                  <div class="flex-1">
+                    <div class="flex items-center space-x-2 mb-2">
+                      <span class="text-lg font-bold text-red-600"><%= index + 1 %>.</span>
+                      <h3 class="font-bold text-gray-900"><%= weak[:node].name %></h3>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4 text-sm text-gray-600 mb-2">
+                      <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                        </svg>
+                        난이도: <%= weak[:node].difficulty %>/5
+                      </span>
+                      <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                        </svg>
+                        중요도: <%= weak[:node].importance %>/5
+                      </span>
+                    </div>
+
+                    <div class="mb-3">
+                      <div class="flex items-center justify-between text-sm mb-1">
+                        <span class="text-gray-600">숙달도</span>
+                        <span class="font-bold text-red-600"><%= (weak[:mastery] * 100).round %>%</span>
+                      </div>
+                      <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-red-500 h-2 rounded-full transition-all duration-500" style="width: <%= (weak[:mastery] * 100).round %>%"></div>
+                      </div>
+                    </div>
+
+                    <% if weak[:prerequisites].any? %>
+                      <div class="text-sm text-gray-600">
+                        <span class="font-medium">선수 개념:</span>
+                        <%= weak[:prerequisites].map { |p| p.name }.join(', ') %>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+
+                <div class="flex space-x-2 mt-3">
+                  <%= link_to "복습하기", "#", class: "btn btn-sm btn-danger" %>
+                  <%= link_to "문제 풀기", "#", class: "btn btn-sm btn-secondary" %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="text-center py-8 text-gray-500">
+            <svg class="mx-auto h-12 w-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p class="font-medium">약점이 없습니다!</p>
+            <p class="text-sm">모든 개념을 잘 이해하고 있습니다.</p>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- 추천 학습 경로 -->
+      <div class="card">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xl font-bold text-gray-900 flex items-center">
+            <span class="text-2xl mr-2">🎯</span>
+            추천 학습 순서
+          </h2>
+        </div>
+
+        <% if @recommended_path.any? %>
+          <div class="space-y-3">
+            <% @recommended_path.each_with_index do |concept, index| %>
+              <div class="flex items-start space-x-4 p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                <div class="flex-shrink-0">
+                  <div class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold">
+                    <%= index + 1 %>
+                  </div>
+                </div>
+                <div class="flex-1">
+                  <h3 class="font-bold text-gray-900"><%= concept[:node].name %></h3>
+                  <p class="text-sm text-gray-600 mt-1"><%= concept[:reason] %></p>
+                  <div class="flex items-center space-x-3 mt-2 text-xs text-gray-500">
+                    <span>난이도: <%= concept[:node].difficulty %>/5</span>
+                    <span>중요도: <%= concept[:node].importance %>/5</span>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+
+          <div class="mt-6">
+            <%= link_to "학습 시작하기", "#", class: "btn btn-primary w-full" %>
+          </div>
+        <% else %>
+          <div class="text-center py-8 text-gray-500">
+            <svg class="mx-auto h-12 w-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            <p class="font-medium">추천 학습 경로가 없습니다</p>
+            <p class="text-sm">먼저 문제를 풀어보세요!</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- 숙달 개념 -->
+    <% if @strong_areas.any? %>
+      <div class="card mt-8">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xl font-bold text-gray-900 flex items-center">
+            <span class="text-2xl mr-2">✅</span>
+            숙달한 개념
+          </h2>
+          <span class="badge badge-success"><%= @strong_areas.count %>개</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <% @strong_areas.each do |strong| %>
+            <div class="p-4 bg-green-50 border-l-4 border-green-500 rounded-lg">
+              <h3 class="font-bold text-gray-900 mb-2"><%= strong[:node].name %></h3>
+              <div class="flex items-center justify-between text-sm mb-2">
+                <span class="text-gray-600">숙달도</span>
+                <span class="font-bold text-green-600"><%= (strong[:mastery] * 100).round %>%</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-green-500 h-2 rounded-full" style="width: <%= (strong[:mastery] * 100).round %>%"></div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- 3D 개념 맵 (향후 구현) -->
+    <div class="card mt-8">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-bold text-gray-900 flex items-center">
+          <span class="text-2xl mr-2">🌐</span>
+          개념 맵
+        </h2>
+        <span class="badge badge-warning">Coming Soon</span>
+      </div>
+
+      <div class="bg-gray-100 rounded-lg p-12 text-center">
+        <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+        </svg>
+        <p class="text-gray-600 font-medium">3D 개념 맵 시각화</p>
+        <p class="text-sm text-gray-500 mt-2">개념 간의 관계를 3D 그래프로 표현합니다</p>
+        <p class="text-xs text-gray-400 mt-4">Three.js 기반 인터랙티브 시각화 예정</p>
+      </div>
+    </div>
+  </div>
+</div>

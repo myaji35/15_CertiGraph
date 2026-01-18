@@ -1,0 +1,50 @@
+\u003c!-- Modern, Highly Readable Study Material Detail Page --\u003e
+\u003cdiv class=\"min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50\"\u003e
+  \u003cdiv class=\"container mx-auto px-4 py-8\"\u003e
+    \u003cdiv class=\"max-w-7xl mx-auto\"\u003e
+      \u003c!-- Header with Breadcrumb --\u003e
+      \u003cdiv class=\"mb-8\"\u003e
+        \u003c%= link_to study_set_study_materials_path(@study_set), class: \"inline-flex items-center text-blue-600 hover:text-blue-800 font-medium mb-4 transition-colors\" do %\u003e
+          \u003csvg class=\"w-5 h-5 mr-2\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"\u003e
+            \u003cpath stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M15 19l-7-7 7-7\" /\u003e
+          \u003c/svg\u003e
+          자료 목록으로 돌아가기
+        \u003c% end %\u003e
+        
+        \u003cdiv class=\"flex justify-between items-start\"\u003e
+          \u003cdiv class=\"flex-1\"\u003e
+            \u003ch1 class=\"text-4xl font-bold text-gray-900 mb-2\"\u003e\u003c%= @study_material.name %\u003e\u003c/h1\u003e
+            \u003cp class=\"text-gray-600 text-lg\"\u003e학습 자료 상세 정보 및 통계\u003c/p\u003e
+          \u003c/div\u003e
+          \u003cdiv class=\"flex space-x-3\"\u003e
+            \u003c% if @study_material.status == 'completed' %\u003e
+              \u003c%= link_to study_set_study_material_knowledge_graphs_path(@study_set, @study_material, @study_material),
+                  class: \"inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all transform hover:scale-105\" do %\u003e
+                \u003csvg class=\"w-5 h-5 mr-2\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"\u003e
+                  \u003cpath stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7\" /\u003e
+                \u003c/svg\u003e
+                Knowledge Graph
+              \u003c% end %\u003e
+            \u003c% end %\u003e
+            \u003c%= button_to reprocess_study_set_study_material_path(@study_set, @study_material),
+                method: :post,
+                class: \"inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-cyan-700 shadow-lg hover:shadow-xl transition-all transform hover:scale-105\" do %\u003e
+              \u003csvg class=\"w-5 h-5 mr-2\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"\u003e
+                \u003cpath stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15\" /\u003e
+              \u003c/svg\u003e
+              재처리
+            \u003c% end %\u003e
+          \u003c/div\u003e
+        \u003c/div\u003e
+      \u003c/div\u003e
+
+      \u003c%= render 'study_materials/stats_cards' %\u003e
+      \u003c%= render 'study_materials/warning_message' if @study_material.total_questions == 0 %\u003e
+      \u003c%= render 'study_materials/extraction_stats' if @extraction_stats.present? %\u003e
+      \u003c%= render 'study_materials/top_concepts' if @knowledge_nodes.any? %\u003e
+      \u003c%= render 'study_materials/questions_list' %\u003e
+    \u003c/div\u003e
+  \u003c/div\u003e
+\u003c/div\u003e
+
+\u003c%= render 'study_materials/knowledge_graph_modal' %\u003e
