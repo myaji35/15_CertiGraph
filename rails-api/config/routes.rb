@@ -147,6 +147,9 @@ Rails.application.routes.draw do
   get '/study-materials/upload', to: 'study_materials#upload_form', as: :upload_study_materials
 
   resources :study_sets do
+    # Knowledge Analysis
+    resource :knowledge_analysis, only: [:show], controller: 'knowledge_analysis'
+    
     # Questions collection route
     resources :questions, only: [:index]
     
@@ -178,6 +181,10 @@ Rails.application.routes.draw do
         get :processing_status
         get :export
       end
+      
+      # Knowledge Graph Visualization (Web UI)
+      resources :knowledge_graphs, only: [:show]
+      
       resources :questions do
         member do
           post :validate_question
@@ -601,6 +608,15 @@ Rails.application.routes.draw do
       get 'ml_patterns/time_series', to: 'ml_patterns#time_series'
       get 'ml_patterns/anomalies', to: 'ml_patterns#anomalies'
       get 'ml_patterns/predictions', to: 'ml_patterns#predictions'
+
+      # Cheat Sheet Generator (Pre-Exam Summary)
+      resources :study_sets, only: [] do
+        member do
+          get 'cheat_sheet', to: 'cheat_sheet#show'
+          get 'cheat_sheet/pdf', to: 'cheat_sheet#pdf'
+        end
+      end
+
 
       # Performance Tracking (Epic 11)
       resources :performance, only: [] do
