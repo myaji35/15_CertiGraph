@@ -1,0 +1,91 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="mb-6">
+    <div class="flex justify-between items-center">
+      <h1 class="text-3xl font-bold text-gray-900">문제 상세</h1>
+      <div class="flex gap-3">
+        <%= link_to '수정', edit_admin_question_path(@question), class: 'btn btn-primary' %>
+        <%= button_to '삭제', admin_question_path(@question), method: :delete,
+            data: { confirm: '정말 삭제하시겠습니까?' },
+            class: 'btn btn-danger' %>
+        <%= link_to '목록으로', admin_questions_path, class: 'btn btn-secondary' %>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow p-6 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 mb-2">문제 ID</h3>
+        <p class="text-lg text-gray-900"><%= @question.id %></p>
+      </div>
+      
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 mb-2">학습 세트</h3>
+        <p class="text-lg text-gray-900"><%= @question.study_set.name %></p>
+      </div>
+      
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 mb-2">문제 유형</h3>
+        <p class="text-lg text-gray-900"><%= @question.question_type %></p>
+      </div>
+      
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 mb-2">난이도</h3>
+        <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full <%= difficulty_badge_class(@question.difficulty) %>">
+          <%= @question.difficulty || 'N/A' %>
+        </span>
+      </div>
+      
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 mb-2">주제</h3>
+        <p class="text-lg text-gray-900"><%= @question.topic || '-' %></p>
+      </div>
+      
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 mb-2">생성일</h3>
+        <p class="text-lg text-gray-900"><%= @question.created_at.strftime('%Y-%m-%d %H:%M') %></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow p-6 mb-6">
+    <h2 class="text-xl font-bold text-gray-900 mb-4">문제 내용</h2>
+    <div class="prose max-w-none">
+      <%= simple_format(@question.content) %>
+    </div>
+  </div>
+
+  <% if @question.options.any? %>
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+      <h2 class="text-xl font-bold text-gray-900 mb-4">선택지</h2>
+      <div class="space-y-3">
+        <% @question.options.each_with_index do |option, index| %>
+          <div class="flex items-start p-4 rounded-lg <%= option.is_correct ? 'bg-green-50 border-2 border-green-500' : 'bg-gray-50' %>">
+            <div class="flex-shrink-0 mr-3">
+              <span class="inline-flex items-center justify-center h-8 w-8 rounded-full <%= option.is_correct ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-700' %>">
+                <%= index + 1 %>
+              </span>
+            </div>
+            <div class="flex-1">
+              <p class="text-gray-900"><%= option.content %></p>
+              <% if option.is_correct %>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mt-2">
+                  ✓ 정답
+                </span>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @question.explanation.present? %>
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-xl font-bold text-gray-900 mb-4">해설</h2>
+      <div class="prose max-w-none">
+        <%= simple_format(@question.explanation) %>
+      </div>
+    </div>
+  <% end %>
+</div>
